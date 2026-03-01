@@ -27,9 +27,20 @@ If the user provides a box name in `$ARGUMENTS` or asks to create one:
 dino box add "$ARGUMENTS" --json
 ```
 
+With description (helps AI route notes to the correct box):
+```bash
+dino box add "Inbox" --description "用于存放待整理的想法和资料" --json
+```
+
+With color:
+```bash
+dino box add "Inbox" --color "#FF5733" --json
+```
+
 ## Workflow
 
 1. If no arguments → list all card boxes
 2. If argument provided → create the box
-3. After creating, confirm success and show the box ID
-4. If the user wants to add notes to a box, suggest using `/create-note` with the `--zettel_boxes` option
+3. Ask the user if they want to add a description (recommended — helps AI route notes)
+4. After creating, confirm success and show the box ID
+5. If the user wants to add notes to a box, suggest using `/create-note` with the `--zettel_boxes` option

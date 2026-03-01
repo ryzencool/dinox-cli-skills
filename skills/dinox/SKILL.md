@@ -28,8 +28,10 @@ synced to the cloud via PowerSync.
 ### Auth
 ```
 dino auth login "Bearer <token>"   # Login with token
+  --no-verify                      #   Skip credential exchange & initial sync
 dino auth logout                   # Logout
-dino auth status                   # Show auth status
+  --clear-local-db                 #   Also delete local SQLite database
+dino auth status                   # Show auth status (userId, sync state, etc.)
 ```
 
 ### Sync
@@ -44,6 +46,8 @@ dino note search [query]           # Search notes (supports FTS + Chinese tokeni
   --from <date>                    #   Filter by created_at start (YYYY-MM-DD or ISO)
   --to <date>                      #   Filter by created_at end
   --days <n>                       #   Recent N days
+  --box <string|@file>             #   Filter by card box names (comma-separated or JSON array)
+  --sql <expr>                     #   SQL-like expression over id/content_md/summary/tags/zettel_boxes/created_at/type
   --include-deleted                #   Include soft-deleted notes
 
 dino note get <id>                 # Get note summary by ID
@@ -70,6 +74,8 @@ dino tag add <name>                # Create a tag (supports slash hierarchy like
 ```
 dino box list                      # List all card boxes
 dino box add <name>                # Create a new card box
+  --description <string>           #   Box purpose/usage description (helps AI route notes)
+  --color <string>                 #   Box color
 ```
 
 ### Prompts
@@ -95,6 +101,7 @@ dino info                          # Show CLI version
 - Card box names must exist before being used; create them first with `box add`
 - Search supports Chinese text via nodejieba tokenization
 - Tag expressions support `AND`, `OR`, `NOT`, and parentheses
+- The `--sql` option supports SQL-like WHERE conditions (read-only; no INSERT/UPDATE/DELETE); `zettel_boxes` values are matched by name and auto-resolved to IDs
 - Notes use soft-delete (`is_del=1`), not permanent deletion
 - Output is YAML format when `--json` is used
 - If `dino` is not found, try `npx dino` or check that dinox-cli is installed globally

@@ -41,6 +41,7 @@ claude --add-dir ./dinox-cli-skills
 | **view-note** | `/view-note <id>` | View full note details by ID |
 | **manage-tags** | `/manage-tags [name]` | List all tags or create a new tag |
 | **manage-boxes** | `/manage-boxes [name]` | List all card boxes or create a new one |
+| **manage-prompts** | `/manage-prompts [name] [cmd]` | List prompts or create a reusable prompt template |
 | **dinox** | *(auto)* | Background context — Claude automatically knows all `dino` commands |
 
 ## Usage Examples
@@ -52,6 +53,8 @@ claude --add-dir ./dinox-cli-skills
 > /view-note 01924f8a-...
 > /manage-tags reading/tech
 > /manage-boxes 项目笔记
+> /manage-prompts
+> /manage-prompts --name 周报助手 --cmd "请基于本周笔记输出一份简洁周报"
 ```
 
 You can also just ask naturally — the `dinox` background skill lets Claude understand requests like:
@@ -60,3 +63,5 @@ You can also just ask naturally — the `dinox` background skill lets Claude und
 - "创建一条笔记，标题是..."
 - "列出所有标签"
 - "查看这条笔记的详细内容"
+- "列出我保存的 prompts"
+- "帮我新增一个周报 prompt"

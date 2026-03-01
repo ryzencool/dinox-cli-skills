@@ -81,6 +81,12 @@ dino box add <name>                # Create a new card box
 ### Prompts
 ```
 dino prompt list                   # List all prompts
+dino prompt add                    # Create a prompt template in c_cmd
+  --name <string>                  #   Prompt display name (required)
+  --cmd <string>                   #   Prompt command/text (required)
+  --sync-timeout <ms>              #   Override connect/sync timeout
+  --offline                        #   Skip connect/sync and use local cache only
+  --json                           #   Output machine-readable YAML
 ```
 
 ### Config
@@ -99,6 +105,9 @@ dino info                          # Show CLI version
 - The `--content` and `--tags` options accept `@filepath` syntax to read from a file
 - Tags must exist before being used in `note create`; create them first with `tag add`
 - Card box names must exist before being used; create them first with `box add`
+- `prompt add` fails fast when `--name` or `--cmd` is empty
+- `prompt add` rejects active duplicates by `(name, cmd)` and restores soft-deleted duplicates
+- If `c_cmd` includes `user_id`, `prompt add` requires a logged-in user (`dino auth login`)
 - Search supports Chinese text via nodejieba tokenization
 - Tag expressions support `AND`, `OR`, `NOT`, and parentheses
 - The `--sql` option supports SQL-like WHERE conditions (read-only; no INSERT/UPDATE/DELETE); `zettel_boxes` values are matched by name and auto-resolved to IDs

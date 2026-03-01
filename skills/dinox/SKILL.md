@@ -1,0 +1,100 @@
+---
+name: dinox
+description: >
+  Background knowledge about the Dinox CLI tool (`dino`). Use this context
+  whenever the user mentions dinox, dino, notes, tags, card boxes, zettel boxes,
+  or wants to interact with their knowledge base. This skill provides the
+  full command reference so you can correctly invoke `dino` subcommands.
+user-invocable: false
+---
+
+# Dinox CLI Reference
+
+Dinox CLI (`dino`) is a command-line tool for managing a personal knowledge base
+(notes, tags, card boxes / zettel boxes). Data is stored locally in SQLite and
+synced to the cloud via PowerSync.
+
+## Global Options
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Output machine-readable YAML |
+| `--offline` | Skip sync, use local cache only |
+| `--sync-timeout <ms>` | Override default 15 s sync timeout |
+| `--verbose` | Enable verbose logging |
+
+## Commands Quick Reference
+
+### Auth
+```
+dino auth login "Bearer <token>"   # Login with token
+dino auth logout                   # Logout
+dino auth status                   # Show auth status
+```
+
+### Sync
+```
+dino sync                          # Sync local data with cloud
+```
+
+### Notes
+```
+dino note search [query]           # Search notes (supports FTS + Chinese tokenization)
+  --tags <expr>                    #   Tag expression: '(work OR life) AND NOT archived'
+  --from <date>                    #   Filter by created_at start (YYYY-MM-DD or ISO)
+  --to <date>                      #   Filter by created_at end
+  --days <n>                       #   Recent N days
+  --include-deleted                #   Include soft-deleted notes
+
+dino note get <id>                 # Get note summary by ID
+dino note detail <id>              # Get full note (with content_md, tags, etc.)
+
+dino note create                   # Create a new note
+  --title <string>                 #   (required) Note title
+  --content <string|@file>         #   (required) Markdown content (or @filepath)
+  --type <note|crawl>              #   Note type (default: crawl)
+  --tags <string|@file>            #   Tag names (JSON array or comma-separated)
+  --zettel_boxes <string|@file>    #   Card box names (JSON array or comma-separated)
+
+dino note delete <id>              # Soft-delete a note
+```
+
+### Tags
+```
+dino tag list                      # List all tags
+dino tag add <name>                # Create a tag (supports slash hierarchy like "work/projects")
+  --emoji <string>                 #   Optional emoji for the tag
+```
+
+### Card Boxes (Zettel Boxes)
+```
+dino box list                      # List all card boxes
+dino box add <name>                # Create a new card box
+```
+
+### Prompts
+```
+dino prompt list                   # List all prompts
+```
+
+### Config
+```
+dino config get                    # View current config
+dino config set <key> <value>      # Set a config value
+```
+
+### Info
+```
+dino info                          # Show CLI version
+```
+
+## Important Notes
+
+- The `--content` and `--tags` options accept `@filepath` syntax to read from a file
+- Tags must exist before being used in `note create`; create them first with `tag add`
+- Card box names must exist before being used; create them first with `box add`
+- Search supports Chinese text via nodejieba tokenization
+- Tag expressions support `AND`, `OR`, `NOT`, and parentheses
+- Notes use soft-delete (`is_del=1`), not permanent deletion
+- Output is YAML format when `--json` is used
+- If `dino` is not found, try `npx dino` or check that dinox-cli is installed globally

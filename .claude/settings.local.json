@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git fetch:*)",
+      "Bash(git show-ref:*)",
+      "WebFetch(domain:github.com)"
+    ]
+  }
+}

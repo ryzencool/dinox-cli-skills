@@ -20,7 +20,7 @@ synced to the cloud via PowerSync.
 |------|-------------|
 | `--json` | Output machine-readable YAML |
 | `--offline` | Skip sync, use local cache only |
-| `--sync-timeout <ms>` | Override default 15 s sync timeout |
+| `--sync-timeout <ms>` | Override default 300000 ms (5 min) sync/connect timeout |
 | `--verbose` | Enable verbose logging |
 
 ## Commands Quick Reference
@@ -37,6 +37,11 @@ dino auth status                   # Show auth status (userId, sync state, etc.)
 ### Sync
 ```
 dino sync                          # Sync local data with cloud
+```
+
+### Update CLI
+```
+dino update                        # Update @dinoxx/dinox-cli via detected package manager
 ```
 
 ### Notes
@@ -121,6 +126,7 @@ dino info                          # Show CLI version
 - `note detail` supports batch read via `[id]` + `--ids`; at least one is required
 - `note update` supports batch update via `[id]` + `--ids`; at least one is required
 - `note update` requires at least one of `--tags`/`--boxes`, and both fields are full-replace semantics
+- `dino update` auto-detects the install package manager (npm/pnpm/yarn/bun) and runs the matching global update command
 - Notes use soft-delete (`is_del=1`), not permanent deletion
 - Output is YAML format when `--json` is used
 - If `dino` is not found, try `npx dino` or check that dinox-cli is installed globally

@@ -43,6 +43,7 @@ claude --add-dir ./dinox-cli-skills
 | **manage-tags** | `/manage-tags [name]` | List all tags or create a new tag |
 | **manage-boxes** | `/manage-boxes [name]` | List all card boxes or create a new one |
 | **manage-prompts** | `/manage-prompts [name] [cmd]` | List prompts or create a reusable prompt template |
+| **update-cli** | `/update-cli` | Upgrade installed `@dinoxx/dinox-cli` to the latest version |
 | **dinox** | *(auto)* | Background context — Claude automatically knows all `dino` commands |
 
 ## Usage Examples
@@ -58,6 +59,7 @@ claude --add-dir ./dinox-cli-skills
 > /manage-boxes 项目笔记
 > /manage-prompts
 > /manage-prompts --name 周报助手 --cmd "请基于本周笔记输出一份简洁周报"
+> /update-cli
 ```
 
 You can also just ask naturally — the `dinox` background skill lets Claude understand requests like:
@@ -68,3 +70,4 @@ You can also just ask naturally — the `dinox` background skill lets Claude und
 - "查看这条笔记的详细内容"
 - "列出我保存的 prompts"
 - "帮我新增一个周报 prompt"
+- "把 dinox-cli 更新到最新版本"

@@ -1,5 +1,5 @@
 ---
-name: dinox
+name: dino-dinox
 description: >
   Background knowledge about the Dinox CLI tool (`dino`). Use this context
   whenever the user mentions dinox, dino, notes, tags, card boxes, zettel boxes,

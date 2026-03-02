@@ -1,5 +1,5 @@
 ---
-name: view-note
+name: dino-view-note
 description: >
   View full details of Dinox notes by ID. Use when the user wants to read,
   view, or open one or more specific notes.
@@ -52,7 +52,7 @@ If the note has `is_del: 1`, inform the user it has been soft-deleted.
 
 ## Error Handling
 
-- If no ID is provided, ask the user or suggest searching first with `/search-notes`
+- If no ID is provided, ask the user or suggest searching first with `/dino-search-notes`
 - If both positional ID and `--ids` are missing, remind that `note detail` requires at least one of them
 - If note is not found, suggest searching for it
 - If the ID looks wrong (too short, etc.), suggest running a search

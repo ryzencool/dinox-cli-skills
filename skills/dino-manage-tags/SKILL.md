@@ -1,5 +1,5 @@
 ---
-name: manage-tags
+name: dino-manage-tags
 description: >
   List or create Dinox tags. Use when the user wants to see their tags,
   add new tags, or organize their tag hierarchy.
@@ -46,4 +46,4 @@ When creating hierarchical tags, the parent path is resolved automatically.
 1. If no arguments → list all tags
 2. If argument provided → create the tag
 3. After creating, confirm success and show the tag ID
-4. If the user wants to see what notes use a tag, suggest `/search-notes --tags "tagname"`
+4. If the user wants to see what notes use a tag, suggest `/dino-search-notes --tags "tagname"`

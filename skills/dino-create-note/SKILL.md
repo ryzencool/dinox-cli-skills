@@ -1,5 +1,5 @@
 ---
-name: create-note
+name: dino-create-note
 description: >
   Create a new Dinox note. Use when the user wants to save, write, record,
   or create a note in their knowledge base.

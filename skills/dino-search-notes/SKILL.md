@@ -1,5 +1,5 @@
 ---
-name: search-notes
+name: dino-search-notes
 description: >
   Search and browse Dinox notes. Use when the user wants to find notes by
   keyword, tags, date range, or browse recent notes.

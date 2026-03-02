@@ -1,5 +1,5 @@
 ---
-name: update-cli
+name: dino-update-cli
 description: >
   Update Dinox CLI itself. Use when the user wants to upgrade
   `@dinoxx/dinox-cli`, refresh to the latest command features, or fix behavior

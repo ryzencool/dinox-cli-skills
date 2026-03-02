@@ -36,33 +36,33 @@ claude --add-dir ./dinox-cli-skills
 
 | Skill | Command | Description |
 |-------|---------|-------------|
-| **search-notes** | `/search-notes [keyword]` | Search notes by keyword, tags, date range |
-| **create-note** | `/create-note [title]` | Create a new note with Markdown content |
-| **update-note** | `/update-note [id]` | Update note tags/card boxes (single or batch) |
-| **view-note** | `/view-note [id]` | View full note details by ID (single or batch) |
-| **manage-tags** | `/manage-tags [name]` | List all tags or create a new tag |
-| **manage-boxes** | `/manage-boxes [name]` | List all card boxes or create a new one |
-| **manage-prompts** | `/manage-prompts [name] [cmd]` | List prompts or create a reusable prompt template |
-| **update-cli** | `/update-cli` | Upgrade installed `@dinoxx/dinox-cli` to the latest version |
-| **dinox** | *(auto)* | Background context — Claude automatically knows all `dino` commands |
+| **dino-search-notes** | `/dino-search-notes [keyword]` | Search notes by keyword, tags, date range |
+| **dino-create-note** | `/dino-create-note [title]` | Create a new note with Markdown content |
+| **dino-update-note** | `/dino-update-note [id]` | Update note tags/card boxes (single or batch) |
+| **dino-view-note** | `/dino-view-note [id]` | View full note details by ID (single or batch) |
+| **dino-manage-tags** | `/dino-manage-tags [name]` | List all tags or create a new tag |
+| **dino-manage-boxes** | `/dino-manage-boxes [name]` | List all card boxes or create a new one |
+| **dino-manage-prompts** | `/dino-manage-prompts [name] [cmd]` | List prompts or create a reusable prompt template |
+| **dino-update-cli** | `/dino-update-cli` | Upgrade installed `@dinoxx/dinox-cli` to the latest version |
+| **dino-dinox** | *(auto)* | Background context — Claude automatically knows all `dino` commands |
 
 ## Usage Examples
 
 ```
-> /search-notes 机器学习
-> /search-notes --tags "work AND NOT archived" --days 7
-> /create-note 今日笔记
-> /update-note 01924f8a-... --tags "work,ai"
-> /update-note --ids @/tmp/note-ids.txt --boxes "Inbox,Project"
-> /view-note 01924f8a-...
-> /manage-tags reading/tech
-> /manage-boxes 项目笔记
-> /manage-prompts
-> /manage-prompts --name 周报助手 --cmd "请基于本周笔记输出一份简洁周报"
-> /update-cli
+> /dino-search-notes 机器学习
+> /dino-search-notes --tags "work AND NOT archived" --days 7
+> /dino-create-note 今日笔记
+> /dino-update-note 01924f8a-... --tags "work,ai"
+> /dino-update-note --ids @/tmp/note-ids.txt --boxes "Inbox,Project"
+> /dino-view-note 01924f8a-...
+> /dino-manage-tags reading/tech
+> /dino-manage-boxes 项目笔记
+> /dino-manage-prompts
+> /dino-manage-prompts --name 周报助手 --cmd "请基于本周笔记输出一份简洁周报"
+> /dino-update-cli
 ```
 
-You can also just ask naturally — the `dinox` background skill lets Claude understand requests like:
+You can also just ask naturally — the `dino-dinox` background skill lets Claude understand requests like:
 
 - "帮我搜索最近一周的笔记"
 - "创建一条笔记，标题是..."

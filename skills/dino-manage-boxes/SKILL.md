@@ -1,5 +1,5 @@
 ---
-name: manage-boxes
+name: dino-manage-boxes
 description: >
   List or create Dinox card boxes (zettel boxes). Use when the user wants to
   see their card boxes, create new boxes, or organize notes into boxes.
@@ -43,4 +43,4 @@ dino box add "Inbox" --color "#FF5733" --json
 2. If argument provided → create the box
 3. Ask the user if they want to add a description (recommended — helps AI route notes)
 4. After creating, confirm success and show the box ID
-5. If the user wants to add notes to a box, suggest using `/create-note` with the `--zettel_boxes` option
+5. If the user wants to add notes to a box, suggest using `/dino-create-note` with the `--zettel_boxes` option

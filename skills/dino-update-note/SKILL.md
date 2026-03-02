@@ -1,5 +1,5 @@
 ---
-name: update-note
+name: dino-update-note
 description: >
   Update Dinox note tags and/or card boxes. Supports single-note and batch
   updates by ID.

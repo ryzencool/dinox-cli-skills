@@ -51,7 +51,8 @@ dino note search [query]           # Search notes (supports FTS + Chinese tokeni
   --include-deleted                #   Include soft-deleted notes
 
 dino note get <id>                 # Get note summary by ID
-dino note detail <id>              # Get full note (with content_md, tags, etc.)
+dino note detail [id]              # Get full note detail (single or batch)
+  --ids <string|@file>             #   Batch note IDs (JSON array or comma/newline-separated)
 
 dino note create                   # Create a new note
   --title <string>                 #   (required) Note title
@@ -59,6 +60,11 @@ dino note create                   # Create a new note
   --type <note|crawl>              #   Note type (default: crawl)
   --tags <string|@file>            #   Tag names (JSON array or comma-separated)
   --zettel_boxes <string|@file>    #   Card box names (JSON array or comma-separated)
+
+dino note update [id]              # Update note tags and/or card boxes (single or batch)
+  --ids <string|@file>             #   Batch note IDs (JSON array or comma/newline-separated)
+  --tags <string|@file>            #   Full-replace tag names (use [] to clear)
+  --boxes <string|@file>           #   Full-replace card box names (use [] to clear)
 
 dino note delete <id>              # Soft-delete a note
 ```
@@ -108,9 +114,13 @@ dino info                          # Show CLI version
 - `prompt add` fails fast when `--name` or `--cmd` is empty
 - `prompt add` rejects active duplicates by `(name, cmd)` and restores soft-deleted duplicates
 - If `c_cmd` includes `user_id`, `prompt add` requires a logged-in user (`dino auth login`)
-- Search supports Chinese text via nodejieba tokenization
+- Search uses FTS + tokenization (with `@node-rs/jieba`); falls back to LIKE when needed
+- `note search` returns streamlined fields: `id`, `title`, `summary`, `tags`, `created_at`, `zettel_boxes`
 - Tag expressions support `AND`, `OR`, `NOT`, and parentheses
 - The `--sql` option supports SQL-like WHERE conditions (read-only; no INSERT/UPDATE/DELETE); `zettel_boxes` values are matched by name and auto-resolved to IDs
+- `note detail` supports batch read via `[id]` + `--ids`; at least one is required
+- `note update` supports batch update via `[id]` + `--ids`; at least one is required
+- `note update` requires at least one of `--tags`/`--boxes`, and both fields are full-replace semantics
 - Notes use soft-delete (`is_del=1`), not permanent deletion
 - Output is YAML format when `--json` is used
 - If `dino` is not found, try `npx dino` or check that dinox-cli is installed globally

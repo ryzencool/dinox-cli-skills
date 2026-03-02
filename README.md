@@ -38,7 +38,8 @@ claude --add-dir ./dinox-cli-skills
 |-------|---------|-------------|
 | **search-notes** | `/search-notes [keyword]` | Search notes by keyword, tags, date range |
 | **create-note** | `/create-note [title]` | Create a new note with Markdown content |
-| **view-note** | `/view-note <id>` | View full note details by ID |
+| **update-note** | `/update-note [id]` | Update note tags/card boxes (single or batch) |
+| **view-note** | `/view-note [id]` | View full note details by ID (single or batch) |
 | **manage-tags** | `/manage-tags [name]` | List all tags or create a new tag |
 | **manage-boxes** | `/manage-boxes [name]` | List all card boxes or create a new one |
 | **manage-prompts** | `/manage-prompts [name] [cmd]` | List prompts or create a reusable prompt template |
@@ -50,6 +51,8 @@ claude --add-dir ./dinox-cli-skills
 > /search-notes 机器学习
 > /search-notes --tags "work AND NOT archived" --days 7
 > /create-note 今日笔记
+> /update-note 01924f8a-... --tags "work,ai"
+> /update-note --ids @/tmp/note-ids.txt --boxes "Inbox,Project"
 > /view-note 01924f8a-...
 > /manage-tags reading/tech
 > /manage-boxes 项目笔记

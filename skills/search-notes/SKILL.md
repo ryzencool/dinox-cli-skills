@@ -14,9 +14,10 @@ The user wants to search their Dinox notes. Use the `dino` CLI to find notes.
 
 ## Instructions
 
-1. Run `dino note search` with the user's query using `--json` for structured output
-2. Present the results in a clear, readable format (title, summary, date, tags)
-3. If the user wants to see a specific note's full content, use `dino note detail <id>`
+1. Run `dino note search` with the user's query using `--json` for structured output.
+2. Present results with `id`, `title`, `summary`, `tags`, `created_at`, and `zettel_boxes`.
+3. Mention that `summary` is already capped to 200 chars by CLI output.
+4. If the user wants full content, use `dino note detail`.
 
 ## Search Command
 
@@ -32,17 +33,19 @@ Combine these based on what the user asks for:
 - **By tags**: `dino note search --tags "(tag1 OR tag2) AND NOT archived" --json`
 - **By date range**: `dino note search --from 2024-01-01 --to 2024-12-31 --json`
 - **Recent N days**: `dino note search --days 7 --json`
-- **By card box**: `dino note search --box "Inbox" --json`
+- **By card box**: `dino note search --box "Inbox,Project" --json`
+- **By card box list file**: `dino note search --box @/tmp/box-names.txt --json`
 - **By SQL expression**: `dino note search --sql 'type = "crawl" AND zettel_boxes IN ("Inbox","Project")' --json`
 - **Include deleted**: `dino note search --include-deleted --json`
 - **Combined**: `dino note search "keyword" --tags "work" --box "Inbox" --days 30 --json`
 
 ## Presenting Results
 
-- Show results as a numbered list with title, summary (truncated), and date
+- Show results as a numbered list with title, summary, tags, created date, and card box names
 - If no results found, suggest broadening the search or trying different keywords
 - Offer to show full details of any note the user is interested in
-- If the user selects a note, run `dino note detail <id> --json` to show the full content
+- If the user selects one note, run `dino note detail <id> --json`
+- If the user selects multiple notes, run `dino note detail --ids "id1,id2,id3" --json`
 
 ## Tag Expression Syntax
 
@@ -66,6 +69,12 @@ Examples:
 - `--sql 'created_at >= "2026-01-01" AND summary LIKE "%AI%"'`
 
 Note: `zettel_boxes` values are matched by box name and auto-resolved to IDs. Only read-only conditions are allowed (no INSERT/UPDATE/DELETE).
+
+## Search Behavior Notes
+
+- Search uses FTS tokenization (including Chinese tokenization) when available, and falls back to `LIKE` search when FTS is unavailable.
+- Search results return card box **names** (not box IDs).
+- Search output does not include `updated_at`, `is_del`, or `version`; use `note detail` if those fields are needed.
 
 ## Error Handling
 

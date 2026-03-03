@@ -35,6 +35,15 @@ After update succeeds, confirm the installed version:
 dino info
 ```
 
+## Post-Update AI Reminder
+
+After `dino update` succeeds, the CLI prints:
+
+- `skills repo: https://github.com/ryzencool/dinox-cli-skills`
+- an AI reminder to review and update local Dinox skills
+
+When the user asks to sync skills, update the skills repo and then verify the key entries are current (especially `dino-dinox`, `dino-update-cli`, and todo-related skills).
+
 ## Error Handling
 
 - If update fails due to permissions, ask the user to rerun in an environment

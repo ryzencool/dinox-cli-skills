@@ -40,6 +40,7 @@ claude --add-dir ./dinox-cli-skills
 | **dino-create-note** | `/dino-create-note [title]` | Create a new note with Markdown content |
 | **dino-update-note** | `/dino-update-note [id]` | Update note tags/card boxes (single or batch) |
 | **dino-view-note** | `/dino-view-note [id]` | View full note details by ID (single or batch) |
+| **dino-manage-todo** | `/dino-manage-todo [query or task]` | Search/create/append/update todo tasks from notes |
 | **dino-manage-tags** | `/dino-manage-tags [name]` | List all tags or create a new tag |
 | **dino-manage-boxes** | `/dino-manage-boxes [name]` | List all card boxes or create a new one |
 | **dino-manage-prompts** | `/dino-manage-prompts [name] [cmd]` | List prompts or create a reusable prompt template |
@@ -55,6 +56,10 @@ claude --add-dir ./dinox-cli-skills
 > /dino-update-note 01924f8a-... --tags "work,ai"
 > /dino-update-note --ids @/tmp/note-ids.txt --boxes "Inbox,Project"
 > /dino-view-note 01924f8a-...
+> /dino-manage-todo 搜索最近 7 天未完成且带 work 标签的任务
+> /dino-manage-todo 创建一个待办笔记，任务：补交报销单、整理发票
+> /dino-manage-todo 在笔记 01924f8a-... 末尾追加任务：联系供应商
+> /dino-manage-todo 把 task-uuid 更新为 completed
 > /dino-manage-tags reading/tech
 > /dino-manage-boxes 项目笔记
 > /dino-manage-prompts
@@ -68,6 +73,8 @@ You can also just ask naturally — the `dino-dinox` background skill lets Claud
 - "创建一条笔记，标题是..."
 - "列出所有标签"
 - "查看这条笔记的详细内容"
+- "帮我创建一个 todo 列表"
+- "把这个 task 标记为完成"
 - "列出我保存的 prompts"
 - "帮我新增一个周报 prompt"
 - "把 dinox-cli 更新到最新版本"

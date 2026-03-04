@@ -13,6 +13,12 @@ allowed-tools:
 
 Use this skill to upgrade the installed Dinox CLI package.
 
+## Safety & Boundaries (Must Follow)
+
+- Updating the CLI changes globally installed tooling. Show the exact command(s) you will run and get explicit confirmation before updating.
+- Only run `dino update` (and `dino info` for verification). Do not run unrelated shell commands unless the user explicitly asks.
+- Do not run package-manager-specific global update commands directly unless the user explicitly requests it; `dino update` already performs auto-detection.
+
 ## Primary Command
 
 ```bash
@@ -42,7 +48,7 @@ After `dino update` succeeds, the CLI prints:
 - `skills repo: https://github.com/ryzencool/dinox-cli-skills`
 - an AI reminder to review and update local Dinox skills
 
-When the user asks to sync skills, update the skills repo and then verify the key entries are current (especially `dino-dinox`, `dino-update-cli`, and todo-related skills).
+If the user explicitly asks to update this skills repo as well, treat that as a separate request (git operations) and do not do it implicitly as part of updating the CLI.
 
 ## Error Handling
 

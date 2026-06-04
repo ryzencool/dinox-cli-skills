@@ -11,6 +11,20 @@ dino note update [id]              # Full-replace note tags, boxes, and/or starr
   --starred <true|false>         # Set starred status
   --dry-run                      # Preview the write without executing it
 
+dino note tag [id]                 # Incrementally add, remove, or replace note tags
+  --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
+  --add <string|@file>           # Tags to add
+  --remove <string|@file>        # Tags to remove
+  --replace <string|@file>       # Full replacement tag list; use [] to clear
+  --dry-run                      # Preview the write without executing it
+
+dino note move [id]                # Incrementally add, remove, or replace note zettel boxes
+  --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
+  --add <string|@file>           # Box paths or unique names to add
+  --remove <string|@file>        # Box paths or unique names to remove
+  --replace <string|@file>       # Full replacement box paths or unique names; use [] to clear
+  --dry-run                      # Preview the write without executing it
+
 dino note star [id]                # Mark one or more notes as starred
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
   --dry-run                      # Preview the write without executing it
@@ -23,7 +37,8 @@ dino note delete <id>              # Soft-delete a note by setting is_del=1
   --dry-run                      # Preview the write without executing it
 ```
 
-- `--tags` and `--boxes` are full-replacement inputs. For boxes, prefer full paths; unique leaf names are accepted when unambiguous.
+- `--tags` and `--boxes` are full-replacement inputs.
+- Prefer `note tag` and `note move` for incremental add/remove/replace metadata changes.
 - Prefer `note star` / `note unstar` for pure starring changes, and `note update` when multiple fields change together.
 - Run the same command with `--dry-run --format json` first.
 <!-- END GENERATED_COMMANDS -->

@@ -105,6 +105,20 @@ dino note update [id]              # Full-replace note tags, boxes, and/or starr
   --starred <true|false>         # Set starred status
   --dry-run                      # Preview the write without executing it
 
+dino note tag [id]                 # Incrementally add, remove, or replace note tags
+  --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
+  --add <string|@file>           # Tags to add
+  --remove <string|@file>        # Tags to remove
+  --replace <string|@file>       # Full replacement tag list; use [] to clear
+  --dry-run                      # Preview the write without executing it
+
+dino note move [id]                # Incrementally add, remove, or replace note zettel boxes
+  --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
+  --add <string|@file>           # Box paths or unique names to add
+  --remove <string|@file>        # Box paths or unique names to remove
+  --replace <string|@file>       # Full replacement box paths or unique names; use [] to clear
+  --dry-run                      # Preview the write without executing it
+
 dino note star [id]                # Mark one or more notes as starred
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
   --dry-run                      # Preview the write without executing it
@@ -150,10 +164,29 @@ dino todo update <taskId>          # Update a todo task checked status by task i
 ```text
 dino tag list                      # List all tags from c_tag_node
 
+dino tag tree                      # Show tags as a hierarchy tree from c_tag_node
+
+dino tag stats                     # Show tag usage counts and unused-tag status
+
 dino tag add [name]                # Create a tag path, restoring deleted nodes when possible
   --name <string>                # Tag name/path (alternative to positional name)
   --emoji <string>               # Tag emoji
   --dry-run                      # Preview the write without executing it
+
+dino tag rename <path> <new-name>  # Rename a tag and cascade descendant paths and note references
+  --dry-run                      # Preview the write without executing it
+
+dino tag move <path>               # Move a tag under another parent and cascade descendant paths and note references
+  --to <parent-path>             # Target parent tag path
+  --dry-run                      # Preview the write without executing it
+
+dino tag merge <from> <to>         # Merge a tag subtree into another tag and soft-delete the source subtree
+  --dry-run                      # Preview the write without executing it
+
+dino tag suggest                   # Suggest likely duplicate tags to merge
+
+dino tag cleanup                   # Inspect tag cleanup candidates
+  --dry-run                      # Preview cleanup candidates without writing
 ```
 
 ### Card Boxes (Zettel Boxes)
@@ -165,6 +198,23 @@ dino box add [path]                # Create a zettel box path, restoring deleted
   --description <string>         # Box purpose/usage description
   --color <string>               # Box color
   --dry-run                      # Preview the write without executing it
+
+dino box tree                      # Show zettel boxes as a hierarchy tree
+
+dino box stats                     # Show zettel box note counts and empty-box status
+
+dino box rename <path> <new-name>  # Rename a zettel box and cascade descendant paths
+  --dry-run                      # Preview the write without executing it
+
+dino box move <path>               # Move a zettel box under another parent and cascade descendant paths
+  --to <parent-path>             # Target parent box path
+  --dry-run                      # Preview the write without executing it
+
+dino box merge <from> <to>         # Merge a zettel box subtree into another box and soft-delete the source subtree
+  --dry-run                      # Preview the write without executing it
+
+dino box cleanup                   # Inspect zettel box cleanup candidates
+  --dry-run                      # Preview cleanup candidates without writing
 ```
 
 ### Prompts

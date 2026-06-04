@@ -27,7 +27,7 @@ dino note detail [id]              # Get full note details for one or more ids
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
 ```
 
-- Use `--boxes` for public box path filters. Full paths are preferred; unique leaf names are accepted when unambiguous.
+- Use `--boxes` for public box filters.
 - Prefer `--fields id,title,summary,tags,created_at,boxes,is_starred` when the user only needs search metadata.
 - `--sql` remains storage-oriented and still uses the field name `zettel_boxes`.
 <!-- END GENERATED_COMMANDS -->

@@ -39,9 +39,28 @@ dino box add [path]                # Create a zettel box path, restoring deleted
   --description <string>         # Box purpose/usage description
   --color <string>               # Box color
   --dry-run                      # Preview the write without executing it
+
+dino box tree                      # Show zettel boxes as a hierarchy tree
+
+dino box stats                     # Show zettel box note counts and empty-box status
+
+dino box rename <path> <new-name>  # Rename a zettel box and cascade descendant paths
+  --dry-run                      # Preview the write without executing it
+
+dino box move <path>               # Move a zettel box under another parent and cascade descendant paths
+  --to <parent-path>             # Target parent box path
+  --dry-run                      # Preview the write without executing it
+
+dino box merge <from> <to>         # Merge a zettel box subtree into another box and soft-delete the source subtree
+  --dry-run                      # Preview the write without executing it
+
+dino box cleanup                   # Inspect zettel box cleanup candidates
+  --dry-run                      # Preview cleanup candidates without writing
 ```
 
 - For writes, run the same command with `--dry-run` first.
+- `box rename` and `box move` cascade descendant paths inside one transaction.
+- `box merge` remaps note references into the target box and soft-deletes the source subtree.
 <!-- END GENERATED_COMMANDS -->
 
 ## Workflow

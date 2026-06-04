@@ -13,7 +13,7 @@ dino note create                   # Create a new note from markdown content
   --dry-run                      # Preview the write without executing it
 ```
 
-- Use `--boxes` for public box path input. Full paths are preferred; unique leaf names are accepted when unambiguous.
+- Use `--boxes` for public box input.
 - Prefer `--type note` unless the user explicitly wants a `crawl` note.
 - Run the same command with `--dry-run --format json` first.
 <!-- END GENERATED_COMMANDS -->

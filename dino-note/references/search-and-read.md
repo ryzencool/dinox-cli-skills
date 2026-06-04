@@ -25,10 +25,18 @@ dino note preview <id>             # Preview the first N lines of note markdown
 
 dino note detail [id]              # Get full note details for one or more ids
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
+
+dino note export [id]              # Export one or more notes as Markdown or JSON for backup and migration
+  --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
+  --type <markdown|json>         # Export format: markdown or json
+  --output <path>                # Output file for one note, or output directory for multiple notes
+  --overwrite                    # Replace existing export files when --output is used
+  --include-deleted              # Allow exporting soft-deleted notes
 ```
 
 - Use `--boxes` for public box filters.
 - Prefer `--fields id,title,summary,tags,created_at,boxes,is_starred` when the user only needs search metadata.
+- Use `note export` for backup or migration; Markdown exports include frontmatter, JSON exports preserve note metadata and content JSON.
 - `--sql` remains storage-oriented and still uses the field name `zettel_boxes`.
 <!-- END GENERATED_COMMANDS -->
 

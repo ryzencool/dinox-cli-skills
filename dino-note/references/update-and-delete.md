@@ -25,6 +25,24 @@ dino note move [id]                # Incrementally add, remove, or replace note 
   --replace <string|@file>       # Full replacement box paths or unique names; use [] to clear
   --dry-run                      # Preview the write without executing it
 
+dino note bulk [query]             # Bulk add, remove, or replace note tags or boxes using safe search filters
+  --tags <expr>                  # Target filter: tag expression with AND/OR/NOT, or [] for empty tags
+  --from <date>                  # Target filter: created_at start (YYYY-MM-DD or ISO datetime)
+  --to <date>                    # Target filter: created_at end (YYYY-MM-DD or ISO datetime)
+  --days <n>                     # Target filter: recent N days by created_at; mutually exclusive with --from/--to
+  --starred <true|false>         # Target filter: starred status
+  --boxes <string|@file>         # Target filter: box paths or unique names, or [] for empty boxes
+  --all                          # Target all active notes; required when no other target filter is provided
+  --tag-add <string|@file>       # Tags to add to matched notes
+  --tag-remove <string|@file>    # Tags to remove from matched notes
+  --tag-replace <string|@file>   # Full replacement tag list for matched notes; use [] to clear
+  --box-add <string|@file>       # Box paths or unique names to add to matched notes
+  --box-remove <string|@file>    # Box paths or unique names to remove from matched notes
+  --box-replace <string|@file>   # Full replacement box list for matched notes; use [] to clear
+  --expected-count <n>           # Required for real writes; must equal the current matched note count
+  --confirm                      # Required for real writes after reviewing a dry run
+  --dry-run                      # Preview matched targets and changes without executing
+
 dino note star [id]                # Mark one or more notes as starred
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
   --dry-run                      # Preview the write without executing it
@@ -39,6 +57,7 @@ dino note delete <id>              # Soft-delete a note by setting is_del=1
 
 - `--tags` and `--boxes` are full-replacement inputs.
 - Prefer `note tag` and `note move` for incremental add/remove/replace metadata changes.
+- Use `note bulk` for filter-based batch metadata changes; it never accepts `--sql`, and real writes require `--confirm --expected-count <n>`.
 - Prefer `note star` / `note unstar` for pure starring changes, and `note update` when multiple fields change together.
 - Run the same command with `--dry-run --format json` first.
 <!-- END GENERATED_COMMANDS -->

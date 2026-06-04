@@ -28,7 +28,7 @@ Use this skill for all `dino note` workflows.
 - Only run `dino ...` commands needed for the active note workflow. Do not run unrelated shell commands unless the user explicitly asks.
 - Prefer `dino ... --format json` for structured note output and downstream parsing.
 - Search or fetch lightweight context first when the target note is ambiguous or the operation is destructive.
-- `create`, `update`, `star`, `unstar`, and `delete` are write operations. Always show the exact command(s) you will run and get explicit confirmation before mutating data.
+- `create`, `update`, `tag`, `move`, `bulk`, `star`, `unstar`, and `delete` are write operations. Always show the exact command(s) you will run and get explicit confirmation before mutating data.
 - When a note command supports `--dry-run`, run the same command with `--dry-run` first.
 - Before pasting large or full `content_md` into chat, ask once for confirmation.
 - Do not ask the user to paste auth tokens into chat. If auth is required, instruct them to run `dino auth login "<token>"` in their own terminal.
@@ -55,10 +55,11 @@ Use this skill for all `dino note` workflows.
 ## Important Principles
 
 1. If the exact option shape is unclear, inspect it first with `dino schema note.<command>`.
-2. `dino note update` uses full-replacement semantics for `--tags` and `--boxes`; incremental add/remove requests require reading current note state first.
-3. `dino note search` returns resolved `boxes`, but `--sql` remains storage-oriented and still uses `zettel_boxes`.
-4. `dino note detail` exposes full markdown content and should only be used when the user really needs it.
-5. Local media paths must be uploaded to storage and rewritten into parser-friendly remote markdown before note create/update.
+2. `dino note update` uses full-replacement semantics for `--tags` and `--boxes`; use `dino note tag` and `dino note move` for explicit-id incremental metadata changes.
+3. Use `dino note bulk` for filter-based batch metadata changes. It does not accept `--sql`; real writes require `--confirm --expected-count <n>`.
+4. `dino note search` returns resolved `boxes`, but `--sql` remains storage-oriented and still uses `zettel_boxes`.
+5. `dino note detail` exposes full markdown content and should only be used when the user really needs it.
+6. Local media paths must be uploaded to storage and rewritten into parser-friendly remote markdown before note create/update.
 
 ## Error Handling
 

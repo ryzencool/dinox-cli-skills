@@ -230,6 +230,7 @@ dino graph stats                   # Get graph statistics for notes and links
 - Search uses FTS + tokenization (with `@node-rs/jieba`); falls back to LIKE when needed
 - `note search` returns streamlined fields: `id`, `title`, `summary`, `tags`, `created_at`, `boxes`
 - Use `note get --context-only` or `note preview` when full `content_md` is not needed
+- `note create` preserves Markdown fenced code blocks with `mermaid` or `mindgraph` languages as structured atomic note nodes
 - `todo search` returns `{ meta, tasks }`; each task includes `task_key`, `task_id`, `note_id`, `note_title`, `status`, hierarchy, and time fields
 - All `todo` subcommands perform a sync-before-run step unless `--offline` is set
 - `todo` mutations (`append`/`create`/`update`) treat `content_json` as source-of-truth and sync derived `image_detail`, `content_md`, and `content_text`

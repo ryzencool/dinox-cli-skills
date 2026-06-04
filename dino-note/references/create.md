@@ -23,6 +23,8 @@ dino note create                   # Create a new note from markdown content
 - Title
 - Markdown content
 
+Markdown fenced code blocks with `mermaid` or `mindgraph` languages are preserved as structured atomic note nodes.
+
 ## Optional Inputs
 
 - Note type

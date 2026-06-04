@@ -51,6 +51,7 @@ Tags support slash-separated hierarchy:
 - `work/projects/frontend` — deeper nesting
 
 When creating hierarchical tags, the parent path is resolved automatically.
+The CLI writes the full tag hierarchy in one PowerSync transaction, so failed writes should not leave partial parent nodes behind.
 
 ## Workflow
 

@@ -7,7 +7,7 @@ Use these generated commands as the canonical interfaces for note mutation workf
 dino note update [id]              # Full-replace note tags, boxes, and/or starred state
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
   --tags <string|@file>          # Full-replace tag list; use [] to clear
-  --boxes <string|@file>         # Full-replace box names; use [] to clear
+  --boxes <string|@file>         # Full-replace box paths or unique names; use [] to clear
   --starred <true|false>         # Set starred status
   --dry-run                      # Preview the write without executing it
 
@@ -23,7 +23,7 @@ dino note delete <id>              # Soft-delete a note by setting is_del=1
   --dry-run                      # Preview the write without executing it
 ```
 
-- `--tags` and `--boxes` are full-replacement inputs.
+- `--tags` and `--boxes` are full-replacement inputs. For boxes, prefer full paths; unique leaf names are accepted when unambiguous.
 - Prefer `note star` / `note unstar` for pure starring changes, and `note update` when multiple fields change together.
 - Run the same command with `--dry-run --format json` first.
 <!-- END GENERATED_COMMANDS -->

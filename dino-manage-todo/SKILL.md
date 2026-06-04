@@ -42,6 +42,7 @@ Use this skill when the user wants to work with `dino todo` commands.
 2. Do not pass `--offline` unless the user explicitly wants local-only cached data.
 3. All todo subcommands sync before execution unless `--offline` is set.
 4. `content_json` is the source of truth; the CLI auto-syncs derived fields.
+5. Todo mutations return `stale` and wait briefly for PowerSync upload flow after the local write.
 
 ## Workflow Router
 

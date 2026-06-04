@@ -9,11 +9,11 @@ dino note create                   # Create a new note from markdown content
   --content <string|@file>       # Markdown content
   --type <note|crawl>            # Note type: note or crawl
   --tags <string|@file>          # Tag list (JSON array or comma/newline-separated)
-  --boxes <string|@file>         # Box names (JSON array or comma/newline-separated)
+  --boxes <string|@file>         # Box paths or unique names (JSON array or comma/newline-separated)
   --dry-run                      # Preview the write without executing it
 ```
 
-- Use `--boxes` for public box input.
+- Use `--boxes` for public box path input. Full paths are preferred; unique leaf names are accepted when unambiguous.
 - Prefer `--type note` unless the user explicitly wants a `crawl` note.
 - Run the same command with `--dry-run --format json` first.
 <!-- END GENERATED_COMMANDS -->

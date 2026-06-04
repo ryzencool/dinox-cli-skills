@@ -74,7 +74,7 @@ dino note search [query]           # Search notes by keyword, tags, date range, 
   --to <date>                    # created_at end (YYYY-MM-DD or ISO datetime)
   --days <n>                     # Recent N days by created_at; mutually exclusive with --from/--to
   --starred <true|false>         # Filter by starred status
-  --boxes <string|@file>         # Box names (JSON array/comma list), or [] for empty boxes
+  --boxes <string|@file>         # Box paths or unique names (JSON array/comma list), or [] for empty boxes
   --sql <expr>                   # SQL-like expression over id/content_md/summary/tags/zettel_boxes/created_at/type/is_starred
   --limit <n>                    # Maximum returned notes
   --offset <n>                   # Result offset for pagination
@@ -95,13 +95,13 @@ dino note create                   # Create a new note from markdown content
   --content <string|@file>       # Markdown content
   --type <note|crawl>            # Note type: note or crawl
   --tags <string|@file>          # Tag list (JSON array or comma/newline-separated)
-  --boxes <string|@file>         # Box names (JSON array or comma/newline-separated)
+  --boxes <string|@file>         # Box paths or unique names (JSON array or comma/newline-separated)
   --dry-run                      # Preview the write without executing it
 
 dino note update [id]              # Full-replace note tags, boxes, and/or starred state
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
   --tags <string|@file>          # Full-replace tag list; use [] to clear
-  --boxes <string|@file>         # Full-replace box names; use [] to clear
+  --boxes <string|@file>         # Full-replace box paths or unique names; use [] to clear
   --starred <true|false>         # Set starred status
   --dry-run                      # Preview the write without executing it
 
@@ -160,8 +160,8 @@ dino tag add [name]                # Create a tag path, restoring deleted nodes 
 ```text
 dino box list                      # List all zettel boxes from c_zettel_box
 
-dino box add [name]                # Create a zettel box, restoring a deleted row when possible
-  --name <string>                # Box name (alternative to positional name)
+dino box add [path]                # Create a zettel box path, restoring deleted path nodes when possible
+  --name <string>                # Box path (alternative to positional path)
   --description <string>         # Box purpose/usage description
   --color <string>               # Box color
   --dry-run                      # Preview the write without executing it
@@ -223,7 +223,7 @@ dino graph stats                   # Get graph statistics for notes and links
 
 - The `--content` and `--tags` options accept `@filepath` syntax to read from a file
 - Tags must exist before being used in `note create`; create them first with `tag add`
-- Card box names must exist before being used; create them first with `box add`
+- Card box paths must exist before being used; create them first with `box add`
 - `prompt add` fails fast when `--name` or `--prompt` is empty
 - `prompt add` rejects active duplicates by `(name, prompt)` and restores soft-deleted duplicates
 - If `c_cmd` includes `user_id`, `prompt add` requires a logged-in user (`dino auth login`)
@@ -233,11 +233,13 @@ dino graph stats                   # Get graph statistics for notes and links
 - `todo search` returns `{ meta, tasks }`; each task includes `task_key`, `task_id`, `note_id`, `note_title`, `status`, hierarchy, and time fields
 - All `todo` subcommands perform a sync-before-run step unless `--offline` is set
 - `todo` mutations (`append`/`create`/`update`) treat `content_json` as source-of-truth and sync derived `image_detail`, `content_md`, and `content_text`
+- `todo` mutations wait briefly for PowerSync upload flow after local writes; structured output includes `stale`
 - `todo append` defaults to latest note (`created_at` desc) with non-empty `image_detail` when `--note-id` is omitted
 - `todo search` date filtering checks `due_time`/`start_time`; when task time is missing, note `created_at` is used
 - `todo update` fails when same `taskId` appears in multiple notes; disambiguate before retrying
 - Tag expressions support `AND`, `OR`, `NOT`, and parentheses
-- The `--sql` option supports SQL-like WHERE conditions (read-only; no INSERT/UPDATE/DELETE); `zettel_boxes` values are matched by name and auto-resolved to IDs
+- The `--sql` option supports SQL-like WHERE conditions (read-only; no INSERT/UPDATE/DELETE); `zettel_boxes` values are matched by box path first, then unique leaf name, and auto-resolved to IDs
+- `tag add` and `box add` create/restore hierarchy nodes inside one PowerSync write transaction; a failed write must not leave a partial hierarchy
 - `note detail` supports batch read via `[id]` + `--ids`; at least one is required
 - `note update` supports batch update via `[id]` + `--ids`; at least one is required
 - `note update` requires at least one of `--tags`/`--boxes`, and both fields are full-replace semantics

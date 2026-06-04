@@ -10,7 +10,7 @@ dino note search [query]           # Search notes by keyword, tags, date range, 
   --to <date>                    # created_at end (YYYY-MM-DD or ISO datetime)
   --days <n>                     # Recent N days by created_at; mutually exclusive with --from/--to
   --starred <true|false>         # Filter by starred status
-  --boxes <string|@file>         # Box names (JSON array/comma list), or [] for empty boxes
+  --boxes <string|@file>         # Box paths or unique names (JSON array/comma list), or [] for empty boxes
   --sql <expr>                   # SQL-like expression over id/content_md/summary/tags/zettel_boxes/created_at/type/is_starred
   --limit <n>                    # Maximum returned notes
   --offset <n>                   # Result offset for pagination
@@ -27,7 +27,7 @@ dino note detail [id]              # Get full note details for one or more ids
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
 ```
 
-- Use `--boxes` for public box filters.
+- Use `--boxes` for public box path filters. Full paths are preferred; unique leaf names are accepted when unambiguous.
 - Prefer `--fields id,title,summary,tags,created_at,boxes,is_starred` when the user only needs search metadata.
 - `--sql` remains storage-oriented and still uses the field name `zettel_boxes`.
 <!-- END GENERATED_COMMANDS -->

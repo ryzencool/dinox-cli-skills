@@ -97,6 +97,9 @@ dino note export [id]              # Export one or more notes as Markdown or JSO
   --overwrite                    # Replace existing export files when --output is used
   --include-deleted              # Allow exporting soft-deleted notes
 
+dino note content-read <id>        # Read note content context and issue a short-lived token required before content patching
+  --include-content              # Include full markdown content in the response
+
 dino note create                   # Create a new note from markdown content
   --title <string>               # Note title
   --content <string|@file>       # Markdown content
@@ -125,6 +128,17 @@ dino note move [id]                # Incrementally add, remove, or replace note 
   --remove <string|@file>        # Box paths or unique names to remove
   --replace <string|@file>       # Full replacement box paths or unique names; use [] to clear
   --dry-run                      # Preview the write without executing it
+
+dino note patch <id>               # Patch note content after a required content-read token
+  --append-section <heading>     # Append a new level-2 section at the end of the note
+  --append-to-heading <path>     # Append content to an existing heading path
+  --replace-section <path>       # Replace the body of an existing heading path
+  --replace-block                # Replace one exact markdown block matched by --match
+  --match <string|@file>         # Exact markdown to replace when using --replace-block
+  --content <string|@file>       # Markdown content to insert
+  --read-token <token>           # Required for real writes; returned by note content-read
+  --allow-protected-replace      # Allow replace operations to affect media, table, container, or unknown blocks after reviewing content-read output
+  --dry-run                      # Preview the patch without writing
 
 dino note bulk [query]             # Bulk add, remove, or replace note tags or boxes using safe search filters
   --tags <expr>                  # Target filter: tag expression with AND/OR/NOT, or [] for empty tags

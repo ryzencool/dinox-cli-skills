@@ -25,6 +25,17 @@ dino note move [id]                # Incrementally add, remove, or replace note 
   --replace <string|@file>       # Full replacement box paths or unique names; use [] to clear
   --dry-run                      # Preview the write without executing it
 
+dino note patch <id>               # Patch note content after a required content-read token
+  --append-section <heading>     # Append a new level-2 section at the end of the note
+  --append-to-heading <path>     # Append content to an existing heading path
+  --replace-section <path>       # Replace the body of an existing heading path
+  --replace-block                # Replace one exact markdown block matched by --match
+  --match <string|@file>         # Exact markdown to replace when using --replace-block
+  --content <string|@file>       # Markdown content to insert
+  --read-token <token>           # Required for real writes; returned by note content-read
+  --allow-protected-replace      # Allow replace operations to affect media, table, container, or unknown blocks after reviewing content-read output
+  --dry-run                      # Preview the patch without writing
+
 dino note bulk [query]             # Bulk add, remove, or replace note tags or boxes using safe search filters
   --tags <expr>                  # Target filter: tag expression with AND/OR/NOT, or [] for empty tags
   --from <date>                  # Target filter: created_at start (YYYY-MM-DD or ISO datetime)
@@ -57,6 +68,7 @@ dino note delete <id>              # Soft-delete a note by setting is_del=1
 
 - `--tags` and `--boxes` are full-replacement inputs.
 - Prefer `note tag` and `note move` for incremental add/remove/replace metadata changes.
+- `note patch` applies structured content edits against `content_json`, resolves hashtag nodes through `c_tag_node`, and synchronizes `tags` from the current content hashtag projection; real writes require `--read-token` and protected blocks require `--allow-protected-replace`.
 - Use `note bulk` for filter-based batch metadata changes; it never accepts `--sql`, and real writes require `--confirm --expected-count <n>`.
 - Prefer `note star` / `note unstar` for pure starring changes, and `note update` when multiple fields change together.
 - Run the same command with `--dry-run --format json` first.

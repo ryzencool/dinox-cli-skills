@@ -32,11 +32,15 @@ dino note export [id]              # Export one or more notes as Markdown or JSO
   --output <path>                # Output file for one note, or output directory for multiple notes
   --overwrite                    # Replace existing export files when --output is used
   --include-deleted              # Allow exporting soft-deleted notes
+
+dino note content-read <id>        # Read note content context and issue a short-lived token required before content patching
+  --include-content              # Include full markdown content in the response
 ```
 
 - Use `--boxes` for public box filters.
 - Prefer `--fields id,title,summary,tags,created_at,boxes,is_starred` when the user only needs search metadata.
 - Use `note export` for backup or migration; Markdown exports include frontmatter, JSON exports preserve note metadata and content JSON.
+- Use `note content-read` immediately before `note patch`; the returned readToken, content hash, block index, outline, and resolved hashtag paths are the required edit context.
 - `--sql` remains storage-oriented and still uses the field name `zettel_boxes`.
 <!-- END GENERATED_COMMANDS -->
 

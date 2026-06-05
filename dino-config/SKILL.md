@@ -2,6 +2,7 @@
 name: dino-config
 description: >
   Read or set Dinox CLI configuration values (e.g. sync.timeoutMs).
+version: 1.1.0
 argument-hint: "[get|set] [key] [value]"
 allowed-tools:
   - Bash

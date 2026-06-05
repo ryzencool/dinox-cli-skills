@@ -2,6 +2,7 @@
 name: dino-sync
 description: >
   Sync Dinox local cache (PowerSync) with the cloud and report status.
+version: 1.1.0
 argument-hint: "[--sync-timeout <ms>]"
 allowed-tools:
   - Bash
@@ -23,7 +24,7 @@ Use this skill when the user asks to run a sync, refresh local cache, or debug s
 
 - Sync connects to the cloud and may upload local changes. Show the exact command you will run and get explicit confirmation before syncing.
 - Only run `dino ...` commands needed for this workflow. Do not run unrelated shell commands unless the user explicitly asks.
-- Do not ask the user to paste auth tokens into chat. If login is required, instruct them to run `dino auth login "<token>"` in their own terminal.
+- Do not ask the user to paste auth tokens into chat. If login is required, instruct them to set `DINOX_TOKEN` or run `dino auth login "<token>"` in their own terminal.
 
 ## Commands
 
@@ -51,4 +52,4 @@ dino sync --sync-timeout 600000 --format json
 ## Error Handling
 
 - If sync times out (`stale: true`), explain the cache may be stale and suggest retrying with a higher `--sync-timeout`.
-- If auth errors occur, instruct the user to run `dino auth login "<token>"` in their own terminal (do not paste tokens into chat), then retry.
+- If auth errors occur, instruct the user to set `DINOX_TOKEN` or run `dino auth login "<token>"` in their own terminal (do not paste tokens into chat), then retry.

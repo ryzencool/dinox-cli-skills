@@ -1,12 +1,26 @@
 # Dinox CLI Skills
 
-Bundled agent skills for [Dinox CLI](https://github.com/ryzencool/dinox-cli) — manage your Dinox knowledge base (notes, tags, card boxes) directly from the current repository.
+Bundled agent skills for [Dinox CLI](https://github.com/ryzencool/dinox-cli) — install once, then let an AI assistant operate your Dinox knowledge base through the `dino` CLI.
 
 > For agent / script integrations, prefer `dino --format json ...`.
 > Legacy `--json` still works, but it returns YAML for backward compatibility.
 > If an agent is unsure how to call a command, inspect it first with `dino schema <path>`.
 
-## Prerequisites
+## Install Skills
+
+Install the skills globally:
+
+```bash
+npx skills add ryzencool/dinox-cli-skills -g
+```
+
+If your agent only supports a local skills directory, point it at this repository:
+
+```bash
+claude --add-dir /path/to/dinox-cli/skills
+```
+
+## Install And Initialize CLI
 
 Install Dinox CLI globally:
 
@@ -14,27 +28,41 @@ Install Dinox CLI globally:
 npm install -g @dinoxx/dinox-cli
 ```
 
-Login:
+Check the installation:
+
+```bash
+dino info --format json
+```
+
+Process-only auth for AI/CI:
+
+```bash
+export DINOX_TOKEN="<your-token-or-Bearer-token>"
+dino auth status --format json
+dino sync --format json
+```
+
+Persistent login, run by the user in their own terminal:
 
 ```bash
 dino auth login "<your-token>"
-dino sync
+dino sync --format json
 ```
 
-Security note: never paste your token into chat logs. Run `dino auth login "<your-token>"` directly in your own terminal session.
+Security note: never paste tokens into chat logs. `DINOX_TOKEN` takes precedence over saved config, supports raw token or `Bearer ...`, and is not persisted by the CLI.
 
-## Location
+## Repository Source
 
-These skills now live inside the `dinox-cli` repository:
+Canonical source for packaged skills:
+
+```bash
+https://github.com/ryzencool/dinox-cli-skills
+```
+
+Development source inside the CLI repository:
 
 ```bash
 <repo>/skills
-```
-
-If your agent supports adding a skills directory manually, point it at the current repo's `skills/` directory:
-
-```bash
-claude --add-dir /path/to/dinox-cli/skills
 ```
 
 When command schemas change, regenerate the bundled background reference with:

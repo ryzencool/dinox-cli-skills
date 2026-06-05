@@ -4,6 +4,7 @@ description: >
   Search, read, create, update, star, and delete Dinox notes. Use when the
   user wants to find notes, open note details, preview content, create a note,
   organize tags or boxes, star or unstar notes, or delete a note.
+version: 1.1.0
 argument-hint: "[request or note id]"
 allowed-tools:
   - Bash
@@ -31,7 +32,7 @@ Use this skill for all `dino note` workflows.
 - `create`, `update`, `tag`, `move`, `bulk`, `star`, `unstar`, and `delete` are write operations. Always show the exact command(s) you will run and get explicit confirmation before mutating data.
 - When a note command supports `--dry-run`, run the same command with `--dry-run` first.
 - Before pasting large or full `content_md` into chat, ask once for confirmation.
-- Do not ask the user to paste auth tokens into chat. If auth is required, instruct them to run `dino auth login "<token>"` in their own terminal.
+- Do not ask the user to paste auth tokens into chat. If auth is required, instruct them to set `DINOX_TOKEN` or run `dino auth login "<token>"` in their own terminal.
 - When writing temp files, only write under `/tmp/` and do not overwrite an existing file path.
 
 ## Intent Mapping
@@ -65,5 +66,5 @@ Use this skill for all `dino note` workflows.
 
 - If `dino` is not found, tell the user to install Dinox CLI: `npm install -g @dinoxx/dinox-cli`
 - If the user does not provide a reliable note identifier for a read or write, search first and ask them to confirm the target note.
-- If auth error occurs, instruct the user to run `dino auth login "<token>"` in their own terminal (do not paste tokens into chat), then retry.
+- If auth error occurs, instruct the user to set `DINOX_TOKEN` or run `dino auth login "<token>"` in their own terminal (do not paste tokens into chat), then retry.
 - If sync times out or a result is marked stale, tell the user the local cache may be outdated.

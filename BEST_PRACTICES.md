@@ -19,6 +19,7 @@ Required fields:
 
 - `name`
 - `description`
+- `version`
 - `metadata`
 - `metadata.requires.bins`
 
@@ -42,6 +43,7 @@ Required fields for background/shared skills:
 name: dino-note
 description: >
   Search, read, create, update, star, and delete Dinox notes.
+version: 1.1.0
 argument-hint: "[request or note id]"
 allowed-tools:
   - Bash
@@ -125,6 +127,8 @@ The checker currently enforces:
 - Valid frontmatter
 - Matching `name`
 - Presence of `description`
+- Presence of `version`
+- `version` matches `skills/VERSION`
 - Presence of `metadata`
 - Presence of `metadata.requires.bins`
 - Shared-guidance reference for user-facing skills

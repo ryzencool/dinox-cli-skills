@@ -5,6 +5,7 @@ description: >
   file to your own S3, and inspect usage stats. Use when the user wants to
   inspect configured object storage targets, verify a custom S3 config, push a
   file into a custom S3 bucket, or see storage usage totals.
+version: 1.1.0
 argument-hint: "[list|test|upload <file>|stats]"
 allowed-tools:
   - Bash
@@ -28,7 +29,7 @@ Use this skill when the user wants to inspect custom storage configs, verify S3 
 - Treat storage credentials and endpoint details as sensitive data. Never echo `secret_access_key` back to the user.
 - `dino storage test` writes a tiny temporary object to S3. `dino storage upload` writes to both S3 and local Dinox metadata. Always show the exact command and get explicit confirmation before running the real write.
 - Prefer `dino storage list --format json` before uploading if the target storage config is ambiguous.
-- Do not ask the user to paste auth tokens into chat. If auth is required, instruct them to run `dino auth login "<token>"` in their own terminal.
+- Do not ask the user to paste auth tokens into chat. If auth is required, instruct them to set `DINOX_TOKEN` or run `dino auth login "<token>"` in their own terminal.
 - If the user wants to upload to a specific config without changing the active storage in the app, prefer `--storage-id`.
 
 <!-- BEGIN GENERATED_COMMANDS -->

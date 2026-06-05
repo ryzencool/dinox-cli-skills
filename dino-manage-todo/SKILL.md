@@ -3,6 +3,7 @@ name: dino-manage-todo
 description: >
   Search, create, append, and update Dinox todo tasks. Use when the user asks
   to manage checklist items, complete/uncomplete tasks, or query todos by tag/time/status.
+version: 1.1.0
 argument-hint: "[query or task text]"
 allowed-tools:
   - Bash
@@ -27,7 +28,7 @@ Use this skill when the user wants to work with `dino todo` commands.
 - Only run `dino ...` commands needed for this workflow. Do not run unrelated shell commands unless the user explicitly asks.
 - `append/create/update` are write operations. Always show the exact command(s) you will run and get explicit confirmation before mutating data.
 - For `append`, require an explicit `--note-id` unless the user explicitly confirms they want to append to the CLI's default "latest eligible note".
-- Do not ask the user to paste auth tokens into chat. If auth is required, instruct them to run `dino auth login "<token>"` in their own terminal.
+- Do not ask the user to paste auth tokens into chat. If auth is required, instruct them to set `DINOX_TOKEN` or run `dino auth login "<token>"` in their own terminal.
 
 ## Intent Mapping
 
@@ -63,4 +64,4 @@ Use this skill when the user wants to work with `dino todo` commands.
 - `Task not found`: ask user to run `todo search` first and pick an exact `task_id`.
 - `Task id is not unique`: show matched note IDs and ask user to disambiguate target.
 - `No eligible note found for append`: suggest `dino todo create` or provide `--note-id`.
-- Auth/sync issues: ask the user to run `dino auth login "<token>"` in their terminal (do not paste tokens into chat), then retry.
+- Auth/sync issues: ask the user to set `DINOX_TOKEN` or run `dino auth login "<token>"` in their terminal (do not paste tokens into chat), then retry.

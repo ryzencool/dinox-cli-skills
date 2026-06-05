@@ -4,28 +4,28 @@
 Use these generated commands as the canonical interfaces for note mutation workflows.
 
 ```text
-dino note update [id]              # Full-replace note tags, boxes, and/or starred state
+dino note update [id]              # Full-replace note metadata for explicit note ids
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
-  --tags <string|@file>          # Full-replace tag list; use [] to clear
-  --boxes <string|@file>         # Full-replace box paths or unique names; use [] to clear
-  --starred <true|false>         # Set starred status
+  --tags <string|@file>          # Replace the entire tag list; use [] to clear all tags
+  --boxes <string|@file>         # Replace the entire box list; use [] to clear all boxes
+  --starred <true|false>         # Replace the starred state
   --dry-run                      # Preview the write without executing it
 
-dino note tag [id]                 # Incrementally add, remove, or replace note tags
+dino note tag [id]                 # Incrementally organize note tags for explicit note ids
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
-  --add <string|@file>           # Tags to add
-  --remove <string|@file>        # Tags to remove
-  --replace <string|@file>       # Full replacement tag list; use [] to clear
+  --add <string|@file>           # Tags to add without removing existing tags
+  --remove <string|@file>        # Tags to remove while preserving the rest
+  --replace <string|@file>       # Replace the entire tag list; use [] to clear all tags
   --dry-run                      # Preview the write without executing it
 
-dino note move [id]                # Incrementally add, remove, or replace note zettel boxes
+dino note move [id]                # Incrementally organize note zettel boxes for explicit note ids
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
-  --add <string|@file>           # Box paths or unique names to add
-  --remove <string|@file>        # Box paths or unique names to remove
-  --replace <string|@file>       # Full replacement box paths or unique names; use [] to clear
+  --add <string|@file>           # Box paths or unique names to add without removing existing boxes
+  --remove <string|@file>        # Box paths or unique names to remove while preserving the rest
+  --replace <string|@file>       # Replace the entire box list; use [] to clear all boxes
   --dry-run                      # Preview the write without executing it
 
-dino note patch <id>               # Patch note content after a required content-read token
+dino note patch <id>               # Patch note content structure after a required content-read token
   --append-section <heading>     # Append a new level-2 section at the end of the note
   --append-to-heading <path>     # Append content to an existing heading path
   --replace-section <path>       # Replace the body of an existing heading path
@@ -36,7 +36,7 @@ dino note patch <id>               # Patch note content after a required content
   --allow-protected-replace      # Allow replace operations to affect media, table, container, or unknown blocks after reviewing content-read output
   --dry-run                      # Preview the patch without writing
 
-dino note bulk [query]             # Bulk add, remove, or replace note tags or boxes using safe search filters
+dino note bulk [query]             # Bulk organize note tags or boxes using safe search filters
   --tags <expr>                  # Target filter: tag expression with AND/OR/NOT, or [] for empty tags
   --from <date>                  # Target filter: created_at start (YYYY-MM-DD or ISO datetime)
   --to <date>                    # Target filter: created_at end (YYYY-MM-DD or ISO datetime)
@@ -44,12 +44,12 @@ dino note bulk [query]             # Bulk add, remove, or replace note tags or b
   --starred <true|false>         # Target filter: starred status
   --boxes <string|@file>         # Target filter: box paths or unique names, or [] for empty boxes
   --all                          # Target all active notes; required when no other target filter is provided
-  --tag-add <string|@file>       # Tags to add to matched notes
-  --tag-remove <string|@file>    # Tags to remove from matched notes
-  --tag-replace <string|@file>   # Full replacement tag list for matched notes; use [] to clear
-  --box-add <string|@file>       # Box paths or unique names to add to matched notes
-  --box-remove <string|@file>    # Box paths or unique names to remove from matched notes
-  --box-replace <string|@file>   # Full replacement box list for matched notes; use [] to clear
+  --tag-add <string|@file>       # Tags to add to every matched note
+  --tag-remove <string|@file>    # Tags to remove from every matched note
+  --tag-replace <string|@file>   # Replace the entire tag list on every matched note; use [] to clear all tags
+  --box-add <string|@file>       # Box paths or unique names to add to every matched note
+  --box-remove <string|@file>    # Box paths or unique names to remove from every matched note
+  --box-replace <string|@file>   # Replace the entire box list on every matched note; use [] to clear all boxes
   --expected-count <n>           # Required for real writes; must equal the current matched note count
   --confirm                      # Required for real writes after reviewing a dry run
   --dry-run                      # Preview matched targets and changes without executing
@@ -67,9 +67,11 @@ dino note delete <id>              # Soft-delete a note by setting is_del=1
 ```
 
 - `--tags` and `--boxes` are full-replacement inputs.
-- Prefer `note tag` and `note move` for incremental add/remove/replace metadata changes.
-- `note patch` applies structured content edits against `content_json`, resolves hashtag nodes through `c_tag_node`, and synchronizes `tags` from the current content hashtag projection; real writes require `--read-token` and protected blocks require `--allow-protected-replace`.
-- Use `note bulk` for filter-based batch metadata changes; it never accepts `--sql`, and real writes require `--confirm --expected-count <n>`.
+- `note update` is for explicit note ids and full metadata replacement. It is not an append command.
+- `note tag` and `note move` are explicit-id incremental organizers: add/remove preserves existing values, replace overwrites the whole list.
+- `note move` changes zettel box membership only; it does not move files or note content.
+- `note patch` is only for structured content edits. Run `note content-read` immediately before it, pass `--read-token` for real writes, and use `--allow-protected-replace` only after reviewing protected blocks.
+- `note bulk` is for filter-based batch metadata organization; it never accepts `--sql`, and real writes require `--confirm --expected-count <n>`.
 - Prefer `note star` / `note unstar` for pure starring changes, and `note update` when multiple fields change together.
 - Run the same command with `--dry-run --format json` first.
 <!-- END GENERATED_COMMANDS -->

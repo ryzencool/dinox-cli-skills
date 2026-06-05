@@ -1,10 +1,11 @@
 ---
 name: dino-dinox
 description: >
-  Background knowledge about the Dinox CLI tool (`dino`). Use this context
-  whenever the user mentions dinox, dino, notes, tags, card boxes, zettel boxes,
-  or wants to interact with their knowledge base. This skill provides the
-  full command reference so you can correctly invoke `dino` subcommands.
+  Background knowledge and bootstrap guidance for Dinox CLI (`dino`) and Dinox
+  agent skills. Use whenever the user mentions dinox, dino, notes, tags, card
+  boxes, zettel boxes, installing Dinox skills, configuring auth, or interacting
+  with their Dinox knowledge base.
+version: 1.1.0
 user-invocable: false
 metadata:
   requires:
@@ -14,11 +15,51 @@ metadata:
   risk: "mixed"
 ---
 
-# Dinox CLI Reference
+# Dinox CLI And Skills
 
 Dinox CLI (`dino`) is a command-line tool for managing a personal knowledge base
 (notes, tags, card boxes / zettel boxes). Data is stored locally in SQLite and
 synced to the cloud via PowerSync.
+
+## Install Skills And CLI
+
+When the user asks to install or enable Dinox skills, use the public skills repo:
+
+```bash
+npx skills add ryzencool/dinox-cli-skills -g
+```
+
+Then make sure the CLI exists:
+
+```bash
+npm install -g @dinoxx/dinox-cli
+dino info --format json
+```
+
+For local development against this repository, add the local skills directory instead:
+
+```bash
+claude --add-dir /path/to/dinox-cli/skills
+```
+
+## Auth Bootstrap
+
+Never ask the user to paste tokens into chat. For process-only auth, tell the user to set:
+
+```bash
+export DINOX_TOKEN="<token-or-Bearer-token>"
+dino auth status --format json
+dino sync --format json
+```
+
+For persistent login, the user should run this in their own terminal:
+
+```bash
+dino auth login "<token>"
+dino sync --format json
+```
+
+`DINOX_TOKEN` takes precedence over saved config, accepts raw token or `Bearer ...`, and is never persisted.
 
 ## Safety & Boundaries (For AI Tooling)
 
@@ -26,7 +67,17 @@ synced to the cloud via PowerSync.
 - Restrict actions to the minimum set of `dino ...` subcommands needed for the user's request; avoid running unrelated shell commands unless explicitly requested.
 - Ask for explicit confirmation before any write operation (create/update/delete, prompt/tag/box mutations, todo mutations, CLI update).
 - Prefer `--dry-run` on supported write commands before the final confirmed execution.
-- Never request auth tokens in chat. If login is required, ask the user to run `dino auth login "<token>"` in their own terminal session.
+- Prefer `--format json` for structured output and `dino schema <path>` when a command shape is uncertain.
+
+## Command Selection
+
+- Notes: use `dino note search/get/preview/detail/export/content-read/create/update/tag/move/patch/bulk/star/unstar/delete`.
+- Tags: use `dino tag list/tree/stats/add/rename/move/merge/suggest/cleanup`; `c_tag_node` is the tag source of truth.
+- Card boxes: use `dino box list/add/tree/stats/rename/move/merge/cleanup`; `c_zettel_box.path` is the primary hierarchy semantic.
+- Todos: use `dino todo search/append/create/update`; todo items are extracted from note content.
+- Files and custom S3: use `dino storage list/test/upload/stats`.
+- Auth and sync: use `dino auth status/login/logout` and `dino sync`.
+- Daemon: public process-management commands are `dino daemon start/status/restart/stop`.
 
 <!-- BEGIN GENERATED_REFERENCE -->
 ## Global Options
@@ -49,6 +100,20 @@ dino auth logout                   # Clear saved login token and optionally remo
   --clear-local-db               # Delete the local PowerSync SQLite database
 
 dino auth status                   # Show current login, local cache, and sync status
+```
+
+### Daemon
+```text
+dino daemon start                  # Start daemon process
+  --port <number>                # Daemon port
+  --no-detach                    # Run in foreground for debugging
+
+dino daemon status                 # Show daemon status
+
+dino daemon restart                # Restart daemon process
+  --port <number>                # Daemon port
+
+dino daemon stop                   # Stop daemon process
 ```
 
 ### Sync
@@ -108,28 +173,28 @@ dino note create                   # Create a new note from markdown content
   --boxes <string|@file>         # Box paths or unique names (JSON array or comma/newline-separated)
   --dry-run                      # Preview the write without executing it
 
-dino note update [id]              # Full-replace note tags, boxes, and/or starred state
+dino note update [id]              # Full-replace note metadata for explicit note ids
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
-  --tags <string|@file>          # Full-replace tag list; use [] to clear
-  --boxes <string|@file>         # Full-replace box paths or unique names; use [] to clear
-  --starred <true|false>         # Set starred status
+  --tags <string|@file>          # Replace the entire tag list; use [] to clear all tags
+  --boxes <string|@file>         # Replace the entire box list; use [] to clear all boxes
+  --starred <true|false>         # Replace the starred state
   --dry-run                      # Preview the write without executing it
 
-dino note tag [id]                 # Incrementally add, remove, or replace note tags
+dino note tag [id]                 # Incrementally organize note tags for explicit note ids
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
-  --add <string|@file>           # Tags to add
-  --remove <string|@file>        # Tags to remove
-  --replace <string|@file>       # Full replacement tag list; use [] to clear
+  --add <string|@file>           # Tags to add without removing existing tags
+  --remove <string|@file>        # Tags to remove while preserving the rest
+  --replace <string|@file>       # Replace the entire tag list; use [] to clear all tags
   --dry-run                      # Preview the write without executing it
 
-dino note move [id]                # Incrementally add, remove, or replace note zettel boxes
+dino note move [id]                # Incrementally organize note zettel boxes for explicit note ids
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
-  --add <string|@file>           # Box paths or unique names to add
-  --remove <string|@file>        # Box paths or unique names to remove
-  --replace <string|@file>       # Full replacement box paths or unique names; use [] to clear
+  --add <string|@file>           # Box paths or unique names to add without removing existing boxes
+  --remove <string|@file>        # Box paths or unique names to remove while preserving the rest
+  --replace <string|@file>       # Replace the entire box list; use [] to clear all boxes
   --dry-run                      # Preview the write without executing it
 
-dino note patch <id>               # Patch note content after a required content-read token
+dino note patch <id>               # Patch note content structure after a required content-read token
   --append-section <heading>     # Append a new level-2 section at the end of the note
   --append-to-heading <path>     # Append content to an existing heading path
   --replace-section <path>       # Replace the body of an existing heading path
@@ -140,7 +205,7 @@ dino note patch <id>               # Patch note content after a required content
   --allow-protected-replace      # Allow replace operations to affect media, table, container, or unknown blocks after reviewing content-read output
   --dry-run                      # Preview the patch without writing
 
-dino note bulk [query]             # Bulk add, remove, or replace note tags or boxes using safe search filters
+dino note bulk [query]             # Bulk organize note tags or boxes using safe search filters
   --tags <expr>                  # Target filter: tag expression with AND/OR/NOT, or [] for empty tags
   --from <date>                  # Target filter: created_at start (YYYY-MM-DD or ISO datetime)
   --to <date>                    # Target filter: created_at end (YYYY-MM-DD or ISO datetime)
@@ -148,12 +213,12 @@ dino note bulk [query]             # Bulk add, remove, or replace note tags or b
   --starred <true|false>         # Target filter: starred status
   --boxes <string|@file>         # Target filter: box paths or unique names, or [] for empty boxes
   --all                          # Target all active notes; required when no other target filter is provided
-  --tag-add <string|@file>       # Tags to add to matched notes
-  --tag-remove <string|@file>    # Tags to remove from matched notes
-  --tag-replace <string|@file>   # Full replacement tag list for matched notes; use [] to clear
-  --box-add <string|@file>       # Box paths or unique names to add to matched notes
-  --box-remove <string|@file>    # Box paths or unique names to remove from matched notes
-  --box-replace <string|@file>   # Full replacement box list for matched notes; use [] to clear
+  --tag-add <string|@file>       # Tags to add to every matched note
+  --tag-remove <string|@file>    # Tags to remove from every matched note
+  --tag-replace <string|@file>   # Replace the entire tag list on every matched note; use [] to clear all tags
+  --box-add <string|@file>       # Box paths or unique names to add to every matched note
+  --box-remove <string|@file>    # Box paths or unique names to remove from every matched note
+  --box-replace <string|@file>   # Replace the entire box list on every matched note; use [] to clear all boxes
   --expected-count <n>           # Required for real writes; must equal the current matched note count
   --confirm                      # Required for real writes after reviewing a dry run
   --dry-run                      # Preview matched targets and changes without executing

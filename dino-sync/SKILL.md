@@ -3,7 +3,7 @@ name: dino-sync
 description: >
   Sync Dinox local cache (PowerSync) with the cloud and report status.
 version: 1.1.0
-argument-hint: "[--sync-timeout <ms>]"
+argument-hint: "[--strict] [--sync-timeout <ms>]"
 allowed-tools:
   - Bash
 metadata:
@@ -38,13 +38,20 @@ With a higher timeout:
 dino sync --sync-timeout 600000 --format json
 ```
 
+Strict freshness gate for analysis:
+```bash
+dino sync --strict --sync-timeout 600000 --format json
+```
+
 ## Workflow
 
 1. Run `dino auth status --format json` first. If `loggedIn: no`, stop and ask the user to login in their own terminal.
 2. Show the exact `dino sync ...` command you will run and ask for confirmation.
-3. Run `dino sync --format json`, then summarize:
+3. Use `dino sync --strict --sync-timeout 600000 --format json` before date-range analysis, latest-note claims, duplicates checks, exports, or other completeness-sensitive work.
+4. Run the selected `dino sync ...` command, then summarize:
    - `dbPath`
    - `stale` and `idle` warnings (if present)
+   - `gate.ok` and `gate.reasons`
    - `uploadEnabled`
    - `status.connected` and `status.lastSyncedAt`
    - `tokenIndex` counters (scanned/reindexed/skipped/removed)
@@ -52,4 +59,5 @@ dino sync --sync-timeout 600000 --format json
 ## Error Handling
 
 - If sync times out (`stale: true`), explain the cache may be stale and suggest retrying with a higher `--sync-timeout`.
+- If strict sync fails with `SYNC_REQUIRED`, do not make data completeness claims until the user retries successfully or explicitly accepts stale/offline results.
 - If auth errors occur, instruct the user to set `DINOX_TOKEN` or run `dino auth login "<token>"` in their own terminal (do not paste tokens into chat), then retry.

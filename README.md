@@ -39,17 +39,19 @@ Process-only auth for AI/CI:
 ```bash
 export DINOX_TOKEN="<your-token-or-Bearer-token>"
 dino auth status --format json
-dino sync --format json
+dino sync --strict --sync-timeout 600000 --format json
 ```
 
 Persistent login, run by the user in their own terminal:
 
 ```bash
 dino auth login "<your-token>"
-dino sync --format json
+dino sync --strict --sync-timeout 600000 --format json
 ```
 
 Security note: never paste tokens into chat logs. `DINOX_TOKEN` takes precedence over saved config, supports raw token or `Bearer ...`, and is not persisted by the CLI.
+
+For completeness-sensitive analysis such as latest notes, date ranges, monthly summaries, duplicates, stats, or exports, use `dino sync --strict --sync-timeout 600000 --format json` first or add `--require-sync` to the read command.
 
 ## Repository Source
 

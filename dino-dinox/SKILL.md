@@ -49,14 +49,14 @@ Never ask the user to paste tokens into chat. For process-only auth, tell the us
 ```bash
 export DINOX_TOKEN="<token-or-Bearer-token>"
 dino auth status --format json
-dino sync --format json
+dino sync --strict --sync-timeout 600000 --format json
 ```
 
 For persistent login, the user should run this in their own terminal:
 
 ```bash
 dino auth login "<token>"
-dino sync --format json
+dino sync --strict --sync-timeout 600000 --format json
 ```
 
 `DINOX_TOKEN` takes precedence over saved config, accepts raw token or `Bearer ...`, and is never persisted.
@@ -68,6 +68,7 @@ dino sync --format json
 - Ask for explicit confirmation before any write operation (create/update/delete, prompt/tag/box mutations, todo mutations, CLI update).
 - Prefer `--dry-run` on supported write commands before the final confirmed execution.
 - Prefer `--format json` for structured output and `dino schema <path>` when a command shape is uncertain.
+- For latest-note, date-range, monthly summary, stats, duplicates, or export completeness claims, use `dino sync --strict --sync-timeout 600000 --format json` first or add `--require-sync` to the read command.
 
 ## Command Selection
 
@@ -87,6 +88,7 @@ dino sync --format json
 | `--format <yaml|json>` | Structured output format. Prefer `json` for agent and script integrations. |
 | `--json` | Legacy alias for machine-readable YAML output. Keep only for backward compatibility. |
 | `--offline` | Skip sync, use local cache only |
+| `--require-sync` | Fail if the local PowerSync cache cannot be confirmed fresh before reading |
 | `--sync-timeout <ms>` | Override default 300000 ms (5 min) sync/connect timeout |
 | `--verbose` | Enable verbose logging |
 
@@ -119,6 +121,7 @@ dino daemon stop                   # Stop daemon process
 ### Sync
 ```text
 dino sync                          # Connect and synchronize the local PowerSync database
+  --strict                       # Fail unless first sync completed, data flow is idle, and no download error exists
 ```
 
 ### Schema

@@ -61,11 +61,14 @@ dino sync --format json
 - `DINOX_TOKEN` has priority over saved config, may be raw token or `Bearer ...`, and is not persisted.
 - If `DINOX_TOKEN` differs from the saved token, the CLI resolves the current identity online and does not reuse the old `userId`.
 - Use `dino sync --format json` when the user wants a fresh cloud-backed view.
+- For conclusion-style analysis (latest note, date range counts, monthly summaries, duplicates, exports, stats), require a proven fresh cache first:
+  `dino sync --strict --sync-timeout 600000 --format json`, or add `--require-sync` to the read command.
 - `--offline` means local cache only. Do not assume results reflect the cloud when offline mode is used.
 
 ## Stale And Upload Warnings
 
 - If a command returns `stale: true`, tell the user the local cache may be stale.
+- If a command fails with `SYNC_REQUIRED`, do not make a data completeness claim. Tell the user sync could not be proven fresh and suggest retrying with a higher `--sync-timeout`.
 - If a command indicates uploads are disabled because `powersync.uploadBaseUrl` is unset, tell the user mutations are local-only for now.
 
 ## Update Guidance

@@ -184,6 +184,7 @@ dino note create                   # Create a new note from markdown content
   --type <note|crawl>            # Note type: note or crawl
   --tags <string|@file>          # Tag list (JSON array or comma/newline-separated)
   --boxes <string|@file>         # Box paths or unique names (JSON array or comma/newline-separated)
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino note update [id]              # Full-replace note metadata for explicit note ids
@@ -191,6 +192,7 @@ dino note update [id]              # Full-replace note metadata for explicit not
   --tags <string|@file>          # Replace the entire tag list; use [] to clear all tags
   --boxes <string|@file>         # Replace the entire box list; use [] to clear all boxes
   --starred <true|false>         # Replace the starred state
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino note tag [id]                 # Incrementally organize note tags for explicit note ids
@@ -198,6 +200,7 @@ dino note tag [id]                 # Incrementally organize note tags for explic
   --add <string|@file>           # Tags to add without removing existing tags
   --remove <string|@file>        # Tags to remove while preserving the rest
   --replace <string|@file>       # Replace the entire tag list; use [] to clear all tags
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino note move [id]                # Incrementally organize note zettel boxes for explicit note ids
@@ -205,6 +208,7 @@ dino note move [id]                # Incrementally organize note zettel boxes fo
   --add <string|@file>           # Box paths or unique names to add without removing existing boxes
   --remove <string|@file>        # Box paths or unique names to remove while preserving the rest
   --replace <string|@file>       # Replace the entire box list; use [] to clear all boxes
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino note patch <id>               # Patch note content structure after a required content-read token
@@ -216,6 +220,7 @@ dino note patch <id>               # Patch note content structure after a requir
   --content <string|@file>       # Markdown content to insert
   --read-token <token>           # Required for real writes; returned by note content-read
   --allow-protected-replace      # Allow replace operations to affect media, table, container, or unknown blocks after reviewing content-read output
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the patch without writing
 
 dino note bulk [query]             # Bulk organize note tags or boxes using safe search filters
@@ -234,17 +239,21 @@ dino note bulk [query]             # Bulk organize note tags or boxes using safe
   --box-replace <string|@file>   # Replace the entire box list on every matched note; use [] to clear all boxes
   --expected-count <n>           # Required for real writes; must equal the current matched note count
   --confirm                      # Required for real writes after reviewing a dry run
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview matched targets and changes without executing
 
 dino note star [id]                # Mark one or more notes as starred
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino note unstar [id]              # Mark one or more notes as not starred
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino note delete <id>              # Soft-delete a note by setting is_del=1
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 ```
 
@@ -264,16 +273,19 @@ dino todo append [task]            # Append one or more tasks to an existing not
   --task <text>                  # Repeatable task text
   --tasks <string|@file>         # Task list (JSON array or comma/newline-separated)
   --note-id <id>                 # Target note id; omitted means latest eligible note
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino todo create [task]            # Create a new note containing one or more todo items
   --task <text>                  # Repeatable task text
   --tasks <string|@file>         # Task list (JSON array or comma/newline-separated)
   --title <string>               # Optional note title
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino todo update <taskId>          # Update a todo task checked status by task id
   --status <status>              # Target status: completed|uncompleted|done|undone|true|false|1|0
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 ```
 
@@ -401,7 +413,7 @@ dino graph stats                   # Get graph statistics for notes and links
 - `todo search` returns `{ meta, tasks }`; each task includes `task_key`, `task_id`, `note_id`, `note_title`, `status`, hierarchy, and time fields
 - All `todo` subcommands perform a sync-before-run step unless `--offline` is set
 - `todo` mutations (`append`/`create`/`update`) treat `content_json` as source-of-truth and sync derived `image_detail`, `content_md`, and `content_text`
-- `todo` mutations wait briefly for PowerSync upload flow after local writes; structured output includes `stale`
+- Note and todo mutations return write receipts with `durability`, `upload_queue_remaining`, `version`, `content_hash`, `changed`, and `stale`; pass `--durability uploaded` only when upload completion is required before success
 - `todo append` defaults to latest note (`created_at` desc) with non-empty `image_detail` when `--note-id` is omitted
 - `todo search` date filtering checks `due_time`/`start_time`; when task time is missing, note `created_at` is used
 - `todo update` fails when same `taskId` appears in multiple notes; disambiguate before retrying

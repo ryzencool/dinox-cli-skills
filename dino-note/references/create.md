@@ -10,6 +10,7 @@ dino note create                   # Create a new note from markdown content
   --type <note|crawl>            # Note type: note or crawl
   --tags <string|@file>          # Tag list (JSON array or comma/newline-separated)
   --boxes <string|@file>         # Box paths or unique names (JSON array or comma/newline-separated)
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 ```
 
@@ -47,4 +48,5 @@ Markdown fenced code blocks with `mermaid` or `mindgraph` languages are preserve
 2. Build the final `dino note create ... --format json --dry-run` command.
 3. Show the preview and ask for confirmation.
 4. Rerun the same command without `--dry-run`.
-5. Report the new note ID and any stale warning.
+5. Report the new note ID plus write receipt fields: `durability`, `upload_queue_remaining`, `version`, `content_hash`, `changed`, and any stale warning.
+6. Use `--durability uploaded` only when the user explicitly needs upload completion before success.

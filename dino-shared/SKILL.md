@@ -30,6 +30,8 @@ Read this file before using any user-invocable `dino-*` skill.
 - Do not ask the user to paste auth tokens into chat. If login is required, instruct them to set `DINOX_TOKEN` in their own shell or run `dino auth login "<token>"` in their own terminal.
 - For write operations, show the exact `dino ...` command first and get explicit confirmation before executing it.
 - When a command supports `--dry-run`, prefer running the same command with `--dry-run` before the final confirmed execution.
+- Note and todo writes return a write receipt: inspect `durability`, `upload_queue_remaining`, `version`, `content_hash`, `changed`, and `stale`.
+- Use `--durability uploaded` only when cloud upload completion is required before reporting success; otherwise accept `durability: local` as local DB success plus queued upload state.
 - When writing temp files, use `/tmp/` and do not overwrite an existing file path.
 
 ## Install And Bootstrap
@@ -71,8 +73,9 @@ dino sync --format json
 ## Stale And Upload Warnings
 
 - If a command returns `stale: true`, tell the user the local cache may be stale.
+- If a write returns `durability: local` with `upload_queue_remaining > 0`, tell the user the local write succeeded but upload is still pending.
 - If a command fails with `SYNC_REQUIRED`, do not make a data completeness claim. Tell the user sync could not be proven fresh and suggest retrying with a higher `--sync-timeout`.
-- If a mutation warns that upload did not finish before timeout, tell the user the local write succeeded but cloud propagation is still pending or failed.
+- If a mutation fails with `UPLOAD_PENDING`, follow the structured `suggested_action.command` or ask before running `dino doctor --fix --format json`.
 - `dino doctor --fix --format json` may drain pending uploads, rebuild the local note FTS index, and restart a stale daemon; treat it as a repair command and ask for confirmation before running it.
 
 ## Error Recovery

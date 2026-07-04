@@ -43,7 +43,8 @@ Use this skill when the user wants to work with `dino todo` commands.
 2. Do not pass `--offline` unless the user explicitly wants local-only cached data.
 3. All todo subcommands sync before execution unless `--offline` is set.
 4. `content_json` is the source of truth; the CLI auto-syncs derived fields.
-5. Todo mutations return `stale` and wait briefly for PowerSync upload flow after the local write.
+5. Todo mutations return write receipts with `durability`, `upload_queue_remaining`, `version`, `content_hash`, `changed`, and `stale`.
+6. Use `--durability uploaded` only when the user needs cloud upload completion before success; otherwise report the returned local/upload state.
 
 ## Workflow Router
 
@@ -57,7 +58,7 @@ Use this skill when the user wants to work with `dino todo` commands.
 3. For `append`, require `--note-id` or get explicit confirmation to use the default "latest eligible note".
 4. For `update`, confirm exact `taskId` and target status.
 5. Run the same write command with `--dry-run` first, show the preview, and ask for confirmation.
-6. Rerun without `--dry-run`, then summarize key fields (IDs, counts, status changes).
+6. Rerun without `--dry-run`, then summarize key fields (IDs, counts, status changes) and receipt fields (`durability`, `upload_queue_remaining`, `version`, `content_hash`).
 
 ## Error Handling
 

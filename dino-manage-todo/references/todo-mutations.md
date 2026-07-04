@@ -8,19 +8,27 @@ dino todo append [task]            # Append one or more tasks to an existing not
   --task <text>                  # Repeatable task text
   --tasks <string|@file>         # Task list (JSON array or comma/newline-separated)
   --note-id <id>                 # Target note id; omitted means latest eligible note
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino todo create [task]            # Create a new note containing one or more todo items
   --task <text>                  # Repeatable task text
   --tasks <string|@file>         # Task list (JSON array or comma/newline-separated)
   --title <string>               # Optional note title
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino todo update <taskId>          # Update a todo task checked status by task id
   --status <status>              # Target status: completed|uncompleted|done|undone|true|false|1|0
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 ```
 
 - Run the same command with `--dry-run` first.
 - For append, prefer explicit `--note-id` unless the user confirms the default target behavior.
 <!-- END GENERATED_COMMANDS -->
+
+## Write Receipts
+
+- Inspect returned write receipts: `durability`, `upload_queue_remaining`, `version`, `content_hash`, `changed`, and `stale`.
+- Use `--durability uploaded` only when upload completion is required before success.

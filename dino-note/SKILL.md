@@ -62,6 +62,7 @@ Use this skill for all `dino note` workflows.
 5. `dino note detail` exposes full markdown content and should only be used when the user really needs it.
 6. Local media paths must be uploaded to storage and rewritten into parser-friendly remote markdown before note create/update.
 7. For conclusion-style read tasks (latest note, recent/monthly activity, counts, duplicates, export completeness), use `--require-sync` on the note command or run `dino sync --strict --sync-timeout 600000 --format json` before reading.
+8. Note writes return write receipts. Inspect `durability`, `upload_queue_remaining`, `version`, `content_hash`, `changed`, and `stale`; use `--durability uploaded` only when the user needs the write uploaded before success.
 
 ## Error Handling
 
@@ -69,4 +70,5 @@ Use this skill for all `dino note` workflows.
 - If the user does not provide a reliable note identifier for a read or write, search first and ask them to confirm the target note.
 - If auth error occurs, instruct the user to set `DINOX_TOKEN` or run `dino auth login "<token>"` in their own terminal (do not paste tokens into chat), then retry.
 - If sync times out or a result is marked stale, tell the user the local cache may be outdated.
+- If a write returns `durability: local` with a nonzero `upload_queue_remaining`, report that the local write succeeded and cloud upload is pending.
 - If the CLI returns `SYNC_REQUIRED`, do not infer that notes are missing or absent; explain that the local cache freshness could not be proven.

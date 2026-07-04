@@ -69,7 +69,7 @@ dino sync --format json
 
 - If a command returns `stale: true`, tell the user the local cache may be stale.
 - If a command fails with `SYNC_REQUIRED`, do not make a data completeness claim. Tell the user sync could not be proven fresh and suggest retrying with a higher `--sync-timeout`.
-- If a command indicates uploads are disabled because `powersync.uploadBaseUrl` is unset, tell the user mutations are local-only for now.
+- If a mutation warns that upload did not finish before timeout, tell the user the local write succeeded but cloud propagation is still pending or failed.
 
 ## Update Guidance
 

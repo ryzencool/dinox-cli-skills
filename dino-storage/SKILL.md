@@ -77,7 +77,7 @@ dino storage stats                 # Summarize uploaded storage usage grouped by
 - `dino storage test` also targets only custom S3 configs and does not create a `c_resource` row.
 - Private buckets are allowed; `storageUrl` is still recorded, but direct read access may require signed URLs elsewhere.
 - Upload also writes a `c_resource` row, so the file is visible to later Dinox workflows.
-- When the uploaded file is an image, the CLI also generates a `400px` wide `webp` thumbnail and stores its URL in the resource `checksum` field.
+- When the uploaded file is an image, the CLI also generates a `400px` wide `webp` thumbnail and returns its URL in the command result. The resource `checksum` column is not used for thumbnail storage.
 
 ## Error Handling
 

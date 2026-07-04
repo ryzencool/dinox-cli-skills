@@ -66,6 +66,7 @@ dino sync --format json
 - For conclusion-style analysis (latest note, date range counts, monthly summaries, duplicates, exports, stats), require a proven fresh cache first:
   `dino sync --strict --sync-timeout 600000 --format json`, or add `--require-sync` to the read command.
 - `--offline` means local cache only. Do not assume results reflect the cloud when offline mode is used.
+- Default online read commands use the daemon-owned DB runtime. If daemon execution fails, follow the structured `suggested_action` or ask before retrying with `--offline`; do not silently rerun the same read locally.
 
 ## Stale And Upload Warnings
 

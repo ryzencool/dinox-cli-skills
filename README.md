@@ -7,6 +7,7 @@ Bundled agent skills for [Dinox CLI](https://github.com/ryzencool/dinox-cli) —
 > If an agent is unsure how to call a command, inspect it first with `dino schema <path>`.
 > For abnormal behavior, suspected stale data, missing search results, daemon failures, upload backlog, or local DB/index concerns, run `dino doctor --format json` first.
 > Structured failures include top-level `code`, `recoverable`, `exit_code`, and `suggested_action.command`; agents should branch on those fields.
+> Default online reads use the daemon-owned DB runtime over a private local socket; retry with `--offline` only when the user accepts local-cache semantics.
 
 ## Install Skills
 

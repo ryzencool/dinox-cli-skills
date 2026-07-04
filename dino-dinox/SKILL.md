@@ -82,6 +82,7 @@ dino sync --strict --sync-timeout 600000 --format json
 - Auth and sync: use `dino auth status/login/logout` and `dino sync`.
 - Health checks and local repairs: use `dino doctor --format json`; only use `dino doctor --fix --format json` after confirmation because it may rebuild indexes, drain uploads, and restart daemon.
 - Daemon: public process-management commands are `dino daemon start/status/restart/stop`.
+- Default online reads use daemon as the DB runtime over a user-private local socket. If daemon execution fails, use the returned `suggested_action` or explicit `--offline`; do not silently rerun locally.
 
 <!-- BEGIN GENERATED_REFERENCE -->
 ## Global Options
@@ -110,13 +111,13 @@ dino auth status                   # Show current login, local cache, and sync s
 ### Daemon
 ```text
 dino daemon start                  # Start daemon process
-  --port <number>                # Daemon port
+  --port <number>                # Legacy compatibility field; daemon listens on a private local socket
   --no-detach                    # Run in foreground for debugging
 
 dino daemon status                 # Show daemon status
 
 dino daemon restart                # Restart daemon process
-  --port <number>                # Daemon port
+  --port <number>                # Legacy compatibility field; daemon listens on a private local socket
 
 dino daemon stop                   # Stop daemon process
 ```

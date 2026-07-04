@@ -68,6 +68,8 @@ dino sync --strict --sync-timeout 600000 --format json
 - Ask for explicit confirmation before any write operation (create/update/delete, prompt/tag/box mutations, todo mutations, CLI update).
 - Prefer `--dry-run` on supported write commands before the final confirmed execution.
 - Prefer `--format json` for structured output and `dino schema <path>` when a command shape is uncertain.
+- For abnormal behavior, suspected stale data, missing search results, daemon failures, upload backlog, or local DB/index concerns, run `dino doctor --format json` first and inspect its `issues`, `sync`, `index`, `daemon`, and `db` sections.
+- Structured errors expose top-level `code`, `recoverable`, `exit_code`, and `suggested_action.command`; agents should follow the suggested action when safe instead of relaying raw error text.
 - For latest-note, date-range, monthly summary, stats, duplicates, or export completeness claims, use `dino sync --strict --sync-timeout 600000 --format json` first or add `--require-sync` to the read command.
 
 ## Command Selection
@@ -78,6 +80,7 @@ dino sync --strict --sync-timeout 600000 --format json
 - Todos: use `dino todo search/append/create/update`; todo items are extracted from note content.
 - Files and custom S3: use `dino storage list/test/upload/stats`.
 - Auth and sync: use `dino auth status/login/logout` and `dino sync`.
+- Health checks and local repairs: use `dino doctor --format json`; only use `dino doctor --fix --format json` after confirmation because it may rebuild indexes, drain uploads, and restart daemon.
 - Daemon: public process-management commands are `dino daemon start/status/restart/stop`.
 
 <!-- BEGIN GENERATED_REFERENCE -->
@@ -116,6 +119,12 @@ dino daemon restart                # Restart daemon process
   --port <number>                # Daemon port
 
 dino daemon stop                   # Stop daemon process
+```
+
+### Doctor
+```text
+dino doctor                        # Check Dinox CLI health across auth, sync, local indexes, daemon, and database integrity
+  --fix                          # Safely repair local indexes, drain upload queue, and restart stale daemon
 ```
 
 ### Sync

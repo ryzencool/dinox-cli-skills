@@ -5,6 +5,8 @@ Bundled agent skills for [Dinox CLI](https://github.com/ryzencool/dinox-cli) —
 > For agent / script integrations, prefer `dino --format json ...`.
 > Legacy `--json` still works, but it returns YAML for backward compatibility.
 > If an agent is unsure how to call a command, inspect it first with `dino schema <path>`.
+> For abnormal behavior, suspected stale data, missing search results, daemon failures, upload backlog, or local DB/index concerns, run `dino doctor --format json` first.
+> Structured failures include top-level `code`, `recoverable`, `exit_code`, and `suggested_action.command`; agents should branch on those fields.
 
 ## Install Skills
 
@@ -107,6 +109,7 @@ skills/BEST_PRACTICES.md
 ```
 > /dino-auth status
 > /dino-sync
+> dino doctor --format json
 > /dino-config get sync.timeoutMs
 > /dino-config set sync.timeoutMs 600000
 > /dino-note 搜索最近 7 天的 AI 笔记

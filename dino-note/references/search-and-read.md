@@ -40,7 +40,7 @@ dino note content-read <id>        # Read note content context and issue a short
 - Use `--boxes` for public box filters.
 - Prefer `--fields id,title,summary,tags,created_at,boxes,is_starred` when the user only needs search metadata.
 - Use `note export` for backup or migration; Markdown exports include frontmatter, JSON exports preserve note metadata and content JSON.
-- Use `note content-read` immediately before `note patch`; the returned readToken, content hash, block index, outline, and resolved hashtag paths are the required edit context.
+- Use `note content-read` immediately before `note patch`; the returned single-use readToken, content hash, block index, outline, and resolved hashtag paths are the required edit context. Run `content-read` again after every patch attempt.
 - `--sql` remains storage-oriented and still uses the field name `zettel_boxes`.
 <!-- END GENERATED_COMMANDS -->
 

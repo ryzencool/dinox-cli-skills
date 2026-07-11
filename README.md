@@ -48,7 +48,7 @@ dino sync --strict --sync-timeout 600000 --format json
 Persistent login, run by the user in their own terminal:
 
 ```bash
-dino auth login "<your-token>"
+printf '%s' "$DINOX_TOKEN" | dino auth login --token-stdin
 dino sync --strict --sync-timeout 600000 --format json
 ```
 

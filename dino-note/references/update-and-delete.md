@@ -78,7 +78,7 @@ dino note delete <id>              # Soft-delete a note by setting is_del=1
 - `note update` is for explicit note ids and full metadata replacement. It is not an append command.
 - `note tag` and `note move` are explicit-id incremental organizers: add/remove preserves existing values, replace overwrites the whole list.
 - `note move` changes zettel box membership only; it does not move files or note content.
-- `note patch` is only for structured content edits. Run `note content-read` immediately before it, pass `--read-token` for real writes, and use `--allow-protected-replace` only after reviewing protected blocks.
+- `note patch` is only for structured content edits. Run `note content-read` immediately before it and pass `--read-token` for real writes. The token is single-use and is consumed before any real patch attempt, so run `content-read` again after every failed attempt. Use `--allow-protected-replace` only after reviewing protected blocks.
 - `note bulk` is for filter-based batch metadata organization; it never accepts `--sql`, and real writes require `--confirm --expected-count <n>`.
 - Prefer `note star` / `note unstar` for pure starring changes, and `note update` when multiple fields change together.
 - Run the same command with `--dry-run --format json` first.

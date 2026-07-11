@@ -24,7 +24,7 @@ Use this skill when the user asks to run a sync, refresh local cache, or debug s
 
 - Sync connects to the cloud and may upload local changes. Show the exact command you will run and get explicit confirmation before syncing.
 - Only run `dino ...` commands needed for this workflow. Do not run unrelated shell commands unless the user explicitly asks.
-- Do not ask the user to paste auth tokens into chat. If login is required, instruct them to set `DINOX_TOKEN` or run `dino auth login "<token>"` in their own terminal.
+- Do not ask the user to paste auth tokens into chat. If login is required, instruct them to set `DINOX_TOKEN` or pipe a token into `dino auth login --token-stdin` in their own terminal.
 
 ## Commands
 
@@ -47,7 +47,7 @@ dino sync --strict --sync-timeout 600000 --format json
 
 1. Run `dino auth status --format json` first. If `loggedIn: no`, stop and ask the user to login in their own terminal.
 2. Show the exact `dino sync ...` command you will run and ask for confirmation.
-3. Use `dino sync --strict --sync-timeout 600000 --format json` before date-range analysis, latest-note claims, duplicates checks, exports, or other completeness-sensitive work.
+3. Use `dino sync --strict --sync-timeout 600000 --format json` before date-range analysis, latest-note claims, duplicates checks, exports, or other completeness-sensitive work. Strict mode requires an active connection and a checkpoint newer than this command's start, then waits for idle flow with no download error.
 4. Run the selected `dino sync ...` command, then summarize:
    - `dbPath`
    - `stale` and `idle` warnings (if present)
@@ -60,4 +60,4 @@ dino sync --strict --sync-timeout 600000 --format json
 
 - If sync times out (`stale: true`), explain the cache may be stale and suggest retrying with a higher `--sync-timeout`.
 - If strict sync fails with `SYNC_REQUIRED`, do not make data completeness claims until the user retries successfully or explicitly accepts stale/offline results.
-- If auth errors occur, instruct the user to set `DINOX_TOKEN` or run `dino auth login "<token>"` in their own terminal (do not paste tokens into chat), then retry.
+- If auth errors occur, instruct the user to set `DINOX_TOKEN` or pipe a token into `dino auth login --token-stdin` in their own terminal (do not paste tokens into chat), then retry.

@@ -20,12 +20,14 @@ dino todo create [task]            # Create a new note containing one or more to
 
 dino todo update <taskId>          # Update a todo task checked status by task id
   --status <status>              # Target status: completed|uncompleted|done|undone|true|false|1|0
+  --note-id <id>                 # Restrict task lookup to one exact note id
   --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 ```
 
 - Run the same command with `--dry-run` first.
 - For append, prefer explicit `--note-id` unless the user confirms the default target behavior.
+- For update, pass the `note_id` returned by todo search as `--note-id` when available; broad task lookup is bounded and refuses truncated results. Legacy ids bind to the searched task snapshot, so search again after the note changes.
 <!-- END GENERATED_COMMANDS -->
 
 ## Write Receipts

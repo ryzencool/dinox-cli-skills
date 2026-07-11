@@ -32,7 +32,7 @@ Use this skill for all `dino note` workflows.
 - `create`, `update`, `tag`, `move`, `bulk`, `star`, `unstar`, and `delete` are write operations. Always show the exact command(s) you will run and get explicit confirmation before mutating data.
 - When a note command supports `--dry-run`, run the same command with `--dry-run` first.
 - Before pasting large or full `content_md` into chat, ask once for confirmation.
-- Do not ask the user to paste auth tokens into chat. If auth is required, instruct them to set `DINOX_TOKEN` or run `dino auth login "<token>"` in their own terminal.
+- Do not ask the user to paste auth tokens into chat. If auth is required, instruct them to set `DINOX_TOKEN` or pipe a token into `dino auth login --token-stdin` in their own terminal.
 - When writing temp files, only write under `/tmp/` and do not overwrite an existing file path.
 
 ## Intent Mapping
@@ -63,12 +63,13 @@ Use this skill for all `dino note` workflows.
 6. Local media paths must be uploaded to storage and rewritten into parser-friendly remote markdown before note create/update.
 7. For conclusion-style read tasks (latest note, recent/monthly activity, counts, duplicates, export completeness), use `--require-sync` on the note command or run `dino sync --strict --sync-timeout 600000 --format json` before reading.
 8. Note writes return write receipts. Inspect `durability`, `upload_queue_remaining`, `version`, `content_hash`, `changed`, and `stale`; use `--durability uploaded` only when the user needs the write uploaded before success.
+9. Tag validation and inline hashtag resolution are scoped to the currently resolved Dinox user. A tag that exists only in another account must be treated as missing; after switching accounts, list or sync tags again before retrying.
 
 ## Error Handling
 
 - If `dino` is not found, tell the user to install Dinox CLI: `npm install -g @dinoxx/dinox-cli`
 - If the user does not provide a reliable note identifier for a read or write, search first and ask them to confirm the target note.
-- If auth error occurs, instruct the user to set `DINOX_TOKEN` or run `dino auth login "<token>"` in their own terminal (do not paste tokens into chat), then retry.
+- If auth error occurs, instruct the user to set `DINOX_TOKEN` or pipe a token into `dino auth login --token-stdin` in their own terminal (do not paste tokens into chat), then retry.
 - If sync times out or a result is marked stale, tell the user the local cache may be outdated.
 - If a write returns `durability: local` with a nonzero `upload_queue_remaining`, report that the local write succeeded and cloud upload is pending.
 - If the CLI returns `SYNC_REQUIRED`, do not infer that notes are missing or absent; explain that the local cache freshness could not be proven.

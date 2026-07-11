@@ -36,6 +36,8 @@ npm install -g @dinoxx/dinox-cli
 dino info --format json
 ```
 
+The CLI requires Node.js `^20.18.1 || >=22.0.0`: use Node.js 20.18.1 or later within 20.x, or Node.js 22 or later. Node.js 21 is not supported.
+
 For local development against this repository, add the local skills directory instead:
 
 ```bash
@@ -55,7 +57,7 @@ dino sync --strict --sync-timeout 600000 --format json
 For persistent login, the user should run this in their own terminal:
 
 ```bash
-dino auth login "<token>"
+printf '%s' "$DINOX_TOKEN" | dino auth login --token-stdin
 dino sync --strict --sync-timeout 600000 --format json
 ```
 
@@ -83,6 +85,7 @@ dino sync --strict --sync-timeout 600000 --format json
 - Health checks and local repairs: use `dino doctor --format json`; only use `dino doctor --fix --format json` after confirmation because it may rebuild indexes, drain uploads, and restart daemon.
 - Daemon: public process-management commands are `dino daemon start/status/restart/stop`.
 - Default online reads use daemon as the DB runtime over a user-private local socket. If daemon execution fails, use the returned `suggested_action` or explicit `--offline`; do not silently rerun locally.
+- Logout prioritizes clearing saved credentials even when daemon shutdown or cache ownership acquisition/release fails. An active `DINOX_TOKEN` still authenticates the current environment; on partial cleanup errors, inspect `persistedCredentialsCleared`, `cleanupPhase`, and the reported cache paths instead of claiming local cleanup completed safely. Every acquired owner lease is given a release attempt, and release failures do not replace an earlier primary logout error.
 
 <!-- BEGIN GENERATED_REFERENCE -->
 ## Global Options
@@ -100,7 +103,8 @@ dino sync --strict --sync-timeout 600000 --format json
 
 ### Auth
 ```text
-dino auth login <token>            # Save login token and verify PowerSync connectivity
+dino auth login [token]            # Save login token and verify PowerSync connectivity
+  --token-stdin                  # Read the login token from piped stdin instead of argv
 
 dino auth logout                   # Clear saved login token and optionally remove the local cache
   --clear-local-db               # Delete the local PowerSync SQLite database
@@ -131,7 +135,7 @@ dino doctor                        # Check Dinox CLI health across auth, sync, l
 ### Sync
 ```text
 dino sync                          # Connect and synchronize the local PowerSync database
-  --strict                       # Fail unless first sync completed, data flow is idle, and no download error exists
+  --strict                       # Fail unless connected, a new checkpoint completes, data flow is idle, and no download error exists
 ```
 
 ### Schema
@@ -142,6 +146,7 @@ dino schema [path]                 # Inspect Dinox CLI command schemas for agent
 ### Update CLI
 ```text
 dino update                        # Update @dinoxx/dinox-cli to the latest version
+  --package-manager <manager>    # Override package manager detection
 ```
 
 ### Notes
@@ -285,6 +290,7 @@ dino todo create [task]            # Create a new note containing one or more to
 
 dino todo update <taskId>          # Update a todo task checked status by task id
   --status <status>              # Target status: completed|uncompleted|done|undone|true|false|1|0
+  --note-id <id>                 # Restrict task lookup to one exact note id
   --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 ```
@@ -368,6 +374,7 @@ dino storage upload <file>         # Upload one local file to a custom S3 storag
   --storage-id <id>              # Explicit storage config id (otherwise use active custom config)
   --category <kind>              # Upload category: images|audios|files|videos
   --key <string>                 # Explicit object key override
+  --overwrite                    # Replace existing objects addressed by an explicit --key
   --dry-run                      # Preview the upload target and resource record without uploading
 
 dino storage stats                 # Summarize uploaded storage usage grouped by provider and bucket
@@ -383,6 +390,13 @@ dino config set <key> <value>      # Write configurable Dinox CLI settings
 ### Info
 ```text
 dino info                          # Show CLI version and bundled skills location
+```
+
+### Metadata
+```text
+dino meta stats                    # Get metadata stats (notes/tags/boxes)
+
+dino meta schema                   # Get structured Dinox data schema for AI integrations
 ```
 
 ### Graph
@@ -420,9 +434,12 @@ dino graph stats                   # Get graph statistics for notes and links
 - Tag expressions support `AND`, `OR`, `NOT`, and parentheses
 - The `--sql` option supports SQL-like WHERE conditions (read-only; no INSERT/UPDATE/DELETE); `zettel_boxes` values are matched by box path first, then unique leaf name, and auto-resolved to IDs
 - `tag add` and `box add` create/restore hierarchy nodes inside one PowerSync write transaction; a failed write must not leave a partial hierarchy
+- `storage upload --key` rejects dot-only `.` or `..` path segments because standard URL clients normalize them to a different object path
+- After `storage upload --overwrite` writes a remote object, a later thumbnail or metadata failure does not automatically delete that object; inspect `remoteObjectChanged`, `affectedKeys`, and `storageKey` in the structured error before verifying or retrying the affected keys
 - `note detail` supports batch read via `[id]` + `--ids`; at least one is required
 - `note update` supports batch update via `[id]` + `--ids`; at least one is required
 - `note update` requires at least one of `--tags`/`--boxes`, and both fields are full-replace semantics
+- `note patch` read tokens are short-lived (currently 30 minutes; use `readTokenExpiresAt` as the authority), bound to the issuing account's local PowerSync database scope, and single-use; they cannot cross accounts or local databases, and after any real patch failure you must run `note content-read` again before retrying
 - Use `dino schema <path>` when you are unsure about accepted arguments, output structure, or risk level for a command
 - `dino update` auto-detects the install package manager (npm/pnpm/yarn/bun) and runs the matching global update command
 - `dino update` output includes the skills repo URL and an AI reminder to review/update local Dinox skills

@@ -3,7 +3,7 @@ name: dino-manage-prompts
 description: >
   List or create Dinox prompts. Use when the user wants to see reusable prompts,
   add a new prompt template, or manage prompt commands in `c_cmd`.
-version: 1.1.0
+version: 1.1.1
 argument-hint: "[name] [prompt]"
 allowed-tools:
   - Bash

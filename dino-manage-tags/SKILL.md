@@ -3,7 +3,7 @@ name: dino-manage-tags
 description: >
   List or create Dinox tags. Use when the user wants to see their tags,
   add new tags, or organize their tag hierarchy.
-version: 1.1.0
+version: 1.1.1
 argument-hint: "[tag name to create]"
 allowed-tools:
   - Bash

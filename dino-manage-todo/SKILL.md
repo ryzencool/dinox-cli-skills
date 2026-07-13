@@ -3,7 +3,7 @@ name: dino-manage-todo
 description: >
   Search, create, append, and update Dinox todo tasks. Use when the user asks
   to manage checklist items, complete/uncomplete tasks, or query todos by tag/time/status.
-version: 1.1.0
+version: 1.1.1
 argument-hint: "[query or task text]"
 allowed-tools:
   - Bash

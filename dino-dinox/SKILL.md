@@ -5,7 +5,7 @@ description: >
   agent skills. Use whenever the user mentions dinox, dino, notes, tags, card
   boxes, zettel boxes, installing Dinox skills, configuring auth, or interacting
   with their Dinox knowledge base.
-version: 1.1.0
+version: 1.1.1
 user-invocable: false
 metadata:
   requires:
@@ -51,14 +51,14 @@ Never ask the user to paste tokens into chat. For process-only auth, tell the us
 ```bash
 export DINOX_TOKEN="<token-or-Bearer-token>"
 dino auth status --format json
-dino sync --strict --sync-timeout 600000 --format json
+dino sync --strict --sync-timeout 20000 --format json
 ```
 
 For persistent login, the user should run this in their own terminal:
 
 ```bash
 printf '%s' "$DINOX_TOKEN" | dino auth login --token-stdin
-dino sync --strict --sync-timeout 600000 --format json
+dino sync --strict --sync-timeout 20000 --format json
 ```
 
 `DINOX_TOKEN` takes precedence over saved config, accepts raw token or `Bearer ...`, and is never persisted.
@@ -72,7 +72,9 @@ dino sync --strict --sync-timeout 600000 --format json
 - Prefer `--format json` for structured output and `dino schema <path>` when a command shape is uncertain.
 - For abnormal behavior, suspected stale data, missing search results, daemon failures, upload backlog, or local DB/index concerns, run `dino doctor --format json` first and inspect its `issues`, `sync`, `index`, `daemon`, and `db` sections.
 - Structured errors expose top-level `code`, `recoverable`, `exit_code`, and `suggested_action.command`; agents should follow the suggested action when safe instead of relaying raw error text.
-- For latest-note, date-range, monthly summary, stats, duplicates, or export completeness claims, use `dino sync --strict --sync-timeout 600000 --format json` first or add `--require-sync` to the read command.
+- For latest-note, date-range, monthly summary, stats, duplicates, or export completeness claims, use `dino sync --strict --sync-timeout 20000 --format json` first or add `--require-sync` to the read command. Give the host tool several extra seconds beyond the CLI timeout.
+- Strict sync uses PowerSync's whole-second checkpoint precision, waits for downloads and the local token index, and does not wait for active uploads. Judge freshness from `stale`, `downloadIdle`, `tokenIndex.complete`, and `gate`, not `idle` alone.
+- Sync success is emitted after database/lease cleanup and daemon restoration. Do not respond to host timeouts by repeatedly increasing the CLI timeout.
 
 ## Command Selection
 
@@ -135,7 +137,7 @@ dino doctor                        # Check Dinox CLI health across auth, sync, l
 ### Sync
 ```text
 dino sync                          # Connect and synchronize the local PowerSync database
-  --strict                       # Fail unless connected, a new checkpoint completes, data flow is idle, and no download error exists
+  --strict                       # Fail unless connected, a current checkpoint completes, downloads settle, and the local index finishes
 ```
 
 ### Schema

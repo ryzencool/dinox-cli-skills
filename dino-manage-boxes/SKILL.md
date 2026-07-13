@@ -3,7 +3,7 @@ name: dino-manage-boxes
 description: >
   List or create Dinox card boxes (zettel boxes). Use when the user wants to
   see their card boxes, create new boxes, or organize notes into boxes.
-version: 1.1.0
+version: 1.1.1
 argument-hint: "[box path to create]"
 allowed-tools:
   - Bash

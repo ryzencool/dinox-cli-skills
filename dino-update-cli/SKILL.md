@@ -4,7 +4,7 @@ description: >
   Update Dinox CLI itself. Use when the user wants to upgrade
   `@dinoxx/dinox-cli`, refresh to the latest command features, or fix behavior
   caused by an outdated CLI version.
-version: 1.1.0
+version: 1.1.1
 argument-hint: ""
 allowed-tools:
   - Bash

@@ -5,7 +5,7 @@ description: >
   file to your own S3, and inspect usage stats. Use when the user wants to
   inspect configured object storage targets, verify a custom S3 config, push a
   file into a custom S3 bucket, or see storage usage totals.
-version: 1.1.0
+version: 1.1.1
 argument-hint: "[list|test|upload <file>|stats]"
 allowed-tools:
   - Bash

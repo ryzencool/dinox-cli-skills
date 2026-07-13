@@ -42,33 +42,35 @@ Process-only auth for AI/CI:
 ```bash
 export DINOX_TOKEN="<your-token-or-Bearer-token>"
 dino auth status --format json
-dino sync --strict --sync-timeout 600000 --format json
+dino sync --strict --sync-timeout 20000 --format json
 ```
 
 Persistent login, run by the user in their own terminal:
 
 ```bash
 printf '%s' "$DINOX_TOKEN" | dino auth login --token-stdin
-dino sync --strict --sync-timeout 600000 --format json
+dino sync --strict --sync-timeout 20000 --format json
 ```
 
 Security note: never paste tokens into chat logs. `DINOX_TOKEN` takes precedence over saved config, supports raw token or `Bearer ...`, and is not persisted by the CLI.
 
-For completeness-sensitive analysis such as latest notes, date ranges, monthly summaries, duplicates, stats, or exports, use `dino sync --strict --sync-timeout 600000 --format json` first or add `--require-sync` to the read command.
+For completeness-sensitive analysis such as latest notes, date ranges, monthly summaries, duplicates, stats, or exports, use `dino sync --strict --sync-timeout 20000 --format json` first or add `--require-sync` to the read command. Set the host tool timeout several seconds higher. Strict freshness waits for the current whole-second checkpoint, downloads, and local token indexing; active uploads do not block it, and structured success appears only after runtime cleanup.
 
 ## Repository Source
 
-Canonical source for packaged skills:
+Canonical development source for packaged skills:
+
+```bash
+https://github.com/ryzencool/dinox-cli/tree/main/skills
+```
+
+Standalone distribution mirror:
 
 ```bash
 https://github.com/ryzencool/dinox-cli-skills
 ```
 
-Development source inside the CLI repository:
-
-```bash
-<repo>/skills
-```
+The standalone repository is generated during a tagged CLI release. Do not edit mirrored skill files there; make changes under `<dinox-cli>/skills` and publish them through the CLI release workflow.
 
 When command schemas change, regenerate the bundled background reference with:
 
@@ -81,6 +83,21 @@ Validate bundled skill structure and shared-guidance references with:
 ```bash
 pnpm skills:check
 ```
+
+Preview or verify the standalone mirror without changing it:
+
+```bash
+pnpm run skills:sync:standalone:dry-run
+pnpm run skills:sync:standalone:check
+```
+
+Apply the mirror locally when preparing or diagnosing a release:
+
+```bash
+pnpm run skills:sync:standalone
+```
+
+Tagged releases publish npm first, then commit the verified mirror and matching `v<version>` tag to `dinox-cli-skills`. Configure `SKILLS_REPO_SSH_KEY` with the private half of a write-enabled deploy key whose public half is attached only to `dinox-cli-skills`; do not reuse a personal GitHub token.
 
 Skill authoring conventions live in:
 
@@ -112,7 +129,7 @@ skills/BEST_PRACTICES.md
 > /dino-sync
 > dino doctor --format json
 > /dino-config get sync.timeoutMs
-> /dino-config set sync.timeoutMs 600000
+> /dino-config set sync.timeoutMs 20000
 > /dino-note 搜索最近 7 天的 AI 笔记
 > /dino-note 01924f8a-... 预览前 30 行
 > /dino-note 创建一条标题为“今日笔记”的笔记

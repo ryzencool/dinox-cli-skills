@@ -4,7 +4,7 @@ description: >
   Search, read, create, update, star, and delete Dinox notes. Use when the
   user wants to find notes, open note details, preview content, create a note,
   organize tags or boxes, star or unstar notes, or delete a note.
-version: 1.1.0
+version: 1.1.1
 argument-hint: "[request or note id]"
 allowed-tools:
   - Bash
@@ -61,7 +61,7 @@ Use this skill for all `dino note` workflows.
 4. `dino note search` returns resolved `boxes`, but `--sql` remains storage-oriented and still uses `zettel_boxes`.
 5. `dino note detail` exposes full markdown content and should only be used when the user really needs it.
 6. Local media paths must be uploaded to storage and rewritten into parser-friendly remote markdown before note create/update.
-7. For conclusion-style read tasks (latest note, recent/monthly activity, counts, duplicates, export completeness), use `--require-sync` on the note command or run `dino sync --strict --sync-timeout 600000 --format json` before reading.
+7. For conclusion-style read tasks (latest note, recent/monthly activity, counts, duplicates, export completeness), use `--require-sync` on the note command or run `dino sync --strict --sync-timeout 20000 --format json` before reading. The host timeout must be several seconds longer; active uploads do not block download freshness.
 8. Note writes return write receipts. Inspect `durability`, `upload_queue_remaining`, `version`, `content_hash`, `changed`, and `stale`; use `--durability uploaded` only when the user needs the write uploaded before success.
 9. Tag validation and inline hashtag resolution are scoped to the currently resolved Dinox user. A tag that exists only in another account must be treated as missing; after switching accounts, list or sync tags again before retrying.
 

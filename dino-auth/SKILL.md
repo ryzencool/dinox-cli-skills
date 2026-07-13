@@ -2,7 +2,7 @@
 name: dino-auth
 description: >
   Check Dinox authentication status, and safely guide login/logout workflows.
-version: 1.1.0
+version: 1.1.1
 argument-hint: "[status|login|logout]"
 allowed-tools:
   - Bash

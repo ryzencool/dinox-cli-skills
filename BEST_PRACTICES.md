@@ -43,7 +43,7 @@ Required fields for background/shared skills:
 name: dino-note
 description: >
   Search, read, create, update, star, and delete Dinox notes.
-version: 1.1.0
+version: 1.1.1
 argument-hint: "[request or note id]"
 allowed-tools:
   - Bash

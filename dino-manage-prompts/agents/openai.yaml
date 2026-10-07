@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dinox Prompts"
+  short_description: "List and create reusable Dinox prompts"
+  default_prompt: "Use $dino-manage-prompts to list or create a reusable Dinox prompt."

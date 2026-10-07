@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "skill_name": "dino-dinox",
+  "evals": [
+    {
+      "id": "dinox-portable-install",
+      "prompt": "Set up Dinox CLI and the matching portable skills for Codex, Claude Code, Hermes Agent, and OpenClaw. Keep CLI and skill versions aligned.",
+      "expected_output": "The agent installs or inspects the CLI, reads `dino info` as structured JSON, verifies the skills version matches the CLI, and uses the pinned standalone skills release for all requested agents.",
+      "assertions": [
+        "Checks `data.skills_version` against `data.version` from `dino info --format json`.",
+        "Uses a version-pinned `ryzencool/dinox-cli-skills#v<version>` source.",
+        "Keeps the instructions vendor-neutral and includes the requested agent identifiers without making vendor metadata the runtime contract."
+      ]
+    },
+    {
+      "id": "dinox-doctor-timeout",
+      "prompt": "Dinox behaves inconsistently: the daemon sometimes fails, searches look stale, and uploads may be queued. Give me a safe health-check and repair plan.",
+      "expected_output": "The agent starts with a bounded structured doctor run, interprets daemon, sync, upload, index, and database signals, and requests confirmation before any repair action.",
+      "assertions": [
+        "Uses `dino doctor --sync-timeout 20000 --format json` for diagnosis.",
+        "Does not run `doctor --fix` without explicit confirmation.",
+        "Treats a host timeout as unknown and avoids silently falling back to stale offline data."
+      ]
+    },
+    {
+      "id": "dinox-schema-discovery",
+      "prompt": "I need the current agent-friendly schema for `dino graph related`, including supported flags and structured output. Do not guess from old docs.",
+      "expected_output": "The agent uses live schema discovery as the source of truth, reads JSON fields, and only falls back to the generated reference if the CLI is unavailable.",
+      "assertions": [
+        "Uses `dino schema graph.related --format json` or resolves the equivalent live schema path.",
+        "Does not invent flags or output fields absent from the schema.",
+        "Treats the generated command reference as a fallback rather than a stronger authority than the installed CLI."
+      ]
+    }
+  ],
+  "trigger_evals": [
+    {
+      "id": "dinox-train-install",
+      "split": "train",
+      "query": "Install Dinox CLI and its agent skills for the first time.",
+      "should_trigger": true,
+      "expected_skills": ["dino-dinox"],
+      "reason": "First-time CLI and portable skill bootstrap is owned by the fallback Dinox skill."
+    },
+    {
+      "id": "dinox-train-doctor",
+      "split": "train",
+      "query": "Run a Dinox doctor check for daemon and database health.",
+      "should_trigger": true,
+      "expected_skills": ["dino-dinox"],
+      "reason": "Doctor, daemon, index, and broad CLI health diagnostics belong to this skill."
+    },
+    {
+      "id": "dinox-train-note",
+      "split": "train",
+      "query": "Put note n_123 under the work tag without changing the tag hierarchy.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "A note-specific membership change belongs to the focused note skill."
+    },
+    {
+      "id": "dinox-train-sync",
+      "split": "train",
+      "query": "Run strict dino sync and confirm the cache is fresh.",
+      "should_trigger": false,
+      "expected_skills": ["dino-sync"],
+      "reason": "Explicit synchronization has a dedicated focused skill."
+    },
+    {
+      "id": "dinox-train-bootstrap-no-brand",
+      "split": "train",
+      "query": "Bootstrap the dino command and matching agent skills on a brand-new workstation.",
+      "should_trigger": true,
+      "expected_skills": ["dino-dinox"],
+      "reason": "This product-name-free wording still requests first-time CLI and skills installation."
+    },
+    {
+      "id": "dinox-train-daemon-typo",
+      "split": "train",
+      "query": "the dino damon keeps dying, can u run a health check?",
+      "should_trigger": true,
+      "expected_skills": ["dino-dinox"],
+      "reason": "The informal misspelled request is broad daemon health troubleshooting."
+    },
+    {
+      "id": "dinox-train-live-schema-no-brand",
+      "split": "train",
+      "query": "Before guessing any flags, inspect the live command schema for graph related.",
+      "should_trigger": true,
+      "expected_skills": ["dino-dinox"],
+      "reason": "Live CLI schema discovery belongs to the general command-discovery skill."
+    },
+    {
+      "id": "dinox-train-doctor-then-sync",
+      "split": "train",
+      "query": "Run doctor for the daemon and local database, then if they are healthy perform a strict cache sync.",
+      "should_trigger": true,
+      "expected_skills": ["dino-dinox", "dino-sync"],
+      "reason": "This compound workflow combines broad CLI health diagnosis with explicit synchronization."
+    },
+    {
+      "id": "dinox-train-existing-upgrade-only",
+      "split": "train",
+      "query": "The CLI is already installed and healthy; just upgrade it to the newest version.",
+      "should_trigger": false,
+      "expected_skills": ["dino-update-cli"],
+      "reason": "An existing healthy installation needs the focused update skill, not bootstrap troubleshooting."
+    },
+    {
+      "id": "dinox-train-tag-taxonomy",
+      "split": "train",
+      "query": "Rename the tag taxonomy path work/legacy to work/archive.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-tags"],
+      "reason": "A tag hierarchy rename belongs to focused tag management."
+    },
+    {
+      "id": "dinox-train-box-taxonomy",
+      "split": "train",
+      "query": "Show card-box usage statistics and identify empty boxes.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-boxes"],
+      "reason": "Box hierarchy statistics are handled by the focused box skill."
+    },
+    {
+      "id": "dinox-train-todo-operation",
+      "split": "train",
+      "query": "Complete checklist item task_901 and leave the rest unchanged.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-todo"],
+      "reason": "A specific checklist mutation belongs to the todo skill."
+    },
+    {
+      "id": "dinox-validation-schema-zh",
+      "split": "validation",
+      "query": "帮我查看 dino graph related 的最新命令 schema",
+      "should_trigger": true,
+      "expected_skills": ["dino-dinox"],
+      "reason": "Live command schema discovery is part of the general Dinox bootstrap and discovery surface."
+    },
+    {
+      "id": "dinox-validation-daemon",
+      "split": "validation",
+      "query": "Why is the Dinox daemon unhealthy, and how do I restart it safely?",
+      "should_trigger": true,
+      "expected_skills": ["dino-dinox"],
+      "reason": "Daemon troubleshooting is a general CLI health workflow."
+    },
+    {
+      "id": "dinox-validation-update",
+      "split": "validation",
+      "query": "Upgrade my existing Dinox CLI to the newest release.",
+      "should_trigger": false,
+      "expected_skills": ["dino-update-cli"],
+      "reason": "An installed CLI upgrade has a dedicated update skill."
+    },
+    {
+      "id": "dinox-validation-storage",
+      "split": "validation",
+      "query": "Upload report.pdf to my active custom S3 storage in Dinox.",
+      "should_trigger": false,
+      "expected_skills": ["dino-storage"],
+      "reason": "Custom storage upload is covered by the focused storage skill."
+    },
+    {
+      "id": "dinox-validation-first-install-zh",
+      "split": "validation",
+      "query": "这台新电脑还没有 dino，帮我安装 CLI，并让 Claude 和 Codex 都能发现配套 skills",
+      "should_trigger": true,
+      "expected_skills": ["dino-dinox"],
+      "reason": "This is a first-time cross-agent installation and discovery request."
+    },
+    {
+      "id": "dinox-validation-long-daemon-diagnosis",
+      "split": "validation",
+      "query": "The command exists and login works, but after the laptop wakes the daemon socket disappears, local search may be stale, and I am unsure whether the database is healthy. Diagnose the CLI runtime before changing any data.",
+      "should_trigger": true,
+      "expected_skills": ["dino-dinox"],
+      "reason": "The long-context problem spans daemon, local database, and broad CLI health rather than a focused data operation."
+    },
+    {
+      "id": "dinox-validation-prompt-operation",
+      "split": "validation",
+      "query": "The installation is fine; list the reusable prompts saved in c_cmd.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-prompts"],
+      "reason": "CLI health is only context; the requested data operation is prompt listing."
+    },
+    {
+      "id": "dinox-validation-auth-operation",
+      "split": "validation",
+      "query": "The CLI and daemon are healthy. Log out the current account while preserving cached notes.",
+      "should_trigger": false,
+      "expected_skills": ["dino-auth"],
+      "reason": "The explicit action is credential logout, which belongs to authentication."
+    }
+  ]
+}

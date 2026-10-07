@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dinox Storage"
+  short_description: "Inspect and use Dinox custom storage"
+  default_prompt: "Use $dino-storage to inspect, test, or upload to my Dinox storage."

@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "name": "dinox-cli-skills",
+  "version": "2.0.0",
+  "license": "ISC",
+  "installer": {
+    "name": "skills",
+    "version": "1.5.16"
+  },
+  "source": {
+    "repository": "https://github.com/ryzencool/dinox-cli",
+    "path": "skills",
+    "revision": "v2.0.0"
+  },
+  "distribution": {
+    "repository": "https://github.com/ryzencool/dinox-cli-skills",
+    "revision": "v2.0.0",
+    "installCommand": "npx --yes skills@1.5.16 add ryzencool/dinox-cli-skills#v2.0.0 -g -a codex -a claude-code -a hermes-agent -a openclaw --skill '*' -y"
+  },
+  "skills": [
+    "dino-auth",
+    "dino-config",
+    "dino-dinox",
+    "dino-manage-boxes",
+    "dino-manage-prompts",
+    "dino-manage-tags",
+    "dino-manage-todo",
+    "dino-manage-views",
+    "dino-note",
+    "dino-storage",
+    "dino-sync",
+    "dino-update-cli"
+  ],
+  "retiredSkills": [
+    {
+      "name": "create-note",
+      "replacement": "dino-note",
+      "source": "ryzencool/dinox-cli-skills",
+      "skillFolderHash": "15a91b77e5032e614cbec95997de0f9697cee29c"
+    },
+    {
+      "name": "dinox",
+      "replacement": "dino-dinox",
+      "source": "ryzencool/dinox-cli-skills",
+      "skillFolderHash": "3089a4b076fffd8d6579db26c520f0d97e225a30"
+    },
+    {
+      "name": "manage-boxes",
+      "replacement": "dino-manage-boxes",
+      "source": "ryzencool/dinox-cli-skills",
+      "skillFolderHash": "49ffa648ab341bef20a9ea4696973d39c5c4e1c9"
+    },
+    {
+      "name": "manage-tags",
+      "replacement": "dino-manage-tags",
+      "source": "ryzencool/dinox-cli-skills",
+      "skillFolderHash": "801f6cc91d225503ad67054f66ac024cb12d01cb"
+    },
+    {
+      "name": "search-notes",
+      "replacement": "dino-note",
+      "source": "ryzencool/dinox-cli-skills",
+      "skillFolderHash": "88d3a95a3cb663b555e79be57d2135c0edbe8e0d"
+    },
+    {
+      "name": "view-note",
+      "replacement": "dino-note",
+      "source": "ryzencool/dinox-cli-skills",
+      "skillFolderHash": "639ce5941e19d4f5ffc3a4b5870486e741ab2937"
+    },
+    {
+      "name": "dino-shared",
+      "replacement": null,
+      "replacementNote": "Runtime guidance is embedded in every current Dinox skill.",
+      "source": "ryzencool/dinox-cli-skills",
+      "skillFolderHash": "842fe8fd30020bf1b58718dcd438d78b4c7d8f33"
+    }
+  ],
+  "retiredSkillsCleanup": {
+    "automaticRemoval": false,
+    "inventoryCommand": "npx --yes skills@1.5.16 list -g --json",
+    "lockFile": "~/.agents/.skill-lock.json",
+    "requiredMatchFields": [
+      "name",
+      "source",
+      "skillFolderHash"
+    ],
+    "guidance": "Use the inventory command to find candidates, then inspect the installer lock. Remove an installed skill only when its name, source, and skillFolderHash all match this official retired inventory. Never delete a skill directory or lock entry by name alone because unrelated skills can share an ID."
+  }
+}

@@ -25,12 +25,12 @@ dino todo update <taskId>          # Update a todo task checked status by task i
   --dry-run                      # Preview the write without executing it
 ```
 
-- Run the same command with `--dry-run` first.
+- Run the same command with `--sync-timeout 20000 --dry-run --format json` first and keep the host timeout 5-10 seconds higher.
 - For append, prefer explicit `--note-id` unless the user confirms the default target behavior.
 - For update, pass the `note_id` returned by todo search as `--note-id` when available; broad task lookup is bounded and refuses truncated results. Legacy ids bind to the searched task snapshot, so search again after the note changes.
 <!-- END GENERATED_COMMANDS -->
 
 ## Write Receipts
 
-- Inspect returned write receipts: `durability`, `upload_queue_remaining`, `version`, `content_hash`, `changed`, and `stale`.
+- Inspect returned write receipts under `data`: `durability`, `upload_queue_remaining`, `version`, `content_hash`, `changed`, and `stale`.
 - Use `--durability uploaded` only when upload completion is required before success.

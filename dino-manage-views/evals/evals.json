@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "skill_name": "dino-manage-views",
+  "evals": [
+    {
+      "id": "views-create-property-filter",
+      "prompt": "Create a Dinox saved view named Active Projects using my Status property and sort it by Priority.",
+      "expected_output": "The agent discovers field semantics and option IDs, constructs canonical version 1 JSON, dry-runs the create, and performs only the matching authorized write.",
+      "assertions": [
+        "Runs `dino view fields --sync-timeout 20000 --format json` before composing property references.",
+        "Uses the stable Status option ID rather than its display label.",
+        "Passes canonical filter/config JSON through secure temporary files and dry-runs creation first."
+      ]
+    },
+    {
+      "id": "views-query-all-pages",
+      "prompt": "Use my saved view called Reading Queue and return every matching note.",
+      "expected_output": "The agent resolves the view ID, queries it with bounded JSON pagination, and follows nextOffset until hasMore is false before claiming completeness.",
+      "assertions": [
+        "Finds the target with `dino view list` or an already-known exact ID.",
+        "Uses `dino view query <id>` with bounded limit/offset and JSON output.",
+        "Checks freshness and pagination before claiming every note was returned."
+      ]
+    },
+    {
+      "id": "views-timeout-update",
+      "prompt": "The agent timed out updating my Priority view. Do not duplicate or overwrite blindly; determine whether it succeeded.",
+      "expected_output": "The agent treats the update outcome as unknown and verifies the existing definition before deciding whether any retry is needed.",
+      "assertions": [
+        "Does not infer that the timed-out write failed.",
+        "Uses `dino view get <id> --sync-timeout 20000 --format json` or catalog lookup to verify the postcondition.",
+        "Retries only if the current definition does not match the requested update."
+      ]
+    }
+  ],
+  "trigger_evals": [
+    {
+      "id": "views-train-list",
+      "split": "train",
+      "query": "List my Dinox saved table views.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-views"],
+      "reason": "The user wants the saved view catalog."
+    },
+    {
+      "id": "views-train-create",
+      "split": "train",
+      "query": "Build a reusable Dinox view for active projects with columns for title, status, and score.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-views"],
+      "reason": "The request creates a persistent filtered table view."
+    },
+    {
+      "id": "views-train-query",
+      "split": "train",
+      "query": "Show the notes currently inside my Reading Queue saved view.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-views"],
+      "reason": "The request queries notes through a named saved view."
+    },
+    {
+      "id": "views-train-search",
+      "split": "train",
+      "query": "Search my notes once for articles mentioning SQLite; do not save a view.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "A one-off note search without persistent view intent belongs to note search."
+    },
+    {
+      "id": "views-train-template",
+      "split": "train",
+      "query": "Create a note from my Weekly Review note template.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "Creating a note from a template is a note workflow, not saved-view management."
+    },
+    {
+      "id": "views-validation-update-zh",
+      "split": "validation",
+      "query": "把 Dinox 里的项目视图改成只显示状态为进行中的笔记，并按优先级降序。",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-views"],
+      "reason": "This updates the filter and sort definition of a persistent view."
+    },
+    {
+      "id": "views-validation-count",
+      "split": "validation",
+      "query": "How many notes match my saved view named Research Backlog?",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-views"],
+      "reason": "Counting membership of a named saved view belongs to saved-view management."
+    },
+    {
+      "id": "views-validation-delete",
+      "split": "validation",
+      "query": "Delete the obsolete Dinox saved view called Old Inbox after showing me the dry run.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-views"],
+      "reason": "The user explicitly requests deleting a saved view."
+    },
+    {
+      "id": "views-validation-note-list",
+      "split": "validation",
+      "query": "List my ten most recently updated notes, but do not create anything reusable.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "This is a transient note query and explicitly rules out a saved view."
+    },
+    {
+      "id": "views-validation-ui-advice",
+      "split": "validation",
+      "query": "Suggest a better table layout for a dashboard mockup that is unrelated to Dinox.",
+      "should_trigger": false,
+      "expected_skills": [],
+      "reason": "Generic UI design advice should not invoke Dinox saved-view tooling."
+    }
+  ]
+}

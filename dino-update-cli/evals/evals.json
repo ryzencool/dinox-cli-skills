@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "skill_name": "dino-update-cli",
+  "evals": [
+    {
+      "id": "update-confirm-global",
+      "prompt": "Upgrade my installed Dinox CLI to the latest supported version.",
+      "expected_output": "The agent shows the global update command and requests explicit confirmation, then lets `dino update` detect the package manager instead of inventing package-manager-specific commands.",
+      "assertions": [
+        "Requests confirmation before executing `dino update --format json`.",
+        "Does not directly run npm, pnpm, yarn, or bun global update commands unless separately requested.",
+        "Limits execution to the update and subsequent info verification commands."
+      ]
+    },
+    {
+      "id": "update-version-alignment",
+      "prompt": "After updating Dinox CLI, verify its version and tell me the exact portable skills release to install for Codex, Claude Code, Hermes Agent, and OpenClaw.",
+      "expected_output": "The agent reads structured updater and info fields, verifies CLI and skills version alignment, and presents the allowlisted version-pinned standalone skills command while treating skill installation as a separate global write.",
+      "assertions": [
+        "Runs `dino info --format json` after the update and compares matching skill fields to the installed CLI version.",
+        "Uses `ryzencool/dinox-cli-skills#v<same-cli-version>` rather than an unpinned branch.",
+        "Requests separate confirmation before globally installing or updating agent skills."
+      ]
+    },
+    {
+      "id": "update-lost-output",
+      "prompt": "The terminal stopped waiting during `dino update`, so I do not know whether the global update finished. Avoid running the update twice.",
+      "expected_output": "The agent treats the outcome as unknown, checks the installed version with `dino info`, and only proposes another confirmed update if verification shows it is still needed.",
+      "assertions": [
+        "Runs `dino info --format json` before retrying.",
+        "Does not assume that lost host output means the global update failed.",
+        "Requires confirmation again before any real retry that changes global tooling."
+      ]
+    }
+  ],
+  "trigger_evals": [
+    {
+      "id": "update-train-upgrade",
+      "split": "train",
+      "query": "Upgrade my installed @dinoxx/dinox-cli package.",
+      "should_trigger": true,
+      "expected_skills": ["dino-update-cli"],
+      "reason": "The user wants to update an existing Dinox CLI installation."
+    },
+    {
+      "id": "update-train-skills",
+      "split": "train",
+      "query": "Update dino and tell me the matching skills release.",
+      "should_trigger": true,
+      "expected_skills": ["dino-update-cli"],
+      "reason": "CLI upgrade plus matching skill-release discovery is the update workflow."
+    },
+    {
+      "id": "update-train-install",
+      "split": "train",
+      "query": "Install Dinox CLI for the first time on this machine.",
+      "should_trigger": false,
+      "expected_skills": ["dino-dinox"],
+      "reason": "First-time installation belongs to bootstrap, not installed-CLI update."
+    },
+    {
+      "id": "update-train-sync",
+      "split": "train",
+      "query": "Refresh my Dinox local cache from the cloud.",
+      "should_trigger": false,
+      "expected_skills": ["dino-sync"],
+      "reason": "Data synchronization is unrelated to updating the CLI package."
+    },
+    {
+      "id": "update-validation-upgrade-zh",
+      "split": "validation",
+      "query": "把已经安装的 Dinox CLI 升级到最新版本",
+      "should_trigger": true,
+      "expected_skills": ["dino-update-cli"],
+      "reason": "This explicitly requests an upgrade of the installed CLI."
+    },
+    {
+      "id": "update-validation-version",
+      "split": "validation",
+      "query": "Run the supported dino updater and verify which version is installed.",
+      "should_trigger": true,
+      "expected_skills": ["dino-update-cli"],
+      "reason": "Updater execution and post-update version verification belong to this skill."
+    },
+    {
+      "id": "update-validation-doctor",
+      "split": "validation",
+      "query": "Run Dinox doctor to inspect daemon and database health.",
+      "should_trigger": false,
+      "expected_skills": ["dino-dinox"],
+      "reason": "General health diagnostics belong to the fallback Dinox skill."
+    },
+    {
+      "id": "update-validation-auth",
+      "split": "validation",
+      "query": "Log out of Dinox and keep my local database.",
+      "should_trigger": false,
+      "expected_skills": ["dino-auth"],
+      "reason": "Credential logout is an authentication workflow."
+    }
+  ]
+}

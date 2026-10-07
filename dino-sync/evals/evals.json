@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "skill_name": "dino-sync",
+  "evals": [
+    {
+      "id": "sync-strict-freshness",
+      "prompt": "Synchronize Dinox before a latest-note analysis and prove download freshness even if uploads are still draining.",
+      "expected_output": "The agent runs strict sync with a bounded CLI deadline and a longer host timeout, then judges freshness from the strict gate, stale state, download idle state, and token index rather than the compatibility idle field alone.",
+      "assertions": [
+        "Uses `dino sync --strict --sync-timeout 20000 --format json`.",
+        "Sets the host execution timeout at least 5-10 seconds above the CLI timeout.",
+        "Accepts fresh downloads when `data.gate.ok` is true and `data.stale` is false even if active uploads keep `data.idle` false."
+      ]
+    },
+    {
+      "id": "sync-host-timeout-unknown",
+      "prompt": "Hermes and OpenClaw both report `dino sync` timed out, but the Dinox data is synchronized afterward. Diagnose why and give a safe retry strategy.",
+      "expected_output": "The agent explains the mismatch between host waiting time and CLI cleanup/deadline behavior, treats loss of the final structured envelope as an unknown outcome, verifies freshness or postcondition, and retries at most once with coordinated bounded timeouts.",
+      "assertions": [
+        "Separates the host process timeout from `--sync-timeout`.",
+        "Does not call the sync failed solely because the host stopped waiting.",
+        "Verifies with a bounded strict sync or doctor before making freshness claims and avoids unbounded timeout escalation."
+      ]
+    },
+    {
+      "id": "sync-auth-error",
+      "prompt": "Run an ordinary Dinox refresh. If credentials are missing, handle that safely without asking me to paste a token here.",
+      "expected_output": "The agent runs sync directly without a redundant online auth preflight, handles a structured auth error if returned, and gives stdin or inherited-environment login guidance without exposing secrets.",
+      "assertions": [
+        "Does not run online `auth status` before the requested sync.",
+        "Uses non-strict bounded sync for an ordinary refresh.",
+        "Never requests a token in chat or places one in argv."
+      ]
+    }
+  ],
+  "trigger_evals": [
+    {
+      "id": "sync-train-explicit",
+      "split": "train",
+      "query": "Run dino sync now and refresh my local cache.",
+      "should_trigger": true,
+      "expected_skills": ["dino-sync"],
+      "reason": "The user explicitly requests Dinox PowerSync synchronization."
+    },
+    {
+      "id": "sync-train-timeout",
+      "split": "train",
+      "query": "dino sync timed out in my agent even though the data later appeared; diagnose it.",
+      "should_trigger": true,
+      "expected_skills": ["dino-sync"],
+      "reason": "This is diagnosis of synchronization execution and outcome."
+    },
+    {
+      "id": "sync-train-config",
+      "split": "train",
+      "query": "Set the saved Dinox sync.timeoutMs value to 20000.",
+      "should_trigger": false,
+      "expected_skills": ["dino-config"],
+      "reason": "Changing a persistent CLI setting belongs to configuration."
+    },
+    {
+      "id": "sync-train-auth",
+      "split": "train",
+      "query": "Am I currently logged into Dinox?",
+      "should_trigger": false,
+      "expected_skills": ["dino-auth"],
+      "reason": "Credential status without a sync request belongs to authentication."
+    },
+    {
+      "id": "sync-validation-fresh-zh",
+      "split": "validation",
+      "query": "同步 Dinox 并确认本地数据是最新的",
+      "should_trigger": true,
+      "expected_skills": ["dino-sync"],
+      "reason": "This explicitly requests synchronization plus a freshness guarantee."
+    },
+    {
+      "id": "sync-validation-stale",
+      "split": "validation",
+      "query": "Why does Dinox say my cache is stale after sync?",
+      "should_trigger": true,
+      "expected_skills": ["dino-sync"],
+      "reason": "Stale-cache and strict gate diagnosis are sync responsibilities."
+    },
+    {
+      "id": "sync-validation-update",
+      "split": "validation",
+      "query": "Update @dinoxx/dinox-cli to the latest version.",
+      "should_trigger": false,
+      "expected_skills": ["dino-update-cli"],
+      "reason": "Updating the installed CLI is separate from syncing Dinox data."
+    },
+    {
+      "id": "sync-validation-note",
+      "split": "validation",
+      "query": "Search my Dinox notes for the phrase upload deadline.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "A note query belongs to the note skill even though it may require fresh data."
+    }
+  ]
+}

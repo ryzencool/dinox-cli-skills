@@ -1,3 +1,13 @@
+# Update, Organize, And Delete Notes
+
+## Contents
+
+- [Command Surface](#command-surface)
+- [Target Resolution](#target-resolution)
+- [Mutation Routing](#mutation-routing)
+- [Write Workflow](#write-workflow)
+- [Important Rules](#important-rules)
+
 <!-- BEGIN GENERATED_COMMANDS -->
 ## Command Surface
 
@@ -35,8 +45,8 @@ dino note patch <id>               # Patch note content structure after a requir
   --replace-block                # Replace one exact markdown block matched by --match
   --match <string|@file>         # Exact markdown to replace when using --replace-block
   --content <string|@file>       # Markdown content to insert
-  --read-token <token>           # Required for real writes; returned by note content-read
-  --allow-protected-replace      # Allow replace operations to affect media, table, container, or unknown blocks after reviewing content-read output
+  --read-token <token|@file>     # Single-use patch capability returned by note content-read; prefer @file to avoid exposing it in argv
+  --allow-protected-replace      # Allow replacement of media, table, container, or unknown blocks only with a reviewed full-content read token
   --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the patch without writing
 
@@ -78,29 +88,36 @@ dino note delete <id>              # Soft-delete a note by setting is_del=1
 - `note update` is for explicit note ids and full metadata replacement. It is not an append command.
 - `note tag` and `note move` are explicit-id incremental organizers: add/remove preserves existing values, replace overwrites the whole list.
 - `note move` changes zettel box membership only; it does not move files or note content.
-- `note patch` is only for structured content edits. Run `note content-read` immediately before it and pass `--read-token` for real writes. The token is single-use and is consumed before any real patch attempt, so run `content-read` again after every failed attempt. Use `--allow-protected-replace` only after reviewing protected blocks.
+- `note patch` is only for structured content edits. Run `note content-read` immediately before it and put the short-lived patch capability in an exclusively created temporary file with owner-only permissions (0600 on POSIX; an owner-only ACL on Windows), then pass `--read-token @<file>` and delete the file immediately after the attempt. Default capabilities have `data.readTokenScope: structural-metadata`; `--allow-protected-replace` requires a reviewed `content-read --include-content` result with `data.readTokenScope: full-content`. Every real attempt consumes the capability, so read again before retrying.
 - `note bulk` is for filter-based batch metadata organization; it never accepts `--sql`, and real writes require `--confirm --expected-count <n>`.
 - Prefer `note star` / `note unstar` for pure starring changes, and `note update` when multiple fields change together.
-- Run the same command with `--dry-run --format json` first.
+- Run the same online command with `--sync-timeout 20000 --dry-run --format json` first and keep the host timeout 5-10 seconds higher.
 <!-- END GENERATED_COMMANDS -->
 
 ## Target Resolution
 
 1. If the user does not give an exact note ID, search first.
-2. Before a destructive write, fetch lightweight context with `dino note get <id> --context-only --format json`.
+2. Before a destructive write, fetch lightweight context with `dino note get <id> --context-only --sync-timeout 20000 --format json`.
 3. For batch writes, confirm every target ID before executing.
 
-## Update Workflow
+## Mutation Routing
 
-1. Confirm the target note IDs and the final desired tags, boxes, or starred state.
-2. If the user intent is incremental add/remove, fetch current state first and convert it into an explicit replacement set.
-3. If the update also touches markdown content and that content includes local media/file paths, first read [media-resources](media-resources.md) and rewrite them into uploaded remote forms before updating the note content elsewhere in the workflow.
-4. Validate candidate tag names with `dino tag list --format json`.
-5. Validate candidate box names with `dino box list --format json`.
-6. If any names are missing, ask whether to create them first.
-7. Run the exact mutation command with `--dry-run --format json`.
-8. Ask for confirmation.
-9. Rerun without `--dry-run`, then summarize `updatedCount/total` or the deleted note ID plus receipt fields (`durability`, `upload_queue_remaining`, `version`, `content_hash`, `changed`).
+- Add or remove tags while preserving the rest: `note tag --add` or `--remove`.
+- Add or remove boxes while preserving the rest: `note move --add` or `--remove`.
+- Replace the complete tag or box set only when explicitly requested: `note tag --replace`, `note move --replace`, or metadata-only `note update`.
+- Change only starred state: `note star` or `note unstar`.
+- Change Markdown content: read [content-edit](content-edit.md); never use a nonexistent `note update --content` option.
+- Apply one metadata change to a filtered set: `note bulk`, with an explicit target filter, dry-run, confirmation, and expected count.
+- Soft-delete one exact note: `note delete`.
+
+## Write Workflow
+
+1. Resolve and verify the target IDs. For incremental metadata changes, use `note tag` or `note move` directly instead of reconstructing a full replacement set.
+2. Validate candidate tags with `dino tag list --sync-timeout 20000 --format json` and boxes with `dino box list --sync-timeout 20000 --format json`. Ask before creating anything missing.
+3. Run the exact mutation with `--sync-timeout 20000 --dry-run --format json`; inspect `data.targets`, `data.changes`, `data.stale`, and `data.sync.gate`. Keep the host timeout 5-10 seconds higher.
+4. If the user already requested that exact incremental edit or star change and the preview matches, execute without another prompt. Always ask again before delete, bulk mutation, or complete replacement.
+5. For bulk writes, pass the preview's current matched count as `--expected-count <n>` together with `--confirm`.
+6. Rerun without `--dry-run`, then summarize `data.updatedCount`/`data.total` or the deleted note ID plus `data.durability`, `data.upload_queue_remaining`, `data.version`, `data.content_hash`, `data.changed`, and `data.stale`.
 
 ## Important Rules
 
@@ -109,4 +126,4 @@ dino note delete <id>              # Soft-delete a note by setting is_del=1
 - Never keep local filesystem media paths inside persisted note markdown; upload them first.
 - For delete, always tell the user this is a soft-delete (`is_del=1`).
 - Use `--durability uploaded` only when the user needs upload completion before success; otherwise inspect the returned durability and queue count.
-- Keep temp files for batch IDs under `/tmp/`.
+- Create batch-ID files in the host operating system's temporary directory and never overwrite an existing path.

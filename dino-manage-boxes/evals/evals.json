@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "skill_name": "dino-manage-boxes",
+  "evals": [
+    {
+      "id": "boxes-current-tree",
+      "prompt": "Show the current Dinox card-box hierarchy and call out any ambiguous duplicate leaf names before I reorganize it.",
+      "expected_output": "The agent retrieves the box tree with bounded structured output, checks freshness and notices, and reports full paths rather than assuming duplicate leaf names are unique.",
+      "assertions": [
+        "Uses `dino box tree` with `--sync-timeout 20000 --format json`.",
+        "Checks top-level `ok`, `data.stale`, and `_notice` before calling the hierarchy current.",
+        "Uses full box paths when leaf names are ambiguous."
+      ]
+    },
+    {
+      "id": "boxes-create-path",
+      "prompt": "Create the Dinox card box Projects/Atlas with description 'Atlas planning'.",
+      "expected_output": "The agent previews the exact hierarchical box creation, verifies the normalized path and description, then performs it without redundant confirmation because the user requested that exact non-destructive write.",
+      "assertions": [
+        "Runs the add command with `--dry-run`, bounded sync timeout, and JSON output first.",
+        "Treats the full path and description as untrusted arguments rather than shell source.",
+        "Executes the matching real add after a successful exact preview without asking again."
+      ]
+    },
+    {
+      "id": "boxes-merge-confirmation",
+      "prompt": "Merge the card-box subtree Projects/OldAtlas into Projects/Atlas and preserve note membership.",
+      "expected_output": "The agent dry-runs the merge, reports source, target, affected notes and soft-deleted boxes, obtains explicit confirmation, and uses the fresh preview count as the guarded real-write count.",
+      "assertions": [
+        "Requires `data.stale: false` before trusting `data.changes.affected_count`.",
+        "Requests explicit confirmation after showing the merge impact.",
+        "Uses both `--confirm` and `--expected-count <affected_count>` for the real merge."
+      ]
+    }
+  ],
+  "trigger_evals": [
+    {
+      "id": "boxes-train-list",
+      "split": "train",
+      "query": "List my Dinox zettel boxes as a hierarchy.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-boxes"],
+      "reason": "Browsing the box hierarchy belongs to box management."
+    },
+    {
+      "id": "boxes-train-create",
+      "split": "train",
+      "query": "Create a new card box called Research/LLMs.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-boxes"],
+      "reason": "Creating a hierarchy path changes the box taxonomy itself."
+    },
+    {
+      "id": "boxes-train-note-membership",
+      "split": "train",
+      "query": "Put note n_42 into the Inbox card box.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "Assigning a box to a specific note is note membership, not box hierarchy management."
+    },
+    {
+      "id": "boxes-train-tags",
+      "split": "train",
+      "query": "Merge the work/old tag into work.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-tags"],
+      "reason": "The requested hierarchy is tags rather than card boxes."
+    },
+    {
+      "id": "boxes-train-tree-no-brand",
+      "split": "train",
+      "query": "Show the full card-box tree with canonical paths and note counts.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-boxes"],
+      "reason": "This product-name-free request inspects the card-box hierarchy and its statistics."
+    },
+    {
+      "id": "boxes-train-rename-typo",
+      "split": "train",
+      "query": "renmae the zettel box Projects/Olld to Projects/Archive pls",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-boxes"],
+      "reason": "Despite informal spelling errors, the user is renaming a box hierarchy path."
+    },
+    {
+      "id": "boxes-train-move-zh-no-brand",
+      "split": "train",
+      "query": "把卡片盒 Projects/Active 移到 Work 下面",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-boxes"],
+      "reason": "Moving a card box within the hierarchy belongs to box management."
+    },
+    {
+      "id": "boxes-train-create-then-assign-note",
+      "split": "train",
+      "query": "Create the box Research/Agents, then put note n_77 into that new box.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-boxes", "dino-note"],
+      "reason": "This compound request creates hierarchy state and then changes one note's box membership."
+    },
+    {
+      "id": "boxes-train-note-move-only",
+      "split": "train",
+      "query": "Move note n_88 from the Inbox box to Archive without changing either box.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "The user explicitly preserves the hierarchy and only changes note membership."
+    },
+    {
+      "id": "boxes-train-tag-tree",
+      "split": "train",
+      "query": "Show the tag tree and suggest which unused tags should be cleaned up.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-tags"],
+      "reason": "The taxonomy is tags, not card boxes."
+    },
+    {
+      "id": "boxes-train-prompt-list",
+      "split": "train",
+      "query": "List the saved prompt templates and check whether Weekly Review exists.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-prompts"],
+      "reason": "Browsing reusable prompts belongs to prompt management."
+    },
+    {
+      "id": "boxes-train-todo-search",
+      "split": "train",
+      "query": "Show unfinished checklist items for today, grouped by note.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-todo"],
+      "reason": "The request concerns todo search rather than box hierarchy management."
+    },
+    {
+      "id": "boxes-validation-merge-zh",
+      "split": "validation",
+      "query": "把卡片盒 Projects/Legacy 合并到 Projects/Archive",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-boxes"],
+      "reason": "This requests a destructive box-subtree merge."
+    },
+    {
+      "id": "boxes-validation-stats",
+      "split": "validation",
+      "query": "Which Dinox card boxes are empty?",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-boxes"],
+      "reason": "Empty-box statistics inspect the box hierarchy."
+    },
+    {
+      "id": "boxes-validation-note-remove",
+      "split": "validation",
+      "query": "Remove the Archive box from note abc123.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "Removing a box from one note is a note update."
+    },
+    {
+      "id": "boxes-validation-prompt",
+      "split": "validation",
+      "query": "Save a reusable prompt named Weekly Review in Dinox.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-prompts"],
+      "reason": "Reusable prompt storage belongs to prompt management."
+    },
+    {
+      "id": "boxes-validation-long-duplicate-merge",
+      "split": "validation",
+      "query": "An import left both Clients/Acme/2025 and Archive/Acme-2025 in the card-box tree. Preview the impact, then merge the first subtree into the second without losing note membership.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-boxes"],
+      "reason": "The long-context request is a guarded card-box subtree merge."
+    },
+    {
+      "id": "boxes-validation-empty-cleanup-zh",
+      "split": "validation",
+      "query": "找出没有任何笔记的卡片盒，并给出清理前的层级路径和数量",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-boxes"],
+      "reason": "Discovering empty boxes and reporting their hierarchy paths is box cleanup analysis."
+    },
+    {
+      "id": "boxes-validation-notes-in-box",
+      "split": "validation",
+      "query": "Find every note currently inside Projects/Atlas; do not modify the card-box tree.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "The hierarchy is explicitly unchanged; this is a note query filtered by box membership."
+    },
+    {
+      "id": "boxes-validation-prompt-about-taxonomy",
+      "split": "validation",
+      "query": "Create a reusable prompt that proposes a zettelkasten box taxonomy for each new project.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-prompts"],
+      "reason": "Boxes are prompt content; the requested persisted object is a reusable prompt."
+    }
+  ]
+}

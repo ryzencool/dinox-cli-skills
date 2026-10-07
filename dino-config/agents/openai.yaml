@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dinox Config"
+  short_description: "Inspect and update Dinox CLI settings"
+  default_prompt: "Use $dino-config to inspect or change a supported Dinox CLI setting."

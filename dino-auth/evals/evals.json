@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "skill_name": "dino-auth",
+  "evals": [
+    {
+      "id": "auth-offline-status",
+      "prompt": "Check whether Dinox is logged in on this machine. Avoid contacting the cloud unless local status is insufficient, and summarize the structured result.",
+      "expected_output": "The agent uses the offline JSON status command first, checks the success envelope, and reports login state without treating lack of a network sync as logout.",
+      "assertions": [
+        "Uses `dino auth status --offline --format json` as the first command.",
+        "Requires top-level `ok: true` and reads login details from `data`.",
+        "Does not request, print, or place an authentication token in argv."
+      ]
+    },
+    {
+      "id": "auth-persistent-login",
+      "prompt": "I need Dinox authentication to persist across Claude Code, Codex, and OpenClaw restarts. Tell me the safe login procedure; I can retrieve the token from my shell secret store.",
+      "expected_output": "The agent explains process-environment inheritance, directs the user to pipe the secret into `--token-stdin` in their own terminal, and verifies with offline status without asking for the token in chat.",
+      "assertions": [
+        "Distinguishes process-only `DINOX_TOKEN` from persistent login.",
+        "Uses `dino auth login --token-stdin` through stdin rather than a positional token.",
+        "Explicitly says not to paste or echo the token in chat or logs."
+      ]
+    },
+    {
+      "id": "auth-destructive-logout",
+      "prompt": "Log me out of Dinox and delete its local database too. An inherited DINOX_TOKEN may still be active in this agent process.",
+      "expected_output": "The agent separates ordinary credential logout from local-cache deletion, requests confirmation for `--clear-local-db`, and explains that an inherited environment token can continue authenticating the running process.",
+      "assertions": [
+        "Asks for separate confirmation before `dino auth logout --clear-local-db --format json`.",
+        "Does not claim full logout while an inherited `DINOX_TOKEN` remains active.",
+        "Plans an offline status verification after the authorized logout."
+      ]
+    }
+  ],
+  "trigger_evals": [
+    {
+      "id": "auth-train-status",
+      "split": "train",
+      "query": "Am I logged into Dinox on this machine?",
+      "should_trigger": true,
+      "expected_skills": ["dino-auth"],
+      "reason": "The user is asking for Dinox credential and login status."
+    },
+    {
+      "id": "auth-train-logout",
+      "split": "train",
+      "query": "Log me out of Dinox but keep the local cache.",
+      "should_trigger": true,
+      "expected_skills": ["dino-auth"],
+      "reason": "Logout and credential cleanup are owned by the authentication skill."
+    },
+    {
+      "id": "auth-train-sync",
+      "split": "train",
+      "query": "Run dino sync and confirm my cache is fresh.",
+      "should_trigger": false,
+      "expected_skills": ["dino-sync"],
+      "reason": "The request is synchronization, not credential management."
+    },
+    {
+      "id": "auth-train-config",
+      "split": "train",
+      "query": "Set sync.timeoutMs to 20000 for Dinox.",
+      "should_trigger": false,
+      "expected_skills": ["dino-config"],
+      "reason": "Changing a supported CLI setting belongs to the configuration skill."
+    },
+    {
+      "id": "auth-train-active-account-no-brand",
+      "split": "train",
+      "query": "Which account is active in the CLI right now?",
+      "should_trigger": true,
+      "expected_skills": ["dino-auth"],
+      "reason": "The user is asking for the identity associated with the current CLI session without naming the product."
+    },
+    {
+      "id": "auth-train-login-typo",
+      "split": "train",
+      "query": "I got logged out; help me log bak in without putting the token on the command line.",
+      "should_trigger": true,
+      "expected_skills": ["dino-auth"],
+      "reason": "Despite the typo and informal wording, this is a secure login request."
+    },
+    {
+      "id": "auth-train-persist-zh-no-brand",
+      "split": "train",
+      "query": "终端重开后登录就没了，帮我把凭据安全地持久化",
+      "should_trigger": true,
+      "expected_skills": ["dino-auth"],
+      "reason": "Persistent credential login across process restarts is owned by authentication."
+    },
+    {
+      "id": "auth-train-status-then-sync",
+      "split": "train",
+      "query": "First tell me which account the CLI is using, then refresh the local cache from the cloud.",
+      "should_trigger": true,
+      "expected_skills": ["dino-auth", "dino-sync"],
+      "reason": "This compound request requires both authenticated identity inspection and synchronization."
+    },
+    {
+      "id": "auth-train-note-after-login",
+      "split": "train",
+      "query": "I'm already signed in; find the note I wrote yesterday about launch metrics.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "Login is only context; the requested action is a note search."
+    },
+    {
+      "id": "auth-train-config-account-fine",
+      "split": "train",
+      "query": "The account is fine; show the sanitized CLI config and current sync timeout.",
+      "should_trigger": false,
+      "expected_skills": ["dino-config"],
+      "reason": "The user explicitly excludes an auth problem and asks to inspect configuration."
+    },
+    {
+      "id": "auth-train-sync-keep-login",
+      "split": "train",
+      "query": "Don't change my login; just sync the cache and tell me whether it is fresh.",
+      "should_trigger": false,
+      "expected_skills": ["dino-sync"],
+      "reason": "Authentication must remain untouched; the only requested workflow is synchronization."
+    },
+    {
+      "id": "auth-train-update-keep-credentials",
+      "split": "train",
+      "query": "Keep my current credentials and upgrade the installed CLI package.",
+      "should_trigger": false,
+      "expected_skills": ["dino-update-cli"],
+      "reason": "Preserving credentials is a constraint on an installed CLI upgrade, not an auth operation."
+    },
+    {
+      "id": "auth-validation-status-zh",
+      "split": "validation",
+      "query": "帮我确认 Dinox 当前登录的是哪个账号",
+      "should_trigger": true,
+      "expected_skills": ["dino-auth"],
+      "reason": "This asks for the authenticated Dinox identity."
+    },
+    {
+      "id": "auth-validation-login",
+      "split": "validation",
+      "query": "How should I persistently log in to dino without exposing my token to the agent?",
+      "should_trigger": true,
+      "expected_skills": ["dino-auth"],
+      "reason": "Safe persistent login is an authentication workflow."
+    },
+    {
+      "id": "auth-validation-update",
+      "split": "validation",
+      "query": "My Dinox login works; now update the existing CLI installation to the newest release.",
+      "should_trigger": false,
+      "expected_skills": ["dino-update-cli"],
+      "reason": "An installed CLI upgrade belongs to the update skill."
+    },
+    {
+      "id": "auth-validation-note",
+      "split": "validation",
+      "query": "Find my latest Dinox note and show its preview.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "Reading note data belongs to the note skill even though authentication may be required."
+    },
+    {
+      "id": "auth-validation-logout-zh-no-brand",
+      "split": "validation",
+      "query": "退出当前账号，但保留本地数据库",
+      "should_trigger": true,
+      "expected_skills": ["dino-auth"],
+      "reason": "The request is credential logout with an explicit constraint to preserve local data."
+    },
+    {
+      "id": "auth-validation-long-context-cleanup",
+      "split": "validation",
+      "query": "I'm handing this laptop to a teammate. The daemon, cached notes, and CLI installation can stay, but remove the saved account credentials and warn me if an inherited environment variable could still authenticate this process.",
+      "should_trigger": true,
+      "expected_skills": ["dino-auth"],
+      "reason": "The long-context request is specifically about credential cleanup and residual environment authentication."
+    },
+    {
+      "id": "auth-validation-config-then-sync",
+      "split": "validation",
+      "query": "I know who is logged in. Increase the saved sync timeout to 25 seconds, then run a fresh synchronization.",
+      "should_trigger": false,
+      "expected_skills": ["dino-config", "dino-sync"],
+      "reason": "The user rules out identity inspection and requests configuration plus synchronization."
+    },
+    {
+      "id": "auth-validation-note-current-session",
+      "split": "validation",
+      "query": "Using the current signed-in session, create a note titled Interview Debrief from this text.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "The current session is incidental context for a note creation request."
+    }
+  ]
+}

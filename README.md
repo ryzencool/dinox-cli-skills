@@ -1,27 +1,55 @@
 # Dinox CLI Skills
 
-Bundled agent skills for [Dinox CLI](https://github.com/ryzencool/dinox-cli) — install once, then let an AI assistant operate your Dinox knowledge base through the `dino` CLI.
+Portable [Agent Skills](https://agentskills.io) for [Dinox CLI](https://github.com/ryzencool/dinox-cli). Install them in any compatible agent, then use natural-language requests to operate your Dinox knowledge base through `dino`.
 
-> For agent / script integrations, prefer `dino --format json ...`.
-> Legacy `--json` still works, but it returns YAML for backward compatibility.
+> For agent / script integrations, prefer `dino ... --format json`.
 > If an agent is unsure how to call a command, inspect it first with `dino schema <path>`.
-> For abnormal behavior, suspected stale data, missing search results, daemon failures, upload backlog, or local DB/index concerns, run `dino doctor --format json` first.
-> Structured failures include top-level `code`, `recoverable`, `exit_code`, and `suggested_action.command`; agents should branch on those fields.
+> For abnormal behavior, suspected stale data, missing search results, daemon failures, upload backlog, or local DB/index concerns, run `dino doctor --sync-timeout 20000 --format json` first.
+> Structured success is `{ "ok": true, "data": ... }`; read command fields from `data` and inspect optional top-level `_notice` separately.
+> Structured failures include top-level `code`, `recoverable`, `exit_code`, and `suggested_action`; agents should branch on those fields and inspect `error` for details.
 > Default online reads use the daemon-owned DB runtime over a private local socket; retry with `--offline` only when the user accepts local-cache semantics.
+> For online Agent calls whose schema exposes `--sync-timeout`, use a bounded value such as `20000` and set the host timeout 5-10 seconds higher. If the host times out before a structured envelope arrives, verify the result before retrying.
 
 ## Install Skills
 
-Install the skills globally:
+Install globally for all four supported clients with the pinned installer:
 
 ```bash
-npx skills add ryzencool/dinox-cli-skills -g
+npx --yes skills@1.5.16 add ryzencool/dinox-cli-skills \
+  -g \
+  -a codex -a claude-code -a hermes-agent -a openclaw \
+  --skill '*' \
+  -y
 ```
 
-If your agent only supports a local skills directory, point it at this repository:
+Do not omit the explicit Agent list. Auto-detection can reuse previous host
+state, skip clients, and still exit successfully. Target one client explicitly
+when that is the intended scope:
 
 ```bash
-claude --add-dir /path/to/dinox-cli/skills
+npx --yes skills@1.5.16 add ryzencool/dinox-cli-skills -g -a codex --skill '*' -y
+npx --yes skills@1.5.16 add ryzencool/dinox-cli-skills -g -a claude-code --skill '*' -y
+npx --yes skills@1.5.16 add ryzencool/dinox-cli-skills -g -a hermes-agent --skill '*' -y
+npx --yes skills@1.5.16 add ryzencool/dinox-cli-skills -g -a openclaw --skill '*' -y
 ```
+
+Global installation is the reliable multi-client default. Verify actual
+`SKILL.md` files under `~/.agents/skills`, `~/.claude/skills`,
+`~/.hermes/skills`, and `~/.openclaw/skills`; installer inventory output is not
+proof that every adapter path exists. Do not assume the
+installer always creates symlinks: single-client installs may copy files.
+
+For project-local installation, omit `-g`, create `.hermes/` and `skills/`
+before a multi-client install, and verify `.agents/skills`, `.claude/skills`,
+`.hermes/skills`, and `skills` afterward. Hermes does not discover project
+`.hermes/skills` by default; prefer its global install or add the project's
+`.agents/skills` to `skills.external_dirs` in `~/.hermes/config.yaml`. Avoid
+project installation inside the Dinox CLI source repository because OpenClaw's
+project target is the canonical `skills/` directory itself.
+
+For a CLI-matched, immutable installation, run `dino info --format json` and execute `data.skills_install_command`. It pins the standalone repository to the matching `v<CLI version>` tag instead of tracking the repository default branch.
+
+The portable behavior lives in standard `SKILL.md` files. Agent-specific metadata under paths such as `agents/`, `.claude-plugin/`, `.codex-plugin/`, or `adapters/` is optional presentation or packaging support; a skill must remain usable when a client ignores those adapters.
 
 ## Install And Initialize CLI
 
@@ -41,18 +69,18 @@ Process-only auth for AI/CI:
 
 ```bash
 export DINOX_TOKEN="<your-token-or-Bearer-token>"
-dino auth status --format json
+dino auth status --offline --format json
 dino sync --strict --sync-timeout 20000 --format json
 ```
 
 Persistent login, run by the user in their own terminal:
 
 ```bash
-printf '%s' "$DINOX_TOKEN" | dino auth login --token-stdin
+printf '%s' "$DINOX_TOKEN" | dino auth login --token-stdin --sync-timeout 20000 --format json
 dino sync --strict --sync-timeout 20000 --format json
 ```
 
-Security note: never paste tokens into chat logs. `DINOX_TOKEN` takes precedence over saved config, supports raw token or `Bearer ...`, and is not persisted by the CLI.
+Security note: never paste tokens into chat logs. `DINOX_TOKEN` takes precedence over saved config, supports raw token or `Bearer ...`, and is not persisted by the CLI. A running agent only sees a process token when it inherited that environment at launch; exporting it in another terminal does not update the agent process.
 
 For completeness-sensitive analysis such as latest notes, date ranges, monthly summaries, duplicates, stats, or exports, use `dino sync --strict --sync-timeout 20000 --format json` first or add `--require-sync` to the read command. Set the host tool timeout several seconds higher. Strict freshness waits for the current whole-second checkpoint, downloads, and local token indexing; active uploads do not block it, and structured success appears only after runtime cleanup.
 
@@ -70,7 +98,7 @@ Standalone distribution mirror:
 https://github.com/ryzencool/dinox-cli-skills
 ```
 
-The standalone repository is generated during a tagged CLI release. Do not edit mirrored skill files there; make changes under `<dinox-cli>/skills` and publish them through the CLI release workflow.
+The standalone repository is generated during a tagged CLI release. Do not edit release files there; make changes under `<dinox-cli>/skills` and publish them through the CLI release workflow. The mirror preserves only `.git`, so every file included in a release tag comes from the canonical source.
 
 When command schemas change, regenerate the bundled background reference with:
 
@@ -97,7 +125,11 @@ Apply the mirror locally when preparing or diagnosing a release:
 pnpm run skills:sync:standalone
 ```
 
-Tagged releases publish npm first, then commit the verified mirror and matching `v<version>` tag to `dinox-cli-skills`. Configure `SKILLS_REPO_SSH_KEY` with the private half of a write-enabled deploy key whose public half is attached only to `dinox-cli-skills`; do not reuse a personal GitHub token.
+`skills/collection.json` records the collection version, exact source tag, standalone tag, pinned install command, license, and public skill inventory. The standalone tag annotation and mirror commit also record the raw CLI source SHA.
+
+Tagged releases generate and validate the canonical source, fully stage and verify the standalone mirror, and dry-run the npm artifact without release credentials. They then commit and tag the preflighted skills mirror before publishing npm, so every CLI package points to an existing immutable skills release. A retry accepts an existing npm version only when its registry integrity matches the local tarball, and accepts an existing skills tag only when its tree matches the generated release.
+
+Configure `SKILLS_REPO_SSH_KEY` with the private half of a write-enabled deploy key whose public half is attached only to `dinox-cli-skills`; do not reuse a personal GitHub token.
 
 Skill authoring conventions live in:
 
@@ -107,27 +139,27 @@ skills/BEST_PRACTICES.md
 
 ## Available Skills
 
-| Skill | Command | Description |
-|-------|---------|-------------|
-| **dino-auth** | `/dino-auth [status|login|logout]` | Check auth status and safely guide login/logout |
-| **dino-sync** | `/dino-sync` | Sync local cache with the cloud and report status |
-| **dino-config** | `/dino-config [get|set] ...` | Read or set CLI config (e.g. `sync.timeoutMs`) |
-| **dino-note** | `/dino-note [request or note id]` | Search, read, create, update, star, or delete notes |
-| **dino-manage-todo** | `/dino-manage-todo [query or task]` | Search/create/append/update todo tasks from notes |
-| **dino-storage** | `/dino-storage [list|test|upload <file>|stats]` | List custom storage configs, test your S3, upload a file, and inspect usage |
-| **dino-manage-tags** | `/dino-manage-tags [name]` | List all tags or create a new tag |
-| **dino-manage-boxes** | `/dino-manage-boxes [name]` | List all card boxes or create a new one |
-| **dino-manage-prompts** | `/dino-manage-prompts [name] [prompt]` | List prompts or create a reusable prompt template |
-| **dino-update-cli** | `/dino-update-cli` | Upgrade installed `@dinoxx/dinox-cli` to the latest version |
-| **dino-shared** | *(internal)* | Shared safety/auth/output rules used by the other bundled skills |
-| **dino-dinox** | *(auto)* | Background context — Claude automatically knows all `dino` commands |
+| Skill | Description |
+|-------|-------------|
+| **dino-auth** | Check auth status and safely guide login/logout |
+| **dino-sync** | Sync local cache with the cloud and report status |
+| **dino-config** | Read or set CLI config such as `sync.timeoutMs` |
+| **dino-note** | Search, read, create, update, organize, star, or delete notes |
+| **dino-manage-todo** | Search, create, append, or update todo tasks from notes |
+| **dino-storage** | List custom storage configs, test S3, upload files, and inspect usage |
+| **dino-manage-tags** | List, create, rename, move, merge, or clean up tags |
+| **dino-manage-boxes** | List, create, rename, move, merge, or clean up card boxes |
+| **dino-manage-prompts** | List or create reusable prompt templates |
+| **dino-manage-views** | List, create, update, query, count, or delete saved table views |
+| **dino-update-cli** | Upgrade installed `@dinoxx/dinox-cli` |
+| **dino-dinox** | Bootstrap installation and route Dinox requests to the focused workflow skills |
 
 ## Usage Examples
 
 ```
 > /dino-auth status
 > /dino-sync
-> dino doctor --format json
+> dino doctor --sync-timeout 20000 --format json
 > /dino-config get sync.timeoutMs
 > /dino-config set sync.timeoutMs 20000
 > /dino-note 搜索最近 7 天的 AI 笔记
@@ -148,10 +180,12 @@ skills/BEST_PRACTICES.md
 > /dino-manage-boxes 项目笔记
 > /dino-manage-prompts
 > /dino-manage-prompts --name 周报助手 --prompt "请基于本周笔记输出一份简洁周报"
+> /dino-manage-views 创建一个只显示进行中项目的视图
+> /dino-manage-views 查询 Reading Queue 视图里的全部笔记
 > /dino-update-cli
 ```
 
-You can also just ask naturally — the `dino-dinox` background skill lets Claude understand requests like:
+Skill-name or slash invocation depends on the host agent. Natural-language requests are portable across clients, for example:
 
 - "帮我搜索最近一周的笔记"
 - "创建一条笔记，标题是..."
@@ -163,4 +197,6 @@ You can also just ask naturally — the `dino-dinox` background skill lets Claud
 - "把这个 task 标记为完成"
 - "列出我保存的 prompts"
 - "帮我新增一个周报 prompt"
+- "创建一个按状态筛选、按优先级排序的项目视图"
+- "查询 Reading Queue 视图中的全部笔记"
 - "把 dinox-cli 更新到最新版本"

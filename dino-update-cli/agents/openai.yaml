@@ -1,0 +1,4 @@
+interface:
+  display_name: "Update Dinox CLI"
+  short_description: "Update Dinox CLI and matching skills"
+  default_prompt: "Use $dino-update-cli to update Dinox CLI and identify its matching skills release."

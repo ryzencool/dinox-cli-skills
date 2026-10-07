@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dinox Tags"
+  short_description: "Organize Dinox tag hierarchies safely"
+  default_prompt: "Use $dino-manage-tags to inspect or organize my Dinox tag hierarchy."

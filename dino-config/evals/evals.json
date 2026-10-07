@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "skill_name": "dino-config",
+  "evals": [
+    {
+      "id": "config-inspect",
+      "prompt": "Show the current Dinox CLI configuration and tell me the effective sync timeout without exposing any secrets.",
+      "expected_output": "The agent reads sanitized configuration as JSON, identifies `sync.timeoutMs`, and avoids implying that hidden PowerSync or credential fields are available.",
+      "assertions": [
+        "Uses `dino config get --format json` or the single-key equivalent.",
+        "Requires top-level `ok: true` and reads the value from `data`.",
+        "Does not expose or attempt to store secrets."
+      ]
+    },
+    {
+      "id": "config-set-timeout",
+      "prompt": "Set Dinox sync.timeoutMs to 20000 and verify the saved value.",
+      "expected_output": "The agent validates the positive integer, performs the exact local config write, checks the structured response, and reads the key back for verification.",
+      "assertions": [
+        "Uses `dino config set sync.timeoutMs 20000 --format json`.",
+        "Verifies with `dino config get sync.timeoutMs --format json`.",
+        "Does not ask for redundant confirmation for this exact supported value."
+      ]
+    },
+    {
+      "id": "config-timeout-boundary",
+      "prompt": "Hermes stops waiting after 15 seconds while `dino sync` later turns out to have succeeded. Should I only increase sync.timeoutMs to fix it?",
+      "expected_output": "The agent explains that the CLI deadline and host execution timeout are separate, recommends a bounded CLI timeout with a host timeout several seconds higher, and routes actual sync outcome diagnosis to the sync workflow.",
+      "assertions": [
+        "Distinguishes `sync.timeoutMs` from the host agent's process timeout.",
+        "Does not present an ever-larger CLI timeout as the sole fix.",
+        "Treats a host timeout without a structured envelope as an unknown sync outcome."
+      ]
+    }
+  ],
+  "trigger_evals": [
+    {
+      "id": "config-train-read",
+      "split": "train",
+      "query": "What is my current Dinox sync.timeoutMs setting?",
+      "should_trigger": true,
+      "expected_skills": ["dino-config"],
+      "reason": "The user is inspecting a supported Dinox CLI configuration key."
+    },
+    {
+      "id": "config-train-write",
+      "split": "train",
+      "query": "Change the dino sync timeout setting to 30 seconds.",
+      "should_trigger": true,
+      "expected_skills": ["dino-config"],
+      "reason": "The request changes `sync.timeoutMs`, which is configuration state."
+    },
+    {
+      "id": "config-train-run-sync",
+      "split": "train",
+      "query": "Synchronize Dinox now and require fresh data.",
+      "should_trigger": false,
+      "expected_skills": ["dino-sync"],
+      "reason": "Executing and judging synchronization belongs to the sync skill."
+    },
+    {
+      "id": "config-train-auth",
+      "split": "train",
+      "query": "Check whether my Dinox token is logged in.",
+      "should_trigger": false,
+      "expected_skills": ["dino-auth"],
+      "reason": "Credential status belongs to the authentication skill."
+    },
+    {
+      "id": "config-train-list-no-brand",
+      "split": "train",
+      "query": "Show me all supported CLI settings, with secrets redacted.",
+      "should_trigger": true,
+      "expected_skills": ["dino-config"],
+      "reason": "This is a product-name-free request to inspect the supported sanitized CLI configuration."
+    },
+    {
+      "id": "config-train-timeout-typo",
+      "split": "train",
+      "query": "set sycn.timeoutMs to 18 sec pls",
+      "should_trigger": true,
+      "expected_skills": ["dino-config"],
+      "reason": "The misspelled informal request clearly intends to change the saved sync timeout setting."
+    },
+    {
+      "id": "config-train-read-zh-no-brand",
+      "split": "train",
+      "query": "只读取当前同步超时配置，不要执行同步",
+      "should_trigger": true,
+      "expected_skills": ["dino-config"],
+      "reason": "The user explicitly requests configuration inspection and excludes sync execution."
+    },
+    {
+      "id": "config-train-auth-then-write",
+      "split": "train",
+      "query": "Check which account is active, then set sync.timeoutMs to 22000.",
+      "should_trigger": true,
+      "expected_skills": ["dino-auth", "dino-config"],
+      "reason": "The compound request requires both identity inspection and a configuration write."
+    },
+    {
+      "id": "config-train-sync-settings-unchanged",
+      "split": "train",
+      "query": "Leave every setting alone; run sync now and tell me whether the cache is stale.",
+      "should_trigger": false,
+      "expected_skills": ["dino-sync"],
+      "reason": "The user explicitly excludes configuration changes and asks for sync execution."
+    },
+    {
+      "id": "config-train-persist-login",
+      "split": "train",
+      "query": "Persist my CLI login securely so it survives a terminal restart.",
+      "should_trigger": false,
+      "expected_skills": ["dino-auth"],
+      "reason": "Persistent credentials are authentication state, not supported CLI configuration."
+    },
+    {
+      "id": "config-train-clean-install",
+      "split": "train",
+      "query": "Set up the dino command and portable skills on this clean laptop.",
+      "should_trigger": false,
+      "expected_skills": ["dino-dinox"],
+      "reason": "First-time CLI and skills bootstrap belongs to the general Dinox skill."
+    },
+    {
+      "id": "config-train-update-existing",
+      "split": "train",
+      "query": "My settings are already correct; upgrade the installed command-line tool to the latest release.",
+      "should_trigger": false,
+      "expected_skills": ["dino-update-cli"],
+      "reason": "Configuration is only context; the requested action is an upgrade of an existing installation."
+    },
+    {
+      "id": "config-validation-write-zh",
+      "split": "validation",
+      "query": "把 Dinox 的 sync.timeoutMs 改成 20000",
+      "should_trigger": true,
+      "expected_skills": ["dino-config"],
+      "reason": "This is an explicit write to the supported sync timeout configuration key."
+    },
+    {
+      "id": "config-validation-list",
+      "split": "validation",
+      "query": "Read the sanitized dino configuration for me.",
+      "should_trigger": true,
+      "expected_skills": ["dino-config"],
+      "reason": "The request is CLI configuration inspection."
+    },
+    {
+      "id": "config-validation-host-timeout",
+      "split": "validation",
+      "query": "OpenClaw reports dino sync timed out, but the data actually synchronized. Diagnose that result.",
+      "should_trigger": false,
+      "expected_skills": ["dino-sync"],
+      "reason": "The core request is diagnosis of sync execution and its final outcome, not merely changing a setting."
+    },
+    {
+      "id": "config-validation-install",
+      "split": "validation",
+      "query": "Install the Dinox CLI and its portable skills for Claude Code.",
+      "should_trigger": false,
+      "expected_skills": ["dino-dinox"],
+      "reason": "First-time CLI and skill installation belongs to the bootstrap skill."
+    },
+    {
+      "id": "config-validation-long-context-write-only",
+      "split": "validation",
+      "query": "Our CI wrapper has a 20-second process limit, and the current saved deadline is too close to it. Change only the CLI's sync.timeoutMs value to 12000; do not execute a sync or alter the host runner.",
+      "should_trigger": true,
+      "expected_skills": ["dino-config"],
+      "reason": "The long context distinguishes the requested saved CLI setting change from sync execution and host configuration."
+    },
+    {
+      "id": "config-validation-conditional-write-zh",
+      "split": "validation",
+      "query": "先查看当前 CLI 配置，如果 sync.timeoutMs 低于 20000 就改成 20000",
+      "should_trigger": true,
+      "expected_skills": ["dino-config"],
+      "reason": "Both the conditional read and write operate on the supported CLI timeout setting."
+    },
+    {
+      "id": "config-validation-diagnose-sync-long",
+      "split": "validation",
+      "query": "The saved timeout is already 20000 and I do not want it changed. Hermes still says the process timed out even though new records appeared later; determine whether the cache is actually fresh.",
+      "should_trigger": false,
+      "expected_skills": ["dino-sync"],
+      "reason": "The setting is explicitly fixed; the requested work is sync outcome and freshness diagnosis."
+    },
+    {
+      "id": "config-validation-storage-config",
+      "split": "validation",
+      "query": "Switch the active custom S3 storage config to my backup bucket.",
+      "should_trigger": false,
+      "expected_skills": ["dino-storage"],
+      "reason": "A custom S3 target named config is storage-domain state, not the Dinox CLI settings surface."
+    }
+  ]
+}

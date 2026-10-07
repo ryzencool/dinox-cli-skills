@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "skill_name": "dino-manage-tags",
+  "evals": [
+    {
+      "id": "tags-hierarchy-stats",
+      "prompt": "Show the current Dinox tag hierarchy with usage counts, including unused tags, without mixing data from another account.",
+      "expected_output": "The agent retrieves tag hierarchy and statistics with bounded structured commands, checks freshness and current identity scope, and reports canonical full paths.",
+      "assertions": [
+        "Uses bounded JSON `dino tag tree` and `dino tag stats` commands.",
+        "Checks `data.stale` and `_notice` before making complete or current claims.",
+        "Does not reuse a tag list captured under a different Dinox user."
+      ]
+    },
+    {
+      "id": "tags-create-path",
+      "prompt": "Create the hierarchical Dinox tag work/projects/atlas with the rocket emoji.",
+      "expected_output": "The agent previews creation of the full tag path and emoji, verifies the fresh normalized change, then performs the exact requested add without redundant confirmation.",
+      "assertions": [
+        "Runs `dino tag add` with `--dry-run`, bounded timeout, and JSON output first.",
+        "Preserves the complete slash-separated path as one untrusted argument.",
+        "Executes the matching non-destructive add after a successful exact preview."
+      ]
+    },
+    {
+      "id": "tags-merge-guard",
+      "prompt": "Merge the duplicate tag work/old-atlas into work/projects/atlas and update all affected notes.",
+      "expected_output": "The agent dry-runs the subtree merge, requires fresh impact data, shows rewritten notes and soft-deleted tags, obtains explicit confirmation, and guards the real merge with the preview count.",
+      "assertions": [
+        "Requires fresh `data.changes.affected_count` from the dry-run.",
+        "Asks for explicit confirmation after showing destructive impact.",
+        "Uses `--confirm --expected-count <affected_count>` for the real merge."
+      ]
+    }
+  ],
+  "trigger_evals": [
+    {
+      "id": "tags-train-tree",
+      "split": "train",
+      "query": "Show my Dinox tag hierarchy.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-tags"],
+      "reason": "The request inspects the tag taxonomy itself."
+    },
+    {
+      "id": "tags-train-merge",
+      "split": "train",
+      "query": "Merge the tag work/old into work/current.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-tags"],
+      "reason": "Merging tag subtrees changes the tag hierarchy."
+    },
+    {
+      "id": "tags-train-note-membership",
+      "split": "train",
+      "query": "Add the work tag to note n_123.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "Assigning a tag to a specific note is a note mutation."
+    },
+    {
+      "id": "tags-train-boxes",
+      "split": "train",
+      "query": "Move the Projects card box under Archive.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-boxes"],
+      "reason": "This changes the card-box hierarchy rather than tags."
+    },
+    {
+      "id": "tags-train-tree-stats-no-brand",
+      "split": "train",
+      "query": "Show the full tag taxonomy with canonical paths and usage counts.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-tags"],
+      "reason": "This product-name-free request inspects the tag hierarchy and its statistics."
+    },
+    {
+      "id": "tags-train-rename-typo",
+      "split": "train",
+      "query": "renmae tag work/oldd to work/archive pls",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-tags"],
+      "reason": "Despite spelling errors and informal wording, this is a tag hierarchy rename."
+    },
+    {
+      "id": "tags-train-move-zh-no-brand",
+      "split": "train",
+      "query": "把标签 projects/atlas 移到 work/active 下面",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-tags"],
+      "reason": "Moving a tag path within the taxonomy belongs to tag management."
+    },
+    {
+      "id": "tags-train-create-then-assign-note",
+      "split": "train",
+      "query": "Create the tag work/research/agents, then attach it to note n_315.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-tags", "dino-note"],
+      "reason": "The compound request creates hierarchy state and then changes one note's membership."
+    },
+    {
+      "id": "tags-train-note-query-by-tag",
+      "split": "train",
+      "query": "Show notes carrying the finance/receipts tag, newest first.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "This queries notes by existing membership and does not manage the tag taxonomy."
+    },
+    {
+      "id": "tags-train-note-membership-only",
+      "split": "train",
+      "query": "Replace the personal tag with work on note n_509; keep both tag paths unchanged.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "The hierarchy is explicitly preserved while a single note's tags change."
+    },
+    {
+      "id": "tags-train-box-tree-stats",
+      "split": "train",
+      "query": "Display the zettel-box tree with counts for each box.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-boxes"],
+      "reason": "The requested taxonomy is card boxes rather than tags."
+    },
+    {
+      "id": "tags-train-todos-by-tag",
+      "split": "train",
+      "query": "Find incomplete checklist items associated with the sprint tag.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-todo"],
+      "reason": "The requested objects are todo items filtered by a tag, not the tag hierarchy itself."
+    },
+    {
+      "id": "tags-validation-create-zh",
+      "split": "validation",
+      "query": "创建标签 work/projects/frontend",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-tags"],
+      "reason": "This creates a hierarchical Dinox tag path."
+    },
+    {
+      "id": "tags-validation-cleanup",
+      "split": "validation",
+      "query": "Find unused or malformed Dinox tags that may need cleanup.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-tags"],
+      "reason": "Tag cleanup candidate discovery belongs to tag management."
+    },
+    {
+      "id": "tags-validation-note-search",
+      "split": "validation",
+      "query": "Find every note tagged work/projects/frontend.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "Searching notes by a tag is a note query, not a hierarchy mutation."
+    },
+    {
+      "id": "tags-validation-todo",
+      "split": "validation",
+      "query": "Mark the Dinox checklist item task_abc as done.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-todo"],
+      "reason": "Todo state changes have a dedicated skill."
+    },
+    {
+      "id": "tags-validation-long-duplicate-cleanup",
+      "split": "validation",
+      "query": "A migration created work/client/acme, work/clients/acme, and an unused work/acme tag. Compare their usage, preserve note assignments, and preview consolidating the duplicates under work/clients/acme.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-tags"],
+      "reason": "The long-context request analyzes and consolidates duplicate tag hierarchy paths."
+    },
+    {
+      "id": "tags-validation-suggest-zh-no-brand",
+      "split": "validation",
+      "query": "根据现有标签层级和使用次数，建议哪些标签应该合并或清理",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-tags"],
+      "reason": "Suggesting taxonomy cleanup from hierarchy statistics belongs to tag management."
+    },
+    {
+      "id": "tags-validation-prompt-about-tags",
+      "split": "validation",
+      "query": "Save a reusable prompt that recommends tags for future meeting notes.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-prompts"],
+      "reason": "Tags are prompt content; the requested persisted object is a reusable prompt."
+    },
+    {
+      "id": "tags-validation-empty-boxes",
+      "split": "validation",
+      "query": "Which card boxes have zero notes and could be removed from the hierarchy?",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-boxes"],
+      "reason": "This is box cleanup analysis, not tag management."
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dinox Sync"
+  short_description: "Synchronize and verify Dinox data"
+  default_prompt: "Use $dino-sync to synchronize Dinox and verify cache freshness."

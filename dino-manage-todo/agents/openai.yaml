@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dinox Todos"
+  short_description: "Search and manage Dinox todo tasks"
+  default_prompt: "Use $dino-manage-todo to find or update my Dinox todo tasks."

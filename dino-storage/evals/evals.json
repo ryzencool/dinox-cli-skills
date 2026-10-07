@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "skill_name": "dino-storage",
+  "evals": [
+    {
+      "id": "storage-select-target",
+      "prompt": "Upload report.pdf to Dinox custom storage. I have several storage configs and did not specify which one.",
+      "expected_output": "The agent lists sanitized custom storage configs with bounded JSON output, asks the user to choose when no active or unique target resolves the ambiguity, and does not expose credentials.",
+      "assertions": [
+        "Uses `dino storage list --sync-timeout 20000 --format json` before upload.",
+        "Does not guess a target when multiple configs remain ambiguous.",
+        "Never echoes `secret_access_key` or other storage credentials."
+      ]
+    },
+    {
+      "id": "storage-image-overwrite",
+      "prompt": "Upload ./cover.jpg using explicit key images/cover.jpg. If it already exists, replace it and its thumbnail.",
+      "expected_output": "The agent dry-runs the exact image upload, explains that preview does not query object existence or enumerate the derived thumbnail key, obtains explicit overwrite acceptance, then reports remote and local resource outcomes precisely.",
+      "assertions": [
+        "Uses a bounded JSON dry-run before the real upload.",
+        "Does not claim the dry-run verified S3 existence, thumbnail generation, or the derived thumbnail key.",
+        "Uses `--overwrite` only because the user explicitly accepted replacement and reports both main and possible thumbnail effects."
+      ]
+    },
+    {
+      "id": "storage-partial-failure",
+      "prompt": "A Dinox upload returned an error with remoteObjectChanged=true and affectedKeys, then the host timed out. Tell me whether it is safe to retry.",
+      "expected_output": "The agent treats the remote outcome as unknown, inspects the structured affected keys and storage key, verifies those exact objects before retrying, and does not claim rollback.",
+      "assertions": [
+        "Does not claim that a changed remote object was rolled back.",
+        "Uses `error.details.affectedKeys` and `error.details.storageKey` as verification targets.",
+        "Avoids an automatic overwrite or blind retry after the host timeout."
+      ]
+    }
+  ],
+  "trigger_evals": [
+    {
+      "id": "storage-train-upload",
+      "split": "train",
+      "query": "Upload report.pdf to my active Dinox custom S3 storage.",
+      "should_trigger": true,
+      "expected_skills": ["dino-storage"],
+      "reason": "A standalone local-file upload to custom storage belongs to the storage skill."
+    },
+    {
+      "id": "storage-train-test",
+      "split": "train",
+      "query": "Test connectivity to my Dinox storage target.",
+      "should_trigger": true,
+      "expected_skills": ["dino-storage"],
+      "reason": "Testing a configured custom storage target is a storage workflow."
+    },
+    {
+      "id": "storage-train-note-media",
+      "split": "train",
+      "query": "Create a note and embed ./diagram.png in its Markdown.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "The upload is subordinate to an end-to-end note creation workflow."
+    },
+    {
+      "id": "storage-train-config",
+      "split": "train",
+      "query": "Change Dinox sync.timeoutMs to 25000.",
+      "should_trigger": false,
+      "expected_skills": ["dino-config"],
+      "reason": "CLI timeout configuration is unrelated to storage targets."
+    },
+    {
+      "id": "storage-validation-stats-zh",
+      "split": "validation",
+      "query": "统计 Dinox 自定义存储的已上传文件用量",
+      "should_trigger": true,
+      "expected_skills": ["dino-storage"],
+      "reason": "This requests custom storage usage statistics."
+    },
+    {
+      "id": "storage-validation-target",
+      "split": "validation",
+      "query": "Which custom S3 config is active in Dinox?",
+      "should_trigger": true,
+      "expected_skills": ["dino-storage"],
+      "reason": "Inspecting the active custom storage config belongs to storage management."
+    },
+    {
+      "id": "storage-validation-note",
+      "split": "validation",
+      "query": "Replace the image section inside note note_77.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "Editing an existing note's Markdown is owned by the note skill."
+    },
+    {
+      "id": "storage-validation-sync",
+      "split": "validation",
+      "query": "Refresh my Dinox PowerSync cache and verify freshness.",
+      "should_trigger": false,
+      "expected_skills": ["dino-sync"],
+      "reason": "Cloud cache synchronization belongs to the sync skill."
+    }
+  ]
+}

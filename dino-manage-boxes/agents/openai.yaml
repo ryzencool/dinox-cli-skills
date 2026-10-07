@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dinox Card Boxes"
+  short_description: "Organize Dinox card box hierarchies"
+  default_prompt: "Use $dino-manage-boxes to inspect or organize my Dinox card boxes."

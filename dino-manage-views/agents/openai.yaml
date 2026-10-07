@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dinox Saved Views"
+  short_description: "Create, update, and query Dinox saved views"
+  default_prompt: "Use $dino-manage-views to create or query a Dinox saved view."

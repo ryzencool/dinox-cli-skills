@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dinox Auth"
+  short_description: "Check and manage Dinox authentication"
+  default_prompt: "Use $dino-auth to check my Dinox login state safely."

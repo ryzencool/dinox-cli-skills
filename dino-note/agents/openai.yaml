@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dinox Notes"
+  short_description: "Search, read, and manage Dinox notes"
+  default_prompt: "Use $dino-note to search, read, create, or edit a Dinox note."

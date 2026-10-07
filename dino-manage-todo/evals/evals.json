@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "skill_name": "dino-manage-todo",
+  "evals": [
+    {
+      "id": "todo-complete-search",
+      "prompt": "Find all incomplete Dinox todos tagged work that are due this week, and tell me the exact count only if it is provable.",
+      "expected_output": "The agent runs a bounded structured todo search, reads tasks and freshness, follows task and note scan truncation signals, and labels totals as lower bounds until the result is complete.",
+      "assertions": [
+        "Uses `dino todo search` with `--sync-timeout 20000 --format json` and appropriate filters.",
+        "Checks `data.stale`, `data.meta.truncated`, and `data.meta.scan_truncated`.",
+        "Does not claim an exact count while `total_count_is_lower_bound` or any truncation flag is true."
+      ]
+    },
+    {
+      "id": "todo-append-explicit-note",
+      "prompt": "Append two checklist items to note note_atlas: review metrics and send the launch brief.",
+      "expected_output": "The agent preserves the two task strings as data, targets the explicit note ID, previews the mutation, and performs the exact write while reporting revision and durability receipts.",
+      "assertions": [
+        "Uses the explicit `--note-id note_atlas` rather than the default latest eligible note.",
+        "Passes free-form task text through safe file or stdin arguments and runs a bounded JSON dry-run first.",
+        "Reports `durability`, upload queue state, version, content hash, and whether content changed."
+      ]
+    },
+    {
+      "id": "todo-legacy-update",
+      "prompt": "Mark legacy-task-9 complete. My last search showed it belongs to note note_77, but that note may have changed since then.",
+      "expected_output": "The agent recognizes that legacy task IDs bind to a searched snapshot, refreshes search when the note may have changed, uses the returned note ID, dry-runs the status update, and avoids retrying a stale identifier blindly.",
+      "assertions": [
+        "Refreshes todo search before mutating when the legacy snapshot may be stale.",
+        "Passes the search result's `note_id` through `--note-id` for disambiguation.",
+        "Runs a dry-run and only performs the exact requested status change after a matching preview."
+      ]
+    }
+  ],
+  "trigger_evals": [
+    {
+      "id": "todo-train-search",
+      "split": "train",
+      "query": "Show my incomplete Dinox todo items for today.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-todo"],
+      "reason": "Searching checklist tasks by time and status belongs to the todo skill."
+    },
+    {
+      "id": "todo-train-complete",
+      "split": "train",
+      "query": "Mark Dinox task task_abc as complete.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-todo"],
+      "reason": "Changing a todo item's checked state is a todo mutation."
+    },
+    {
+      "id": "todo-train-note-edit",
+      "split": "train",
+      "query": "Append a prose paragraph to the Project Atlas note.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "Ordinary Markdown editing belongs to the note skill, not todo item management."
+    },
+    {
+      "id": "todo-train-prompt",
+      "split": "train",
+      "query": "Save a reusable prompt called Task Prioritizer.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-prompts"],
+      "reason": "A reusable prompt template is not a Dinox checklist task."
+    },
+    {
+      "id": "todo-validation-append-zh",
+      "split": "validation",
+      "query": "给 note_atlas 追加两个待办事项",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-todo"],
+      "reason": "This asks to append todo items to an existing note."
+    },
+    {
+      "id": "todo-validation-reopen",
+      "split": "validation",
+      "query": "Reopen the completed Dinox checklist item task_42.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-todo"],
+      "reason": "Reopening a checklist item changes todo state."
+    },
+    {
+      "id": "todo-validation-note-search",
+      "split": "validation",
+      "query": "Find notes whose title contains project plan.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "The user is searching notes, not extracted todo tasks."
+    },
+    {
+      "id": "todo-validation-tags",
+      "split": "validation",
+      "query": "Show unused tags in my Dinox hierarchy.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-tags"],
+      "reason": "Unused-tag inspection belongs to tag management."
+    }
+  ]
+}

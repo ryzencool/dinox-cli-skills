@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dinox CLI"
+  short_description: "Bootstrap and troubleshoot Dinox CLI"
+  default_prompt: "Use $dino-dinox to install, inspect CLI capabilities or health, or troubleshoot Dinox CLI and its skills."

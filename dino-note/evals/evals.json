@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "skill_name": "dino-note",
+  "evals": [
+    {
+      "id": "note-latest-complete",
+      "prompt": "Find my latest Dinox note tagged work and give me a short preview. Do not claim it is latest unless freshness and pagination prove it.",
+      "expected_output": "The agent performs a completeness-sensitive synchronized note search, checks nested freshness and pagination, resolves an exact note, then retrieves only the minimum authorized preview.",
+      "assertions": [
+        "Uses `--require-sync` on the note query or runs strict bounded sync first.",
+        "Checks `data.meta.stale` and `data.meta.pagination.has_more` before claiming the latest result.",
+        "Uses lightweight context or preview instead of exposing full Markdown unnecessarily."
+      ]
+    },
+    {
+      "id": "note-create-media",
+      "prompt": "Create a Dinox note titled Field Report from my text and embed the local image ./cover.jpg. Use the existing work tag and Inbox box.",
+      "expected_output": "The agent treats the request as one note workflow, validates existing tag and box membership, uploads the local image through a dry-run and real storage handoff, rewrites the Markdown to the returned remote resource, and dry-runs note creation before writing.",
+      "assertions": [
+        "Does not embed the unresolved local filesystem path in final note Markdown.",
+        "Uses bounded JSON dry-runs for both storage upload and note creation and does not claim that upload dry-run verified remote existence.",
+        "Preserves parser-friendly resource fields and reports the note write durability receipt."
+      ]
+    },
+    {
+      "id": "note-protected-patch",
+      "prompt": "Replace a table-containing section in note note_77. I authorize reading the full content and replacing the protected block after you show me the exact affected section.",
+      "expected_output": "The agent uses full-content content-read for protected replacement, previews the structured patch, obtains confirmation after showing the affected protected content, refreshes a full-content capability immediately before the real write, passes it through a protected temporary `@file`, and deletes that file after the attempt.",
+      "assertions": [
+        "Uses `note content-read --include-content` and verifies `data.readTokenScope` is `full-content` before protected replacement.",
+        "Runs the patch dry-run without a capability and requests confirmation before `--allow-protected-replace`.",
+        "Writes `data.readToken` to a unique mode-0600 temporary file, passes `--read-token @<file>`, and removes the file immediately after the single real attempt."
+      ]
+    }
+  ],
+  "trigger_evals": [
+    {
+      "id": "note-train-search",
+      "split": "train",
+      "query": "Find my latest Dinox note about PowerSync.",
+      "should_trigger": true,
+      "expected_skills": ["dino-note"],
+      "reason": "Searching and reading notes belongs to the note skill."
+    },
+    {
+      "id": "note-train-membership",
+      "split": "train",
+      "query": "Add the work tag and Inbox box to note n_123.",
+      "should_trigger": true,
+      "expected_skills": ["dino-note"],
+      "reason": "Changing tag and box membership on a specific note is a note mutation."
+    },
+    {
+      "id": "note-train-tag-hierarchy",
+      "split": "train",
+      "query": "Merge the work/old tag subtree into work/current.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-tags"],
+      "reason": "Changing the tag taxonomy itself belongs to tag management."
+    },
+    {
+      "id": "note-train-todo",
+      "split": "train",
+      "query": "Complete todo task task_abc in Dinox.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-todo"],
+      "reason": "Todo item state has a dedicated focused skill."
+    },
+    {
+      "id": "note-train-create-zh",
+      "split": "train",
+      "query": "创建一条带本地图片的 Dinox 笔记",
+      "should_trigger": true,
+      "expected_skills": ["dino-note"],
+      "reason": "Creating a note that embeds local media remains an end-to-end note workflow."
+    },
+    {
+      "id": "note-train-create-zh-media",
+      "split": "train",
+      "query": "把会议记录存进 Dinox，并把 cover.png 作为笔记图片",
+      "should_trigger": true,
+      "expected_skills": ["dino-note"],
+      "reason": "A natural-language request to store note content with local media belongs to the note workflow."
+    },
+    {
+      "id": "note-validation-edit-zh-media-holdout",
+      "split": "validation",
+      "query": "把本地照片 agenda.jpg 加到我刚写的 Dinox 会议笔记里",
+      "should_trigger": true,
+      "expected_skills": ["dino-note"],
+      "reason": "Embedding a local image into an existing note is owned end to end by the note skill."
+    },
+    {
+      "id": "note-validation-edit",
+      "split": "validation",
+      "query": "Append a new Results section to note note_42.",
+      "should_trigger": true,
+      "expected_skills": ["dino-note"],
+      "reason": "Structured Markdown editing belongs to the note skill."
+    },
+    {
+      "id": "note-validation-box-hierarchy",
+      "split": "validation",
+      "query": "Create a new card-box path Research/AI.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-boxes"],
+      "reason": "Creating the box hierarchy itself belongs to box management."
+    },
+    {
+      "id": "note-validation-storage-only",
+      "split": "validation",
+      "query": "Upload report.pdf to my custom Dinox S3 target but do not create a note.",
+      "should_trigger": false,
+      "expected_skills": ["dino-storage"],
+      "reason": "A standalone storage upload without note creation belongs to the storage skill."
+    }
+  ]
+}

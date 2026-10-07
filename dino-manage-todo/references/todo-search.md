@@ -15,13 +15,22 @@ dino todo search [query]           # Search todo tasks extracted from note conte
   --include-deleted              # Include soft-deleted notes
 ```
 
-- Prefer `--format json` for machine-readable search output.
+- Execute online searches with `--sync-timeout 20000 --format json` and keep the host timeout 5-10 seconds higher.
 <!-- END GENERATED_COMMANDS -->
 
 ## Output Shape
 
-- `meta`: query, filters, returned/total counts, truncation info
-- `tasks`: each item includes `task_key`, `task_id`, `note_id`, `note_title`, `status`, `depth`, `parent_id`, time fields, tags
+- `data.stale`: whether cache freshness could be proven
+- `data.meta`: query, filters, returned/total counts, scan bounds, and truncation info
+- `data.tasks`: each item includes `task_key`, `task_id`, `note_id`, `note_title`, `status`, `depth`, `parent_id`, time fields, and tags
+
+## Completeness Rules
+
+- `data.meta.truncated: true` means the returned task array is incomplete.
+- `data.meta.scan_truncated: true` means not all eligible note rows were scanned.
+- `data.meta.total_count_is_lower_bound: true` means `total_count` is not exact.
+- Increase `--limit` for task-result truncation and `--scan-limit` for note-scan truncation, keeping both bounded.
+- Do not infer task absence, uniqueness, or an exact count until freshness is current and all three flags above are false.
 
 ## Notes
 

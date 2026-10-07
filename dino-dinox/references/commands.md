@@ -14,6 +14,7 @@ user asks for a broad inventory of Dinox commands.
 - [Sync](#sync)
 - [Schema](#schema)
 - [Update CLI](#update-cli)
+- [Agent Skills](#agent-skills)
 - [Notes](#notes)
 - [Todo](#todo)
 - [Tags](#tags)
@@ -86,6 +87,15 @@ dino schema [path]                 # Inspect Dinox CLI command schemas for agent
 ```text
 dino update                        # Update @dinoxx/dinox-cli to the latest version
   --package-manager <manager>    # Override package manager detection
+```
+
+### Agent Skills
+```text
+dino skills doctor                 # Check installed Dinox skills against this CLI version and find safely removable retired skills
+
+dino skills migrate                # Preview or confirm safe removal of retired Dinox skills
+  --dry-run                      # Preview safe removals without changing installed skills (default)
+  --confirm                      # Execute the reviewed migration using the pinned public skills installer
 ```
 
 ### Notes

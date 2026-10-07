@@ -49,6 +49,8 @@ project target is the canonical `skills/` directory itself.
 
 For a CLI-matched, immutable installation, run `dino info --format json` and execute `data.skills_install_command`. It pins the standalone repository to the matching `v<CLI version>` tag instead of tracking the repository default branch.
 
+Check installed skills at any time with `dino skills doctor --format json`. `data.current` reports each current skill as `current`, `outdated`, `missing`, `foreign`, or `unknown-version` against the CLI version and includes the matching pinned `installCommand`; `data.skills` lists retired Dinox skills. Remove retired skills that exactly match the official inventory with `dino skills migrate --dry-run --format json`, then `--confirm` after review.
+
 The portable behavior lives in standard `SKILL.md` files. Agent-specific metadata under paths such as `agents/`, `.claude-plugin/`, `.codex-plugin/`, or `adapters/` is optional presentation or packaging support; a skill must remain usable when a client ignores those adapters.
 
 ## Install And Initialize CLI
@@ -100,13 +102,13 @@ https://github.com/ryzencool/dinox-cli-skills
 
 The standalone repository is generated during a tagged CLI release. Do not edit release files there; make changes under `<dinox-cli>/skills` and publish them through the CLI release workflow. The mirror preserves only `.git`, so every file included in a release tag comes from the canonical source.
 
-When command schemas change, regenerate the bundled background reference with:
+`src/skills/registry.ts` is the single list of published skills and the generated blocks each skill contains. Regenerate every generated block (runtime contract, command sections, full command reference) and `collection.json` with:
 
 ```bash
 pnpm skills:sync
 ```
 
-Validate bundled skill structure and shared-guidance references with:
+Validate skill structure, evals, generated-block freshness, the collection manifest, and that every `dino ...` invocation in skill markdown resolves to a real command and option with:
 
 ```bash
 pnpm skills:check

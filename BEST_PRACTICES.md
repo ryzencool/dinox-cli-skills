@@ -29,7 +29,7 @@ name: dino-note
 description: Use this skill for Dinox notes/笔记 and Markdown, not todo. Search, read, create, edit, export, embed media, star, delete, or change membership.
 license: ISC
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   dinox-command: "dino note"
   category: "notes"
   risk: "mixed"

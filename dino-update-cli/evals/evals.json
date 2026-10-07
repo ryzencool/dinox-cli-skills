@@ -31,6 +31,16 @@
         "Does not assume that lost host output means the global update failed.",
         "Requires confirmation again before any real retry that changes global tooling."
       ]
+    },
+    {
+      "id": "update-installed-skills-drift",
+      "prompt": "I just updated Dinox CLI. Check whether my installed Dinox agent skills still match it and clean up any old Dinox skills.",
+      "expected_output": "The agent runs the read-only skills doctor, reports current skill drift and retired skills from structured fields, previews the retired-skill migration, and asks before reinstalling skills or confirming removal.",
+      "assertions": [
+        "Runs `dino skills doctor --format json` and reads `data.current.inSync`, `data.current.skills`, and `data.summary`.",
+        "Previews cleanup with `dino skills migrate --dry-run --format json` before any `--confirm` run.",
+        "Requests separate explicit confirmation before running the pinned install command or `dino skills migrate --confirm`."
+      ]
     }
   ],
   "trigger_evals": [

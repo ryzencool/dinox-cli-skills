@@ -5,7 +5,7 @@ description: >
   count, or query table views; not for ordinary note searches without a view.
 license: ISC
 metadata:
-  version: "2.1.0"
+  version: "2.1.1"
   dinox-cli-help: "dino view --help"
   category: "views"
   risk: "mixed"

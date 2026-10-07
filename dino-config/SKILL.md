@@ -5,7 +5,7 @@ description: >
   values such as sync.timeoutMs; do not use it to run sync.
 license: ISC
 metadata:
-  version: "2.1.0"
+  version: "2.1.1"
   dinox-cli-help: "dino config --help"
   category: "config"
   risk: "mixed"

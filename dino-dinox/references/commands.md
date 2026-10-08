@@ -141,8 +141,9 @@ dino note create                   # Create a new note from markdown content
   --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
-dino note update [id]              # Full-replace note metadata for explicit note ids
+dino note update [id]              # Full-replace note metadata (title, tags, boxes, starred) for explicit note ids
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
+  --title <title>                # Replace the note title (single note id only; content is unchanged)
   --tags <string|@file>          # Replace the entire tag list; use [] to clear all tags
   --boxes <string|@file>         # Replace the entire box list; use [] to clear all boxes
   --starred <true|false>         # Replace the starred state

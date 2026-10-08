@@ -31,6 +31,16 @@
         "Runs the patch dry-run without a capability and requests confirmation before `--allow-protected-replace`.",
         "Writes `data.readToken` to a unique mode-0600 temporary file, passes `--read-token @<file>`, and removes the file immediately after the single real attempt."
       ]
+    },
+    {
+      "id": "note-rename-title",
+      "prompt": "Rename Dinox note 0199aaaa-bbbb-7ccc-8ddd-eeeeffff0001 to \"2026 Q3 Planning\" without touching its content.",
+      "expected_output": "The agent previews and then runs a metadata-only title update on the exact note id, without reading or patching note content.",
+      "assertions": [
+        "Uses `dino note update 0199aaaa-bbbb-7ccc-8ddd-eeeeffff0001 --title \"2026 Q3 Planning\"` with `--dry-run` first and `--format json`.",
+        "Does not run `note content-read` or `note patch` for the title change.",
+        "Checks `data.results[].title` and the write receipt after the real update."
+      ]
     }
   ],
   "trigger_evals": [

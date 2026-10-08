@@ -6,7 +6,7 @@ description: >
   membership.
 license: ISC
 metadata:
-  version: "2.1.1"
+  version: "2.2.0"
   dinox-cli-help: "dino note --help"
   category: "notes"
   risk: "mixed"
@@ -66,7 +66,7 @@ metadata:
 ## Important Principles
 
 1. If the exact option shape is unclear, inspect it first with `dino schema note.<command>`.
-2. `dino note update` changes metadata only and uses full-replacement semantics for `--tags` and `--boxes`; use `dino note tag` and `dino note move` for incremental changes, and `dino note patch` for Markdown content.
+2. `dino note update` changes metadata only: `--title` renames one note (no content-read or patch needed), and `--tags` / `--boxes` use full-replacement semantics. Use `dino note tag` and `dino note move` for incremental changes, and `dino note patch` for Markdown content.
 3. Use `dino note bulk` for filter-based batch metadata changes. It does not accept `--sql`; real writes require `--confirm --expected-count <n>`.
 4. `dino note search` returns resolved `boxes`, but `--sql` remains storage-oriented and still uses `zettel_boxes`.
 5. `dino note detail`, content-inclusive `content-read`, and inline exports expose full Markdown. Use them only when authorized and necessary.

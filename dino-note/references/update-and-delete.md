@@ -14,8 +14,9 @@
 Use these generated commands as the canonical interfaces for note mutation workflows.
 
 ```text
-dino note update [id]              # Full-replace note metadata for explicit note ids
+dino note update [id]              # Full-replace note metadata (title, tags, boxes, starred) for explicit note ids
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
+  --title <title>                # Replace the note title (single note id only; content is unchanged)
   --tags <string|@file>          # Replace the entire tag list; use [] to clear all tags
   --boxes <string|@file>         # Replace the entire box list; use [] to clear all boxes
   --starred <true|false>         # Replace the starred state
@@ -106,6 +107,7 @@ dino note delete <id>              # Soft-delete a note by setting is_del=1
 - Add or remove boxes while preserving the rest: `note move --add` or `--remove`.
 - Replace the complete tag or box set only when explicitly requested: `note tag --replace`, `note move --replace`, or metadata-only `note update`.
 - Change only starred state: `note star` or `note unstar`.
+- Rename a note (change only its title): `note update <id> --title "New title"`. One note id per call; the body is untouched. Do not use `note content-read` plus `note patch` for title changes.
 - Change Markdown content: read [content-edit](content-edit.md); never use a nonexistent `note update --content` option.
 - Apply one metadata change to a filtered set: `note bulk`, with an explicit target filter, dry-run, confirmation, and expected count.
 - Soft-delete one exact note: `note delete`.

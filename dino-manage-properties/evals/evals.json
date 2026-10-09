@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "skill_name": "dino-manage-properties",
+  "evals": [
+    {
+      "id": "properties-set-status-by-label",
+      "prompt": "Set the 状态 property of my note abc123 to 进行中 and its rating to 4.",
+      "expected_output": "The agent checks the property catalog, dry-runs a value write that passes labels and numbers, and performs only the matching write.",
+      "assertions": [
+        "Runs `dino prop list --sync-timeout 20000 --format json` or `dino prop show` before writing.",
+        "Uses `dino prop set <noteId> --set 状态=进行中 --set rating=4` with `--dry-run` first.",
+        "Reads `data.properties` and `data.changed` after the real write instead of assuming success."
+      ]
+    },
+    {
+      "id": "properties-create-select",
+      "prompt": "Add a Priority field to Dinox with High, Medium, and Low options.",
+      "expected_output": "The agent dry-runs an idempotent property create with three options, reports whether the key already existed, and then creates it.",
+      "assertions": [
+        "Uses `dino prop create --key <key> --type select --option High:red ...` with `--dry-run` first.",
+        "Reports `data.created` so an existing property is reused rather than duplicated.",
+        "Does not invent option ids; reads them back from `data.property.options`."
+      ]
+    },
+    {
+      "id": "properties-remove-option-safely",
+      "prompt": "Remove the Low option from my Priority property.",
+      "expected_output": "The agent archives the option instead of deleting it, explains that stored values keep the option id, and dry-runs first.",
+      "assertions": [
+        "Uses `dino prop update <ref> --archive-option Low` rather than replacing the option list without it.",
+        "Explains that archiving keeps existing note values readable.",
+        "Runs the update with `--dry-run` before the real write."
+      ]
+    },
+    {
+      "id": "properties-template-note",
+      "prompt": "Create a template called Book with fields 作者 and rating, then make a note for Dune from it with rating 5.",
+      "expected_output": "The agent ensures both property definitions, creates the template with ordered keys, and creates the note from the template with an initial value in one atomic create.",
+      "assertions": [
+        "Creates the template with `dino template create --name Book --property-key 作者 --property-key rating` after a dry run.",
+        "Creates the note with `dino note create --template <id> --properties` rather than a separate unatomic write.",
+        "Verifies the resulting `data.properties` contains the declared slot and the rating value."
+      ]
+    }
+  ],
+  "trigger_evals": [
+    {
+      "id": "properties-train-set",
+      "split": "train",
+      "query": "Mark my Dinox note about the Q3 plan as status Done.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-properties"],
+      "reason": "Setting a property value on a note belongs to property management."
+    },
+    {
+      "id": "properties-train-define",
+      "split": "train",
+      "query": "Create a Dinox property called Deadline that stores a date and time.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-properties"],
+      "reason": "Defining a typed property field is property catalog management."
+    },
+    {
+      "id": "properties-train-template",
+      "split": "train",
+      "query": "Edit my Dinox Meeting template so new notes get Owner and Due fields.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-properties"],
+      "reason": "Changing a template's declared property keys is template management."
+    },
+    {
+      "id": "properties-train-view",
+      "split": "train",
+      "query": "Build a saved view that shows notes whose Status is Done.",
+      "should_trigger": false,
+      "expected_skills": ["dino-manage-views"],
+      "reason": "Filtering notes by a property inside a persistent view belongs to saved views."
+    },
+    {
+      "id": "properties-train-tag",
+      "split": "train",
+      "query": "Add the tag reading to my latest Dinox note.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "Tags are note metadata, not typed properties."
+    },
+    {
+      "id": "properties-validation-zh",
+      "split": "validation",
+      "query": "给这条笔记的评分属性填 5 分，再把作者设成刘慈欣。",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-properties"],
+      "reason": "This writes property values on a note."
+    },
+    {
+      "id": "properties-validation-options",
+      "split": "validation",
+      "query": "Rename the High option of my Dinox Priority field to Urgent.",
+      "should_trigger": true,
+      "expected_skills": ["dino-manage-properties"],
+      "reason": "Editing select options is property definition management."
+    },
+    {
+      "id": "properties-validation-search",
+      "split": "validation",
+      "query": "Search my Dinox notes for anything mentioning property taxes.",
+      "should_trigger": false,
+      "expected_skills": ["dino-note"],
+      "reason": "A keyword search that mentions the word property is a note search."
+    },
+    {
+      "id": "properties-validation-css",
+      "split": "validation",
+      "query": "What does the CSS property display: grid do?",
+      "should_trigger": false,
+      "expected_skills": [],
+      "reason": "Generic programming questions about properties are unrelated to Dinox."
+    }
+  ]
+}

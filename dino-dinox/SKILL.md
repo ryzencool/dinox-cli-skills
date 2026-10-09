@@ -6,7 +6,7 @@ description: >
   work.
 license: ISC
 metadata:
-  version: "2.2.0"
+  version: "2.3.0"
   dinox-cli-help: "dino --help"
   category: "bootstrap"
   risk: "mixed"
@@ -103,7 +103,9 @@ are unsupported.
 - Tags: use `dino tag list/tree/stats/add/rename/move/merge/suggest/cleanup`; `c_tag_node` is the tag source of truth.
 - Card boxes: use `dino box list/add/tree/stats/rename/move/merge/cleanup`; `c_zettel_box.path` is the primary hierarchy semantic.
 - Todos: use `dino todo search/append/create/update`; todo items are extracted from note content.
-- Saved views: use `dino view list/get/fields/query/count/create/update/delete`; discover property fields and stable option IDs with `view fields` before authoring canonical filter/config JSON.
+- Saved views: use `dino view list/get/fields/query/count/analytics/note-detail/create/update/delete`; discover property fields and stable option IDs with `view fields` before authoring filter/config JSON.
+- Properties: use `dino prop list/get/create/update/delete/migrate-options` for definitions and `dino prop show/set/fill/slots` for note values.
+- Note templates: use `dino template list/get/create/update/delete`; create notes from one with `dino note create --template <id>`.
 - Files and custom S3: use `dino storage list/test/upload/stats`.
 - Auth and sync: use `dino auth status/login/logout` and `dino sync`.
 - Health checks and local repairs: use `dino doctor --sync-timeout 20000 --format json`; only use `dino doctor --fix --sync-timeout 20000 --format json` after confirmation because it may rebuild indexes, drain uploads, and restart daemon.

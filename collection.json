@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "name": "dinox-cli-skills",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "license": "ISC",
   "installer": {
     "name": "skills",
@@ -10,12 +10,12 @@
   "source": {
     "repository": "https://github.com/ryzencool/dinox-cli",
     "path": "skills",
-    "revision": "v2.2.0"
+    "revision": "v2.3.0"
   },
   "distribution": {
     "repository": "https://github.com/ryzencool/dinox-cli-skills",
-    "revision": "v2.2.0",
-    "installCommand": "npx --yes skills@1.5.16 add ryzencool/dinox-cli-skills#v2.2.0 -g -a codex -a claude-code -a hermes-agent -a openclaw --skill '*' -y"
+    "revision": "v2.3.0",
+    "installCommand": "npx --yes skills@1.5.16 add ryzencool/dinox-cli-skills#v2.3.0 -g -a codex -a claude-code -a hermes-agent -a openclaw --skill '*' -y"
   },
   "skills": [
     "dino-auth",
@@ -23,6 +23,7 @@
     "dino-dinox",
     "dino-manage-boxes",
     "dino-manage-prompts",
+    "dino-manage-properties",
     "dino-manage-tags",
     "dino-manage-todo",
     "dino-manage-views",

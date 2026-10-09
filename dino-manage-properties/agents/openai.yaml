@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dinox Properties"
+  short_description: "Define note properties, set values, and manage templates"
+  default_prompt: "Use $dino-manage-properties to set a property on a Dinox note."

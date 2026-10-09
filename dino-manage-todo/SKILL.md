@@ -5,7 +5,7 @@ description: >
   append, complete, or reopen tasks by tag, time, or status; not note editing.
 license: ISC
 metadata:
-  version: "2.2.0"
+  version: "2.3.0"
   dinox-cli-help: "dino todo --help"
   category: "todo"
   risk: "mixed"

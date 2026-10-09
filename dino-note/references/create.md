@@ -4,9 +4,11 @@
 Use this generated command surface as the canonical interface for note creation.
 
 ```text
-dino note create                   # Create a new note from markdown content
+dino note create                   # Create a new note from markdown content or a note template
   --title <string>               # Note title
-  --content <string|@file>       # Markdown content
+  --content <string|@file>       # Markdown content (required unless --template is given; overrides template content)
+  --template <id>                # Note template id: hydrates its content ({{date}}, {{time}}, ...) and declares its property keys as empty slots
+  --properties <json|@file>      # Initial property values as a JSON object; validated against property definitions
   --type <note|crawl>            # Note type: note or crawl
   --tags <string|@file>          # Tag list (JSON array or comma/newline-separated)
   --boxes <string|@file>         # Box paths or unique names (JSON array or comma/newline-separated)
@@ -15,6 +17,7 @@ dino note create                   # Create a new note from markdown content
 ```
 
 - Use `--boxes` for public box input.
+- `--template <id>` hydrates the template content and declares its property keys as empty slots; `--properties` writes initial values atomically with the note.
 - Prefer `--type note` unless the user explicitly wants a `crawl` note.
 - Run the same command with `--sync-timeout 20000 --dry-run --format json` first and keep the host timeout 5-10 seconds higher.
 <!-- END GENERATED_COMMANDS -->
@@ -22,7 +25,7 @@ dino note create                   # Create a new note from markdown content
 ## Required Inputs
 
 - Title
-- Markdown content
+- Markdown content, unless the note is created from a template (`--template <id>`)
 
 Markdown fenced code blocks with `mermaid` or `mindgraph` languages are preserved as structured atomic note nodes.
 
@@ -32,6 +35,8 @@ Markdown fenced code blocks with `mermaid` or `mindgraph` languages are preserve
 - Tags
 - Boxes
 - Media/file resources referenced from local paths
+- A note template (`--template <id>`, from `dino template list --sync-timeout 20000 --format json`): its content is hydrated (`{{date}}`, `{{time}}`, `{{datetime}}`) and its property keys are declared as empty slots. Explicit `--content` replaces the template content.
+- Initial property values (`--properties @values.json`, a JSON object): validated against property definitions and written atomically with the note; a bad value aborts the whole create. See the `dino-manage-properties` skill for value shapes.
 
 ## Validation Flow
 
@@ -48,5 +53,5 @@ Markdown fenced code blocks with `mermaid` or `mindgraph` languages are preserve
 2. Build the final `dino note create ... --sync-timeout 20000 --format json --dry-run` command and keep the host timeout 5-10 seconds higher.
 3. Inspect `data.inputs`, `data.changes`, `data.stale`, and `data.sync.gate`. If the preview exactly matches the note the user explicitly asked to create, execute without asking again; otherwise clarify the title, content, tags, boxes, or type.
 4. Rerun the same command without `--dry-run`.
-5. Require top-level `ok: true`, then report the new note ID plus `data.durability`, `data.upload_queue_remaining`, `data.version`, `data.content_hash`, `data.changed`, `data.stale`, and top-level `_notice`.
+5. Require top-level `ok: true`, then report the new note ID (and `data.properties` when a template or properties were used) plus `data.durability`, `data.upload_queue_remaining`, `data.version`, `data.content_hash`, `data.changed`, `data.stale`, and top-level `_notice`.
 6. Use `--durability uploaded` only when the user explicitly needs upload completion before success.

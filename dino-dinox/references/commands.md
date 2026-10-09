@@ -21,6 +21,8 @@ user asks for a broad inventory of Dinox commands.
 - [Card Boxes (Zettel Boxes)](#card-boxes-zettel-boxes)
 - [Prompts](#prompts)
 - [Saved Views](#saved-views)
+- [Properties](#properties)
+- [Note Templates](#note-templates)
 - [Storage](#storage)
 - [Config](#config)
 - [Info](#info)
@@ -132,9 +134,11 @@ dino note export [id]              # Export one or more notes as Markdown or JSO
 dino note content-read <id>        # Read note content context and issue a short-lived token required before content patching
   --include-content              # Include full markdown plus detailed block text and attributes
 
-dino note create                   # Create a new note from markdown content
+dino note create                   # Create a new note from markdown content or a note template
   --title <string>               # Note title
-  --content <string|@file>       # Markdown content
+  --content <string|@file>       # Markdown content (required unless --template is given; overrides template content)
+  --template <id>                # Note template id: hydrates its content ({{date}}, {{time}}, ...) and declares its property keys as empty slots
+  --properties <json|@file>      # Initial property values as a JSON object; validated against property definitions
   --type <note|crawl>            # Note type: note or crawl
   --tags <string|@file>          # Tag list (JSON array or comma/newline-separated)
   --boxes <string|@file>         # Box paths or unique names (JSON array or comma/newline-separated)
@@ -318,37 +322,48 @@ dino prompt add                    # Create a prompt template, restoring a delet
 
 ### Saved Views
 ```text
-dino view list                     # List active saved table views
+dino view list                     # List active saved views
   --limit <n>                    # Maximum returned views (1-5000)
 
-dino view get <id>                 # Get one saved view definition
+dino view get <id>                 # Get one saved view definition (stored rows the CLI cannot parse return valid=false with the raw JSON)
 
-dino view fields                   # List system and property fields available to saved views
+dino view fields                   # List system and property fields with their filter operators, sortability, and option ids
 
 dino view query <id>               # Query notes through a saved view filter and sort definition
   --limit <n>                    # Maximum returned notes (1-500)
   --offset <n>                   # Result offset for pagination
+  --time-zone <iana>             # IANA time zone for dynamic date filters (isToday, isThisWeek, withinLastDays); defaults to the system zone
 
 dino view count <id>               # Count notes matching a saved view
+  --time-zone <iana>             # IANA time zone for dynamic date filters (isToday, isThisWeek, withinLastDays); defaults to the system zone
 
-dino view create                   # Create a canonical saved table view
+dino view analytics <id>           # Compute the stats, charts, and summary row configured on a saved view
+  --time-zone <iana>             # IANA time zone for dynamic date filters (isToday, isThisWeek, withinLastDays); defaults to the system zone
+
+dino view note-detail <noteId>     # List saved views embedded on a note (views with a noteDetail rule, $self bound to the note)
+  --limit <n>                    # Maximum rows per section (1-100)
+  --time-zone <iana>             # IANA time zone for dynamic date filters (isToday, isThisWeek, withinLastDays); defaults to the system zone
+
+dino view create                   # Create a saved view
   --name <string>                # Saved view name
   --emoji <string>               # Optional emoji or short icon text
-  --filter <json|@file>          # Canonical version 1 saved view filter JSON; defaults to no filter
-  --config <json|@file>          # Canonical version 1 saved view config JSON; defaults to title + updated_at
+  --filter <json|@file>          # Saved view filter JSON (version 1-3); defaults to no filter
+  --config <json|@file>          # Saved view config JSON (columns, sort, layout, noteDetail, stats, charts, computedColumns, summary); defaults to title + updated_at
+  --layout <layout>              # View layout (table, list, card); overrides config.layout
   --template-id <id>             # Optional note template id associated with the view
   --group-id <id>                # Optional saved view group id
-  --sort-rank <n>                # Explicit catalog sort rank
+  --sort-rank <n>                # Explicit catalog sort rank (defaults to the end of the sidebar)
   --pinned-at <timestamp>        # Pinned timestamp
   --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
-  --dry-run                      # Validate and preview the view without writing
+  --dry-run                      # Validate and preview the stored view without writing
 
-dino view update <id>              # Update a canonical saved table view
+dino view update <id>              # Update a saved view; fields you do not pass are left as stored
   --name <string>                # Replace the saved view name
   --emoji <string>               # Replace emoji or short icon text
   --clear-emoji                  # Clear the saved view emoji
-  --filter <json|@file>          # Replace the canonical version 1 filter JSON
-  --config <json|@file>          # Replace the canonical version 1 config JSON
+  --filter <json|@file>          # Replace the filter JSON (version 1-3)
+  --config <json|@file>          # Replace the whole config JSON
+  --layout <layout>              # View layout (table, list, card); overrides config.layout
   --template-id <id>             # Replace the associated note template id
   --clear-template               # Clear the associated note template id
   --group-id <id>                # Replace the saved view group id
@@ -358,11 +373,118 @@ dino view update <id>              # Update a canonical saved table view
   --pinned-at <timestamp>        # Replace the pinned timestamp
   --unpin                        # Clear the pinned timestamp
   --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
-  --dry-run                      # Validate and preview the update without writing
+  --dry-run                      # Validate and preview the stored view without writing
 
 dino view delete <id>              # Soft-delete a saved view
   --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the soft delete without writing
+```
+
+### Properties
+```text
+dino prop list                     # List property definitions (types, option ids, config)
+  --limit <n>                    # Maximum returned definitions (1-5000)
+
+dino prop get <ref>                # Get one property definition by id or key
+
+dino prop create                   # Create a property definition, or reuse the existing one with this key (new options are merged)
+  --key <key>                    # Stable key stored in note properties; immutable after creation
+  --name <name>                  # Display name (defaults to the key)
+  --type <type>                  # Property type: text, number, date, select, multi_select, status, url, email, phone, checkbox, files, relation, unique_id, place (defaults to text)
+  --option <label[:color[:group]]> # Add a select/multi_select/status option (repeatable); status defaults to todo/in_progress/complete options
+  --options <json|@file>         # Option list JSON: [{label, color?, sortRank?, archived?, group?}]
+  --config <json|@file>          # Type config envelope, e.g. {"version":1,"type":"date","mode":"datetime"}
+  --unique-id-prefix <prefix>    # Prefix for unique_id values (A-Z0-9, max 12)
+  --description <text>           # Semantic description (helps AI fill values)
+  --icon <icon>                  # Icon text
+  --source <source>              # Definition source: manual or ai
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
+  --dry-run                      # Run the write in a rolled-back transaction and preview the result
+
+dino prop update <ref>             # Update a property definition: name, description, icon, card visibility, order, options, config
+  --name <name>                  # Rename (note data is keyed by the immutable key and is not touched)
+  --description <text>           # Replace the description
+  --clear-description            # Clear the description
+  --icon <icon>                  # Replace the icon
+  --clear-icon                   # Clear the icon
+  --show-on-card <bool>          # Show on compact note cards: true or false
+  --sort-rank <n>                # Catalog sort rank
+  --add-option <label[:color[:group]]> # Append an option (repeatable)
+  --archive-option <id|label>    # Archive an option; options are never removed (repeatable)
+  --restore-option <id|label>    # Un-archive an option (repeatable)
+  --rename-option <id|label=new> # Relabel an option; stored values keep its id (repeatable)
+  --option-color <id|label=color> # Recolor an option (repeatable)
+  --options <json|@file>         # Replace the whole option list; existing options must keep their id (archive instead of removing)
+  --repair-invalid-options       # With --options: replace malformed stored options by id-less items
+  --unique-id-prefix <prefix>    # Replace the unique_id prefix (issued numbers are kept)
+  --config <json|@file>          # Replace the type config envelope
+  --clear-config                 # Remove the explicit config and restore the type default
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
+  --dry-run                      # Run the write in a rolled-back transaction and preview the result
+
+dino prop delete <ref>             # Soft-delete a property definition; note values are kept and shown as untyped
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
+  --dry-run                      # Run the write in a rolled-back transaction and preview the result
+
+dino prop migrate-options          # Migrate legacy string-array select options to stable option ids (rewrites note values and view filters)
+  --dry-run                      # Run the write in a rolled-back transaction and preview the result
+  --confirm                      # Required for real writes after reviewing a dry run
+  --expected-count <n>           # Must equal the dry run changes.affected_count
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
+
+dino prop show <noteId>            # Show a note's property values resolved against their definitions
+
+dino prop set <noteId>             # Set or remove note property values; values are coerced and validated against their definitions
+  --set <key=value>              # Set a value (repeatable); JSON values are parsed, select options accept a label or id
+  --unset <key>                  # Remove a property from the note (repeatable)
+  --patch <json|@file>           # JSON object of key to value; null removes the key
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
+  --dry-run                      # Run the write in a rolled-back transaction and preview the result
+
+dino prop fill <noteId>            # Fill only properties that are declared but still empty on the note; other keys are skipped
+  --values <json|@file>          # JSON object of key to value
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
+  --dry-run                      # Run the write in a rolled-back transaction and preview the result
+
+dino prop slots <noteId>           # Declare empty property slots, clear values, remove keys, or reorder keys on a note
+  --declare <key>                # Add an empty slot for a key (repeatable)
+  --clear <key>                  # Clear a value but keep the slot (repeatable)
+  --remove <key>                 # Remove a key and its value (repeatable)
+  --order <key>                  # Preferred display order of visible keys (repeat in order, at least 2)
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
+  --dry-run                      # Run the write in a rolled-back transaction and preview the result
+```
+
+### Note Templates
+```text
+dino template list                 # List note templates
+  --limit <n>                    # Maximum returned templates (1-2000)
+
+dino template get <id>             # Get one note template with its Tiptap document
+
+dino template create               # Create a note template
+  --name <string>                # Template name
+  --content <string|@file>       # Template content as Markdown; {{date}} {{time}} {{datetime}} {{location}} tokens are filled when a note is created
+  --content-json <json|@file>    # Template content as a Tiptap doc JSON
+  --property-key <key>           # Property key declared on notes created from the template (repeatable, ordered)
+  --property-keys <string|@file> # Property keys as a JSON array or comma/newline-separated list
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
+  --dry-run                      # Run the write in a rolled-back transaction and preview the result
+
+dino template update <id>          # Update a note template; fields you do not pass are left as stored
+  --name <string>                # Rename the template
+  --content <string|@file>       # Template content as Markdown; {{date}} {{time}} {{datetime}} {{location}} tokens are filled when a note is created
+  --content-json <json|@file>    # Template content as a Tiptap doc JSON
+  --clear-content                # Make the template property-only
+  --property-key <key>           # Property key declared on notes created from the template (repeatable, ordered)
+  --property-keys <string|@file> # Property keys as a JSON array or comma/newline-separated list
+  --clear-property-keys          # Remove all property keys
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
+  --dry-run                      # Run the write in a rolled-back transaction and preview the result
+
+dino template delete <id>          # Soft-delete a note template
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
+  --dry-run                      # Run the write in a rolled-back transaction and preview the result
 ```
 
 ### Storage

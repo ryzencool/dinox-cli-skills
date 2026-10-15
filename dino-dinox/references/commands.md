@@ -67,6 +67,11 @@ dino daemon restart                # Restart daemon process
   --port <number>                # Legacy compatibility field; daemon listens on a private local socket
 
 dino daemon stop                   # Stop daemon process
+
+dino daemon install                # Run the daemon as a login service (launchd / systemd) so it outlives the shell or agent that started it
+  --port <number>                # Legacy compatibility field; daemon listens on a private local socket
+
+dino daemon uninstall              # Stop the daemon service and remove it from the login session
 ```
 
 ### Agent Gateways

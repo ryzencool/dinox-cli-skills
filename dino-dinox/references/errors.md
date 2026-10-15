@@ -35,6 +35,8 @@ unavailable. Branch on the structured `code` and `recoverable` fields and follow
 | `DAEMON_LEGACY_UNVERIFIED` | 1 | A daemon from an older CLI could not be verified safely. |
 | `DAEMON_RELEASE_FAILED` | 1 | The daemon could not release database ownership. |
 | `DAEMON_RELEASE_TIMEOUT` | 1 | The daemon did not release database ownership in time. |
+| `DAEMON_SERVICE_FAILED` | 1 | The service manager (launchd / systemd) rejected a daemon service operation. |
+| `DAEMON_SERVICE_UNSUPPORTED` | 5 | The daemon cannot run as a login service on this platform or with this auth setup. |
 | `DAEMON_STALE` | 5 | The daemon state is stale and needs a restart. |
 | `DAEMON_START_FAILED` | 5 | The daemon process failed to start. |
 | `DAEMON_START_TIMEOUT` | 1 | The daemon did not become ready in time. |

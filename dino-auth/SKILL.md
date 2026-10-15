@@ -5,7 +5,7 @@ description: >
   identity, or credential cleanup; do not use it for sync.
 license: ISC
 metadata:
-  version: "2.4.0"
+  version: "2.5.2"
   dinox-cli-help: "dino auth --help"
   category: "auth"
   risk: "mixed"

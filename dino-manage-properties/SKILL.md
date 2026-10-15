@@ -5,7 +5,7 @@ description: >
   values on notes, or manage note templates; not for saved-view filters.
 license: ISC
 metadata:
-  version: "2.4.0"
+  version: "2.5.2"
   dinox-cli-help: "dino prop --help"
   category: "properties"
   risk: "mixed"

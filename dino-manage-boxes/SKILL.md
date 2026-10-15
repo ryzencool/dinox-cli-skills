@@ -5,7 +5,7 @@ description: >
   move, merge, or clean up card/zettel boxes; use dino-note for note membership.
 license: ISC
 metadata:
-  version: "2.4.0"
+  version: "2.5.2"
   dinox-cli-help: "dino box --help"
   category: "boxes"
   risk: "mixed"

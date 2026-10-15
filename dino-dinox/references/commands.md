@@ -72,6 +72,9 @@ dino daemon install                # Run the daemon as a login service (launchd 
   --port <number>                # Legacy compatibility field; daemon listens on a private local socket
 
 dino daemon uninstall              # Stop the daemon service and remove it from the login session
+
+dino daemon supervise              # Run the daemon in the foreground and restart it after a crash (used by the Windows logon task)
+  --port <number>                # Legacy compatibility field; daemon listens on a private local socket
 ```
 
 ### Agent Gateways

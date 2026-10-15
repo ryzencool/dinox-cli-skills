@@ -10,6 +10,7 @@ user asks for a broad inventory of Dinox commands.
 - [Commands Quick Reference](#commands-quick-reference)
 - [Auth](#auth)
 - [Daemon](#daemon)
+- [Agent Gateways](#agent-gateways)
 - [Doctor](#doctor)
 - [Sync](#sync)
 - [Schema](#schema)
@@ -66,6 +67,29 @@ dino daemon restart                # Restart daemon process
   --port <number>                # Legacy compatibility field; daemon listens on a private local socket
 
 dino daemon stop                   # Stop daemon process
+```
+
+### Agent Gateways
+```text
+dino gateway detect                # Find ACP agents installed on this machine (verified with a real handshake)
+  --add                          # Add every verified agent that is not configured yet
+
+dino gateway add <name>            # Add an agent gateway and start hosting it in the daemon
+  --kind <kind>                  # Agent runtime protocol
+  --command <command>            # ACP agent executable (e.g. hermes, openclaw, claude-code-acp)
+  --arg <value>                  # Argument passed to the agent (repeatable, e.g. --arg acp)
+  --cwd <dir>                    # Working directory for the agent sessions
+  --env <KEY=VALUE>              # Environment for the agent process, stored locally (repeatable)
+
+dino gateway list                  # List configured agent gateways (environment values are never shown)
+
+dino gateway remove <gateway>      # Remove an agent gateway and stop hosting it
+
+dino gateway status                # Show live connection status of each hosted gateway
+
+dino gateway reload                # Re-read gateway configuration in the running daemon
+
+dino gateway mcp                   # Serve read-only Dinox knowledge tools over stdio MCP (started by gateway agents)
 ```
 
 ### Doctor

@@ -75,6 +75,14 @@
       "reason": "This product-name-free wording still requests first-time CLI and skills installation."
     },
     {
+      "id": "dinox-train-gateway",
+      "split": "train",
+      "query": "Host the Hermes agent on this machine as a Dinox remote device.",
+      "should_trigger": true,
+      "expected_skills": ["dino-dinox"],
+      "reason": "Agent gateway setup belongs to general CLI bootstrap, not a notes or sync skill."
+    },
+    {
       "id": "dinox-train-daemon-typo",
       "split": "train",
       "query": "the dino damon keeps dying, can u run a health check?",

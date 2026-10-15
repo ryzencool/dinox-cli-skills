@@ -2,11 +2,10 @@
 name: dino-dinox
 description: >
   Use this skill for Dinox CLI install/安装, doctor, or schema. Also handle
-  daemon, graph, metadata, bootstrap, or uncategorized failures; never domain
-  work.
+  daemon, gateway, graph, metadata, bootstrap; never domain work.
 license: ISC
 metadata:
-  version: "2.3.0"
+  version: "2.4.0"
   dinox-cli-help: "dino --help"
   category: "bootstrap"
   risk: "mixed"
@@ -77,7 +76,7 @@ by default, so prefer global installation or configure
 canonical `.agents/skills`. Do not project-install inside the Dinox CLI source
 repository because OpenClaw's target `skills/` is also the canonical source.
 
-The CLI requires Node.js `^20.18.1 || >=22.0.0 <26.0.0`. Node.js 21 and 26+
+The CLI requires Node.js `>=22.0.0 <26.0.0`. Node.js 21 and below, and 26+,
 are unsupported.
 
 ## Auth Bootstrap
@@ -110,6 +109,7 @@ are unsupported.
 - Auth and sync: use `dino auth status/login/logout` and `dino sync`.
 - Health checks and local repairs: use `dino doctor --sync-timeout 20000 --format json`; only use `dino doctor --fix --sync-timeout 20000 --format json` after confirmation because it may rebuild indexes, drain uploads, and restart daemon.
 - Daemon: public process-management commands are `dino daemon start/status/restart/stop`.
+- Agent gateways: use `dino gateway detect/add/list/remove/status/reload` to host ACP agents as remote devices. `dino gateway mcp` is the stdio server those agents start. Never print gateway environment values.
 - Installed agent skills: use `dino skills doctor` for version drift and retired skills; `dino skills migrate` removes only exact retired matches after confirmation.
 
 ## Command Discovery

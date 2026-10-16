@@ -44,7 +44,7 @@ user asks for a broad inventory of Dinox commands.
 
 ### Auth
 ```text
-dino auth login                    # Save login token and verify PowerSync connectivity
+dino auth login                    # Log in by scanning a QR code, or save a token and verify PowerSync connectivity
   --token-stdin                  # Read the login token from piped stdin instead of argv
 
 dino auth logout                   # Clear saved login token and optionally remove the local cache
@@ -53,7 +53,7 @@ dino auth logout                   # Clear saved login token and optionally remo
 dino auth status                   # Show current login, local cache, and sync status
 ```
 
-Agent safety: the positional login-token form is legacy compatibility and is intentionally omitted from this agent-facing signature. Agent workflows must never place a Dinox authentication token in argv; use `--token-stdin` from the user's own shell or secret store.
+Agent safety: the positional login-token form is legacy compatibility and is intentionally omitted from this agent-facing signature. Agent workflows must never place a Dinox authentication token in argv. Prefer `dino auth login` in the user's terminal (QR code; it blocks for up to 10 minutes; in Claude Code the user can type `! dino auth login`). Use `--token-stdin` only from the user's own shell or secret store.
 
 ### Daemon
 ```text

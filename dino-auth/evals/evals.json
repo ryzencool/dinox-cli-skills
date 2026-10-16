@@ -13,6 +13,16 @@
       ]
     },
     {
+      "id": "auth-qr-login",
+      "prompt": "Help me log in to Dinox from this machine. I have the Dinox phone app and I am in Claude Code.",
+      "expected_output": "The agent tells the user to run dino auth login in their own terminal and scan the QR code. In Claude Code it may suggest ! dino auth login. It warns that the command can block for up to 10 minutes and does not ask for a token.",
+      "assertions": [
+        "Directs the user to run `dino auth login` and scan the QR code with the Dinox app.",
+        "Mentions that the command can block for up to 10 minutes.",
+        "Does not request, print, or place an authentication token in argv."
+      ]
+    },
+    {
       "id": "auth-persistent-login",
       "prompt": "I need Dinox authentication to persist across Claude Code, Codex, and OpenClaw restarts. Tell me the safe login procedure; I can retrieve the token from my shell secret store.",
       "expected_output": "The agent explains process-environment inheritance, directs the user to pipe the secret into `--token-stdin` in their own terminal, and verifies with offline status without asking for the token in chat.",

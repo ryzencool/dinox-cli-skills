@@ -5,7 +5,7 @@ description: >
   daemon, gateway, graph, metadata, bootstrap; never domain work.
 license: ISC
 metadata:
-  version: "2.9.0"
+  version: "2.10.0"
   dinox-cli-help: "dino --help"
   category: "bootstrap"
   risk: "mixed"
@@ -24,7 +24,7 @@ metadata:
 - On a nonzero exit, parse structured stderr. Use top-level `code`, `recoverable`, `exit_code`, and `suggested_action`; inspect `error` for details. `dino schema errors --format json` lists every code and its exit status.
 - A direct user request for an exact write authorizes that write when the dry-run matches. Ask again before delete, overwrite, merge, bulk mutation, local-cache removal, repair, global CLI update, or whenever targets or impact are ambiguous.
 - A dry-run does not apply the planned mutation, but an online PowerSync runtime may flush older queued writes. Use `--offline` only when the user accepts stale local-cache semantics.
-- Do not ask for Dinox authentication credentials in chat or place a Dinox authentication token in argv. The `dino` child process must inherit `DINOX_TOKEN` or receive it from the host secret store at execution time; if the host cannot inject it safely, have the user perform persistent `--token-stdin` login in their own terminal.
+- Do not ask for Dinox authentication credentials in chat or place a Dinox authentication token in argv. For persistent login, have the user run `dino auth login` in their own terminal and scan the QR code with the Dinox app. In Claude Code they can type `! dino auth login`. That command blocks for up to 10 minutes; say so before an agent runs it. Inherited `DINOX_TOKEN` and `dino auth login --token-stdin` remain for CI and secret stores.
 - Execute `dino` in an environment that can access the intended CLI binary, Dinox config/cache, and injected secret. Host-turn secret injection does not automatically cross into a sandbox or remote execution backend; never copy a secret through prompts to bridge that boundary.
 - If the host times out before receiving a structured envelope, treat the outcome as unknown. Verify freshness or the write postcondition before retrying.
 - Before claiming complete, current, all, none, latest, or an exact count, verify the command's freshness field is false (usually `data.stale`; note search uses `data.meta.stale`), inspect `_notice`, and check pagination or truncation fields returned by the command.
@@ -83,7 +83,7 @@ are unsupported.
 
 - Never request or echo a Dinox authentication token in chat. A note patch capability returned as `data.readToken` is a different, short-lived secret: keep it only in an exclusively created temporary file with owner-only permissions (0600 on POSIX; an owner-only ACL on Windows) for `--read-token @<file>`, then delete the file immediately after the single real patch attempt.
 - A process-only `DINOX_TOKEN` must reach the `dino` child through inherited environment or safe execution-time host injection. Exporting it in another terminal does not update a running agent unless the host supports per-turn injection.
-- For persistent auth, have the user pipe a token from their shell or secret store into `dino auth login --token-stdin` in their own terminal.
+- For persistent auth, have the user run `dino auth login` in their own terminal and scan the QR code with the Dinox app. In Claude Code they can type `! dino auth login`. Say that the command blocks for up to 10 minutes before an agent runs it. CI and secret stores can still pipe a token into `dino auth login --token-stdin`.
 - Check local login state with `dino auth status --offline --format json`. Use bounded online status only when identity or connectivity must be resolved.
 - Run sync directly when requested; do not add an online auth preflight that duplicates connection work.
 

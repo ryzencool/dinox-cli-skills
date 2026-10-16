@@ -5,7 +5,7 @@ description: >
   append, complete, or reopen tasks by tag, time, or status; not note editing.
 license: ISC
 metadata:
-  version: "2.9.0"
+  version: "2.10.0"
   dinox-cli-help: "dino todo --help"
   category: "todo"
   risk: "mixed"
@@ -24,7 +24,7 @@ metadata:
 - On a nonzero exit, parse structured stderr. Use top-level `code`, `recoverable`, `exit_code`, and `suggested_action`; inspect `error` for details. `dino schema errors --format json` lists every code and its exit status.
 - A direct user request for an exact write authorizes that write when the dry-run matches. Ask again before delete, overwrite, merge, bulk mutation, local-cache removal, repair, global CLI update, or whenever targets or impact are ambiguous.
 - A dry-run does not apply the planned mutation, but an online PowerSync runtime may flush older queued writes. Use `--offline` only when the user accepts stale local-cache semantics.
-- Do not ask for Dinox authentication credentials in chat or place a Dinox authentication token in argv. The `dino` child process must inherit `DINOX_TOKEN` or receive it from the host secret store at execution time; if the host cannot inject it safely, have the user perform persistent `--token-stdin` login in their own terminal.
+- Do not ask for Dinox authentication credentials in chat or place a Dinox authentication token in argv. For persistent login, have the user run `dino auth login` in their own terminal and scan the QR code with the Dinox app. In Claude Code they can type `! dino auth login`. That command blocks for up to 10 minutes; say so before an agent runs it. Inherited `DINOX_TOKEN` and `dino auth login --token-stdin` remain for CI and secret stores.
 - Execute `dino` in an environment that can access the intended CLI binary, Dinox config/cache, and injected secret. Host-turn secret injection does not automatically cross into a sandbox or remote execution backend; never copy a secret through prompts to bridge that boundary.
 - If the host times out before receiving a structured envelope, treat the outcome as unknown. Verify freshness or the write postcondition before retrying.
 - Before claiming complete, current, all, none, latest, or an exact count, verify the command's freshness field is false (usually `data.stale`; note search uses `data.meta.stale`), inspect `_notice`, and check pagination or truncation fields returned by the command.
@@ -37,7 +37,7 @@ metadata:
 - Run a dry-run before `append`, `create`, or `update`. If it exactly matches an explicit user request, execute without asking again; otherwise clarify the task text, target note, task ID, or status.
 - For `append`, require an explicit `--note-id` unless the user explicitly confirms they want to append to the CLI's default "latest eligible note".
 - For `update`, pass the `note_id` returned by todo search as `--note-id` whenever available, especially for `legacy-task-*` ids. Legacy ids bind to the searched task snapshot; if the note changes, search again instead of retrying a stale id.
-- Do not ask the user to paste auth tokens into chat. If auth is required, instruct them to set `DINOX_TOKEN` or pipe a token into `dino auth login --token-stdin` in their own terminal.
+- Do not ask the user to paste auth tokens into chat. If auth is required, have the user run `dino auth login` in their own terminal and scan the QR code (in Claude Code they can type `! dino auth login`). Say that the command can block for up to 10 minutes before running it. CI and secret stores can still set `DINOX_TOKEN` or pipe a token into `dino auth login --token-stdin`.
 
 ## Intent Mapping
 
@@ -86,4 +86,4 @@ metadata:
 - `Task lookup reached the ... safety limit`: run `todo search`, select the matching `note_id`, and retry update with `--note-id`.
 - `No eligible note found for append`: suggest `dino todo create` or provide `--note-id`.
 - If search is truncated, do not select or mutate a task based on assumed uniqueness. Narrow the query or increase bounded limits first.
-- Auth/sync issues: ask the user to set `DINOX_TOKEN` or pipe a token into `dino auth login --token-stdin` in their terminal (do not paste tokens into chat), then retry.
+- Auth/sync issues: have the user run `dino auth login` in their terminal and scan the QR code (it can block for up to 10 minutes; do not paste tokens into chat), then retry. CI can use `dino auth login --token-stdin`.

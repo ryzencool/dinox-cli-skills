@@ -5,7 +5,7 @@ description: >
   even when Dinox is not mentioned; not for notes, tasks, or one-off advice.
 license: ISC
 metadata:
-  version: "2.9.0"
+  version: "2.10.0"
   dinox-cli-help: "dino prompt --help"
   category: "prompts"
   risk: "mixed"
@@ -24,7 +24,7 @@ metadata:
 - On a nonzero exit, parse structured stderr. Use top-level `code`, `recoverable`, `exit_code`, and `suggested_action`; inspect `error` for details. `dino schema errors --format json` lists every code and its exit status.
 - A direct user request for an exact write authorizes that write when the dry-run matches. Ask again before delete, overwrite, merge, bulk mutation, local-cache removal, repair, global CLI update, or whenever targets or impact are ambiguous.
 - A dry-run does not apply the planned mutation, but an online PowerSync runtime may flush older queued writes. Use `--offline` only when the user accepts stale local-cache semantics.
-- Do not ask for Dinox authentication credentials in chat or place a Dinox authentication token in argv. The `dino` child process must inherit `DINOX_TOKEN` or receive it from the host secret store at execution time; if the host cannot inject it safely, have the user perform persistent `--token-stdin` login in their own terminal.
+- Do not ask for Dinox authentication credentials in chat or place a Dinox authentication token in argv. For persistent login, have the user run `dino auth login` in their own terminal and scan the QR code with the Dinox app. In Claude Code they can type `! dino auth login`. That command blocks for up to 10 minutes; say so before an agent runs it. Inherited `DINOX_TOKEN` and `dino auth login --token-stdin` remain for CI and secret stores.
 - Execute `dino` in an environment that can access the intended CLI binary, Dinox config/cache, and injected secret. Host-turn secret injection does not automatically cross into a sandbox or remote execution backend; never copy a secret through prompts to bridge that boundary.
 - If the host times out before receiving a structured envelope, treat the outcome as unknown. Verify freshness or the write postcondition before retrying.
 - Before claiming complete, current, all, none, latest, or an exact count, verify the command's freshness field is false (usually `data.stale`; note search uses `data.meta.stale`), inspect `_notice`, and check pagination or truncation fields returned by the command.
@@ -36,7 +36,7 @@ metadata:
 - Prefer `--prompt @file` for prompt text so quotes, newlines, substitutions, and shell metacharacters remain data. Create a unique file in the host temporary directory and never overwrite an existing path.
 - Run a dry-run before creation. If it exactly matches the prompt the user asked to save, execute without asking again; otherwise clarify the stored text.
 - Do not store secrets (tokens, passwords, API keys) inside prompt templates.
-- Do not ask the user to paste auth tokens into chat. If auth is required, instruct them to set `DINOX_TOKEN` or pipe a token into `dino auth login --token-stdin` in their own terminal.
+- Do not ask the user to paste auth tokens into chat. If auth is required, have the user run `dino auth login` in their own terminal and scan the QR code (in Claude Code they can type `! dino auth login`). Say that the command can block for up to 10 minutes before running it. CI and secret stores can still set `DINOX_TOKEN` or pipe a token into `dino auth login --token-stdin`.
 
 <!-- BEGIN GENERATED_COMMANDS -->
 ## Command Reference
@@ -68,7 +68,7 @@ dino prompt add                    # Create a prompt template, restoring a delet
 ## Error Handling
 
 - **Not logged in** (`Missing resolved userId` / `Run dino auth login first`):
-  ask the user to set `DINOX_TOKEN` or pipe a token into `dino auth login --token-stdin` in their terminal (do not paste tokens into chat), then retry.
+  have the user run `dino auth login` in their terminal and scan the QR code (it can block for up to 10 minutes; do not paste tokens into chat), then retry. CI can use `dino auth login --token-stdin`.
 - **Stale or host timeout**:
   do not infer that the prompt write failed. Inspect `data.stale`, `_notice`, or the structured error, then list prompts to verify the postcondition before retrying the write. Do not respond by repeatedly increasing the timeout.
 - **Missing required input**:

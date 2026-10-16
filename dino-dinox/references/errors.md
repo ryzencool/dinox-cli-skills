@@ -22,6 +22,9 @@ unavailable. Branch on the structured `code` and `recoverable` fields and follow
 |------|------|---------|
 | `ALREADY_EXISTS` | 5 | The target resource already exists. |
 | `AUTH_INVALID` | 3 | The configured credentials were rejected. |
+| `AUTH_PAIRING_FAILED` | 3 | Device QR login failed because the server rejected the pairing request. |
+| `AUTH_PAIRING_TIMEOUT` | 3 | Device QR login timed out before the phone approved this computer. |
+| `AUTH_PAIRING_UNSUPPORTED` | 3 | This server does not accept the CLI device type for QR login yet. |
 | `AUTH_REQUIRED` | 3 | The command needs an authenticated Dinox account. |
 | `AUTH_STATE_CHANGED` | 3 | Authentication changed while the command was running. |
 | `CACHE_CLEANUP_FAILED` | 1 | Local cache cleanup after logout did not complete. |

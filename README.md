@@ -75,7 +75,15 @@ dino auth status --offline --format json
 dino sync --strict --sync-timeout 20000 --format json
 ```
 
-Persistent login, run by the user in their own terminal:
+Persistent login, run by the user in their own terminal. It blocks for up to 10 minutes while waiting for a QR scan:
+
+```bash
+dino auth login --sync-timeout 20000 --format json
+```
+
+In Claude Code, the user can type `! dino auth login`.
+
+CI / secret-store login, run by the user in their own terminal:
 
 ```bash
 printf '%s' "$DINOX_TOKEN" | dino auth login --token-stdin --sync-timeout 20000 --format json

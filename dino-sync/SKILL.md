@@ -6,7 +6,7 @@ description: >
   settings.
 license: ISC
 metadata:
-  version: "2.9.0"
+  version: "2.10.0"
   dinox-cli-help: "dino sync --help"
   category: "sync"
   risk: "write"
@@ -25,7 +25,7 @@ metadata:
 - On a nonzero exit, parse structured stderr. Use top-level `code`, `recoverable`, `exit_code`, and `suggested_action`; inspect `error` for details. `dino schema errors --format json` lists every code and its exit status.
 - A direct user request for an exact write authorizes that write when the dry-run matches. Ask again before delete, overwrite, merge, bulk mutation, local-cache removal, repair, global CLI update, or whenever targets or impact are ambiguous.
 - A dry-run does not apply the planned mutation, but an online PowerSync runtime may flush older queued writes. Use `--offline` only when the user accepts stale local-cache semantics.
-- Do not ask for Dinox authentication credentials in chat or place a Dinox authentication token in argv. The `dino` child process must inherit `DINOX_TOKEN` or receive it from the host secret store at execution time; if the host cannot inject it safely, have the user perform persistent `--token-stdin` login in their own terminal.
+- Do not ask for Dinox authentication credentials in chat or place a Dinox authentication token in argv. For persistent login, have the user run `dino auth login` in their own terminal and scan the QR code with the Dinox app. In Claude Code they can type `! dino auth login`. That command blocks for up to 10 minutes; say so before an agent runs it. Inherited `DINOX_TOKEN` and `dino auth login --token-stdin` remain for CI and secret stores.
 - Execute `dino` in an environment that can access the intended CLI binary, Dinox config/cache, and injected secret. Host-turn secret injection does not automatically cross into a sandbox or remote execution backend; never copy a secret through prompts to bridge that boundary.
 - If the host times out before receiving a structured envelope, treat the outcome as unknown. Verify freshness or the write postcondition before retrying.
 - Before claiming complete, current, all, none, latest, or an exact count, verify the command's freshness field is false (usually `data.stale`; note search uses `data.meta.stale`), inspect `_notice`, and check pagination or truncation fields returned by the command.
@@ -35,7 +35,7 @@ metadata:
 
 - Sync connects to the cloud and may upload queued local changes. A user's explicit request to sync authorizes that sync; do not ask for redundant confirmation. If sync is only an implicit prerequisite for another task, disclose the upload behavior and ask before running it.
 - Only run `dino ...` commands needed for this workflow. Do not run unrelated shell commands unless the user explicitly asks.
-- Do not ask the user to paste auth tokens into chat. If login is required, instruct them to set `DINOX_TOKEN` or pipe a token into `dino auth login --token-stdin` in their own terminal.
+- Do not ask the user to paste auth tokens into chat. If login is required, have the user run `dino auth login` in their own terminal and scan the QR code (in Claude Code they can type `! dino auth login`). Say that the command can block for up to 10 minutes before running it. CI and secret stores can still set `DINOX_TOKEN` or pipe a token into `dino auth login --token-stdin`.
 
 ## Commands
 
@@ -65,4 +65,4 @@ Set the host tool timeout at least several seconds above the CLI timeout (for ex
 - If a successful envelope has `data.stale: true`, inspect `data.gate.reasons`. `index-timeout` means local indexing was interrupted and is resumable. Do not blindly retry with progressively larger timeouts; first ensure the host timeout exceeds the CLI timeout, then retry the same bounded command once or run `dino doctor --sync-timeout 20000 --format json`.
 - If the host times out without receiving an envelope, treat the result as unknown rather than failed: the sync may have completed while the host stopped waiting. Check `dino doctor --sync-timeout 20000 --format json` or run one bounded sync again before making freshness claims.
 - If strict sync fails with `SYNC_REQUIRED`, do not make data completeness claims until the user retries successfully or explicitly accepts stale/offline results.
-- If auth errors occur, instruct the user to set `DINOX_TOKEN` or pipe a token into `dino auth login --token-stdin` in their own terminal (do not paste tokens into chat), then retry.
+- If auth errors occur, have the user run `dino auth login` in their own terminal and scan the QR code (it can block for up to 10 minutes; do not paste tokens into chat), then retry. CI can set `DINOX_TOKEN` or pipe a token into `dino auth login --token-stdin`.

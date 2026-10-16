@@ -29,7 +29,7 @@ name: dino-note
 description: Use this skill for Dinox notes/笔记 and Markdown, not todo. Search, read, create, edit, export, embed media, star, delete, or change membership.
 license: ISC
 metadata:
-  version: "2.9.0"
+  version: "2.10.0"
   dinox-command: "dino note"
   category: "notes"
   risk: "mixed"
@@ -176,8 +176,11 @@ Keep long-lived authentication credentials distinct from short-lived command
 capabilities:
 
 - A Dinox authentication token establishes identity. Never request it in chat,
-  echo it, or place it in argv. Use an inherited `DINOX_TOKEN` or persistent
-  `dino auth login --token-stdin` from the user's own shell or secret store.
+  echo it, or place it in argv. For persistent login, have the user run
+  `dino auth login` in their own terminal and scan the QR code (it can block
+  for up to 10 minutes; in Claude Code they can type `! dino auth login`).
+  Inherited `DINOX_TOKEN` and `dino auth login --token-stdin` remain for CI
+  and secret stores.
 - `data.readToken` from `note content-read` is not an authentication credential.
   It is a note-, account-, database-, review-scope-bound, short-lived,
   single-use capability for one real `note patch` attempt.

@@ -5,7 +5,7 @@ description: >
   move, merge, suggest, or clean up tags; use dino-note for note membership.
 license: ISC
 metadata:
-  version: "2.11.0"
+  version: "2.12.0"
   dinox-cli-help: "dino tag --help"
   category: "tags"
   risk: "mixed"

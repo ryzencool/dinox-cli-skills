@@ -97,7 +97,7 @@ dino gateway status                # Show live connection status of each hosted 
 
 dino gateway reload                # Re-read gateway configuration in the running daemon
 
-dino gateway mcp                   # Serve Dinox tools over stdio MCP: read-only knowledge tools and send_file (started by gateway agents)
+dino gateway mcp                   # Serve Dinox tools over stdio MCP: full read/write knowledge tools and send_file (started by gateway agents)
 ```
 
 ### Doctor

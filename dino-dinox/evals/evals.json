@@ -3,6 +3,16 @@
   "skill_name": "dino-dinox",
   "evals": [
     {
+      "id": "dinox-gateway-mcp-writes",
+      "prompt": "What can agents do through dino gateway mcp, and how should they handle writes?",
+      "expected_output": "Explains the fast daemon-backed reads and descriptor-driven dinox_* command-group tools for full knowledge-base reads and writes, alongside send_file.",
+      "assertions": [
+        "Approval is handled by the agent permission flow; confirm unsolicited writes with the user.",
+        "High-risk actions require a dry run first and the CLI confirmation guards.",
+        "Account and operational commands are not offered as MCP tools."
+      ]
+    },
+    {
       "id": "dinox-portable-install",
       "prompt": "Set up Dinox CLI and the matching portable skills for Codex, Claude Code, Hermes Agent, and OpenClaw. Keep CLI and skill versions aligned.",
       "expected_output": "The agent installs or inspects the CLI, reads `dino info` as structured JSON, verifies the skills version matches the CLI, and uses the pinned standalone skills release for all requested agents.",

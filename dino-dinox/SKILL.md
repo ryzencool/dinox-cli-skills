@@ -5,7 +5,7 @@ description: >
   daemon, gateway, graph, metadata, bootstrap; never domain work.
 license: ISC
 metadata:
-  version: "2.7.0"
+  version: "2.8.0"
   dinox-cli-help: "dino --help"
   category: "bootstrap"
   risk: "mixed"
@@ -109,7 +109,7 @@ are unsupported.
 - Auth and sync: use `dino auth status/login/logout` and `dino sync`.
 - Health checks and local repairs: use `dino doctor --sync-timeout 20000 --format json`; only use `dino doctor --fix --sync-timeout 20000 --format json` after confirmation because it may rebuild indexes, drain uploads, and restart daemon.
 - Daemon: public process-management commands are `dino daemon start/status/restart/stop`. `dino daemon install` hands the daemon to launchd (macOS), systemd --user (Linux), or a per-user Task Scheduler logon task running `dino daemon supervise` (Windows; no admin needed) so it starts at login, restarts after a crash, and no longer dies with the shell or agent session that first started it; `dino daemon uninstall` removes it. `dino daemon status --format json` reports `service`, `supervised`, and `logPath` (read the log when the daemon fails to start or keeps dying).
-- Agent gateways: use `dino gateway detect/add/list/remove/status/reload` to host ACP agents as remote devices. `dino gateway mcp` is the stdio server those agents start. Never print gateway environment values. Gateways live only as long as the daemon: when `daemon status` shows `supervised: false` (or gateway commands warn on stderr), the gateways go offline once the session that started the daemon ends — suggest `dino daemon install` and ask before running it. Gateway agents do not inherit the caller's shell environment; pass agent credentials with `dino gateway add --env KEY=VALUE`.
+- Agent gateways: use `dino gateway detect/add/list/remove/status/reload` to host ACP agents as remote devices. `dino gateway mcp` is the stdio server those agents start: read-only knowledge tools plus `send_file`, which uploads a file the agent made (e.g. a generated image) to official Dinox storage and shows it in the reply; images an agent puts in its messages, and those Codex saves under `generated_images`, are sent the same way. Never print gateway environment values. Gateways live only as long as the daemon: when `daemon status` shows `supervised: false` (or gateway commands warn on stderr), the gateways go offline once the session that started the daemon ends — suggest `dino daemon install` and ask before running it. Gateway agents do not inherit the caller's shell environment; pass agent credentials with `dino gateway add --env KEY=VALUE`.
 - Installed agent skills: use `dino skills doctor` for version drift and retired skills; `dino skills migrate` removes only exact retired matches after confirmation.
 
 ## Command Discovery

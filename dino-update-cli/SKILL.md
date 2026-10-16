@@ -6,7 +6,7 @@ description: >
   troubleshooting.
 license: ISC
 metadata:
-  version: "2.10.0"
+  version: "2.11.0"
   dinox-cli-help: "dino update --help"
   category: "maintenance"
   risk: "write"
@@ -46,7 +46,13 @@ dino update --format json
 ```
 
 `dino update` auto-detects the package manager used for the current installation
-and performs the supported global update. Do not duplicate package-manager
+and performs the supported global update. After the CLI package updates, it
+checks the local agent CLIs and installs a missing ACP adapter with that same
+package manager: `@agentclientprotocol/claude-agent-acp` when `claude` is on
+PATH, `@agentclientprotocol/codex-acp` when `codex` is, and `zcode-acp` when
+`zcode` is. An adapter command that is already installed is skipped. A failed
+adapter install is reported in `data.acpAdapters` (`status`: `installed` or
+`failed`) and does not fail the CLI update. Do not duplicate package-manager
 commands in this skill; the CLI implementation is the source of truth.
 
 ## Verification
@@ -59,7 +65,8 @@ dino info --format json
 
 Require top-level `ok: true`. Read the updater result from `data.version`,
 `data.packageManager`, `data.skillsVersion`, `data.skillsTag`,
-`data.skillsRelease`, and `data.skillsInstallCommand`. Verify the installed CLI
+`data.skillsRelease`, `data.skillsInstallCommand`, and `data.acpAdapters`.
+Verify the installed CLI
 with `data.version` from `dino info`; that command exposes matching skill fields
 as `data.skills_version`, `data.skills_tag`, `data.skills_release`, and
 `data.skills_install_command`.

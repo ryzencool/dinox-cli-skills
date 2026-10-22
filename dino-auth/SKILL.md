@@ -5,7 +5,7 @@ description: >
   identity, or credential cleanup; do not use it for sync.
 license: ISC
 metadata:
-  version: "2.13.0"
+  version: "2.13.1"
   dinox-cli-help: "dino auth --help"
   category: "auth"
   risk: "mixed"
@@ -32,7 +32,7 @@ metadata:
 
 ## Safety & Boundaries (Must Follow)
 
-- Never ask the user to paste auth tokens into chat. For persistent login, have the user run `dino auth login` in their own terminal and scan the QR code with the Dinox app. In Claude Code they can type `! dino auth login`. The command blocks for up to 10 minutes; say so before an agent runs it.
+- Never ask the user to paste auth tokens into chat. For persistent login, have the user run `dino auth login` in their own terminal and scan the QR code with the Dinox app. In Claude Code they can type `! dino auth login`. The command waits up to 10 minutes for phone approval; say so before an agent runs it. After approval and credential verification, login returns immediately; the first full sync continues in the background through the daemon or the next command.
 - `DINOX_TOKEN` takes precedence over saved config, may be a raw token or `Bearer ...`, and must never be echoed in chat or logs.
 - The `dino` child process must inherit `DINOX_TOKEN` or receive it through a host secret store at execution time. Exporting the variable in a separate terminal does not update an already-running agent unless that host supports per-turn environment injection. Otherwise restart the agent from the authenticated shell, or use QR login / persistent stdin login.
 - Only run `dino ...` commands needed for this workflow. Do not run unrelated shell commands unless the user explicitly asks.
@@ -88,8 +88,10 @@ export DINOX_TOKEN="<token-or-Bearer-token>"
 
 1. For a login-state check, run `dino auth status --offline --format json`. Require top-level `ok: true`, then read `data.loggedIn`, `data.userId`, `data.dbPath`, and `data.offline`.
 2. Run the bounded online status command only when the user asks about connectivity or when credentials exist but identity must be resolved. Read connectivity from `data.status`; do not infer logout from a sync timeout.
-3. For process-only login, explain the environment inheritance boundary. For persistent login, have the user run `dino auth login` in their own terminal and scan the QR code (warn that it can block for up to 10 minutes), then verify with the offline status command. Use `--token-stdin` when the user already has a token in a secret store.
+3. For process-only login, explain the environment inheritance boundary. For persistent login, have the user run `dino auth login` in their own terminal and scan the QR code (explain that the QR wait for phone approval can take up to 10 minutes), then verify with the offline status command. Use `--token-stdin` when the user already has a token in a secret store.
 4. For plain logout explicitly requested by the user, run it and verify with offline status. For `--clear-local-db`, show the exact cache-deleting command and get separate confirmation first.
+
+After approval and credential verification, login is saved without waiting for the initial sync or indexing. The daemon or the next command continues the first full sync in the background. `data.stale: true` and `data.lastSyncedAt: null` immediately after login are expected, not a failure. Run `dino sync` to wait for synchronization.
 
 ## Error Handling
 

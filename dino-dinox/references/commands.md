@@ -44,7 +44,7 @@ user asks for a broad inventory of Dinox commands.
 
 ### Auth
 ```text
-dino auth login                    # Log in by scanning a QR code, or save a token and verify PowerSync connectivity
+dino auth login                    # Log in by scanning a QR code or with a token; the initial sync continues in the background
   --token-stdin                  # Read the login token from piped stdin instead of argv
 
 dino auth logout                   # Clear saved login token and optionally remove the local cache

@@ -15,11 +15,12 @@
     {
       "id": "auth-qr-login",
       "prompt": "Help me log in to Dinox from this machine. I have the Dinox phone app and I am in Claude Code.",
-      "expected_output": "The agent tells the user to run dino auth login in their own terminal and scan the QR code. In Claude Code it may suggest ! dino auth login. It warns that the command can block for up to 10 minutes and does not ask for a token.",
+      "expected_output": "The agent tells the user to run dino auth login in their own terminal and scan the QR code. In Claude Code it may suggest ! dino auth login. It explains that only the QR wait for phone approval can take up to 10 minutes; after approval and verification login is saved immediately and initial sync continues in the background. It does not ask for a token.",
       "assertions": [
         "Directs the user to run `dino auth login` and scan the QR code with the Dinox app.",
-        "Mentions that the command can block for up to 10 minutes.",
-        "Does not request, print, or place an authentication token in argv."
+        "Explains that the QR wait for phone approval can take up to 10 minutes, while login does not await initial sync.",
+        "Does not request, print, or place an authentication token in argv.",
+        "Treats data.stale: true immediately after login as expected, not a failure."
       ]
     },
     {

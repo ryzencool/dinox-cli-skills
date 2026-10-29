@@ -137,6 +137,7 @@ unavailable. Branch on the structured `code` and `recoverable` fields and follow
 | `SAVED_VIEW_UNSUPPORTED_LAYOUT` | 1 | The saved view layout is unsupported. |
 | `SAVED_VIEW_VALUE_TYPE_MISMATCH` | 1 | A filter value does not match the field type. |
 | `SCHEMA_PATH_NOT_FOUND` | 5 | No command schema exists for the requested path. |
+| `SEMANTIC_SEARCH_UNAVAILABLE` | 1 | The semantic search service could not be reached or failed; keyword search (note search) still works. |
 | `SKILLS_LOCK_INVALID` | 1 | The skills installer lock file is malformed. |
 | `SKILLS_LOCK_READ_FAILED` | 1 | The skills installer lock file could not be read. |
 | `SKILLS_MIGRATION_FAILED` | 1 | The skills installer failed during migration. |

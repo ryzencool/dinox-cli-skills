@@ -14,6 +14,8 @@ user asks for a broad inventory of Dinox commands.
 - [Doctor](#doctor)
 - [Sync](#sync)
 - [Schema](#schema)
+- [Batch](#batch)
+- [MCP Server](#mcp-server)
 - [Update CLI](#update-cli)
 - [Agent Skills](#agent-skills)
 - [Notes](#notes)
@@ -38,6 +40,7 @@ user asks for a broad inventory of Dinox commands.
 | `--offline` | Skip sync, use local cache only |
 | `--require-sync` | Fail if the local PowerSync cache cannot be confirmed fresh before reading |
 | `--sync-timeout <ms>` | Override default 300000 ms (5 min) sync/connect timeout |
+| `--select <fields>` | Keep only these comma-separated output fields (dot paths such as `notes.id,notes.title`); unknown fields are reported in `_notice.select_missing` |
 | `--request-id <id>` | Idempotency key for data commands: rerunning with the same id within 24h replays the stored result |
 | `--verbose` | Enable verbose logging |
 
@@ -118,6 +121,20 @@ dino sync                          # Connect and synchronize the local PowerSync
 dino schema [path]                 # Inspect Dinox CLI command schemas for agent-friendly usage
 ```
 
+### Batch
+```text
+dino batch                         # Run several data commands from one JSON array on stdin or a file and return every result
+  --input <file>                 # Read the JSON array from this file instead of stdin (- for stdin)
+  --stop-on-error                # Stop at the first failed item; later items are reported as skipped
+```
+
+### MCP Server
+```text
+dino mcp                           # Serve Dinox commands as MCP tools over stdio for MCP clients (Claude Desktop, Cursor, ...)
+  --read-only                    # Expose only read actions
+  --groups <names>               # Comma-separated tool groups to expose (note, tag, box, todo, view, prop, template, prompt, graph, storage, stats); default all
+```
+
 ### Update CLI
 ```text
 dino update                        # Update @dinoxx/dinox-cli to the latest version
@@ -145,8 +162,34 @@ dino note search [query]           # Search notes by keyword, tags, date range, 
   --sql <expr>                   # SQL-like expression over id/content_md/summary/tags/zettel_boxes/created_at/type/is_starred
   --limit <n>                    # Maximum returned notes
   --offset <n>                   # Result offset for pagination
+  --cursor <token>               # Continue from meta.pagination.next_cursor of the previous page (same query)
   --fields <list>                # Comma-separated fields: id,title,summary,tags,created_at,starred_at,boxes,is_starred
   --include-deleted              # Include soft-deleted notes
+
+dino note semantic <query>         # Find notes by meaning through the Dinox semantic index (online)
+  --mode <mode>                  # hybrid (meaning + keywords, default), semantic (meaning only), or keyword
+  --limit <n>                    # Maximum returned notes (1-60, default 10)
+  --tags <string|@file>          # Only notes with all these tags (JSON array or comma list; child tags included)
+  --boxes <string|@file>         # Only notes in any of these box paths or unique names (JSON array or comma list)
+  --from <date>                  # created_at start (YYYY-MM-DD or ISO datetime)
+  --to <date>                    # created_at end (YYYY-MM-DD or ISO datetime)
+  --days <n>                     # Recent N days by created_at; mutually exclusive with --from/--to
+  --include-resources            # Also match attachments (PDFs, images, web clips); hits report their parent note
+
+dino note similar <id>             # Find notes semantically similar to a note (online)
+  --limit <n>                    # Maximum returned notes (1-20, default 6)
+
+dino note context <query>          # Assemble cited, token-budgeted context from notes to answer a question (online)
+  --mode <mode>                  # hybrid (meaning + keywords, default), semantic (meaning only), or keyword
+  --max-tokens <n>               # Context token budget (1-16000, default 2400)
+  --max-notes <n>                # Maximum notes contributing blocks (1-20, default 6)
+  --limit <n>                    # Retrieved chunks before assembly (1-60, default 12)
+  --tags <string|@file>          # Only notes with all these tags (JSON array or comma list; child tags included)
+  --boxes <string|@file>         # Only notes in any of these box paths or unique names (JSON array or comma list)
+  --from <date>                  # created_at start (YYYY-MM-DD or ISO datetime)
+  --to <date>                    # created_at end (YYYY-MM-DD or ISO datetime)
+  --days <n>                     # Recent N days by created_at; mutually exclusive with --from/--to
+  --notes-only                   # Leave attachments out of the context
 
 dino note get <id>                 # Get lightweight note context by id without exposing full note content
   --context-only                 # Compatibility flag; note get is context-only by default
@@ -156,6 +199,8 @@ dino note preview <id>             # Preview the first N lines of note markdown
 
 dino note detail [id]              # Get full note details for one or more ids
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
+  --content <formats>            # Content fields to return: comma-separated md,text,json, or none (default: all three)
+  --max-chars <n>                # Shorten content_md and content_text to n characters; sets content_truncated
 
 dino note export [id]              # Export one or more notes as Markdown or JSON for backup and migration
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
@@ -259,6 +304,7 @@ dino todo search [query]           # Search todo tasks extracted from note conte
   --days <n>                     # Recent N days; mutually exclusive with --from/--to
   --limit <n>                    # Maximum returned tasks
   --scan-limit <n>               # Maximum scanned note rows
+  --cursor <token>               # Continue from meta.next_cursor of the previous page (same query)
   --include-deleted              # Include soft-deleted notes
 
 dino todo append [task]            # Append one or more tasks to an existing note
@@ -293,18 +339,22 @@ dino tag stats                     # Show tag usage counts and unused-tag status
 dino tag add [name]                # Create a tag path, restoring deleted nodes when possible
   --name <string>                # Tag name/path (alternative to positional name)
   --emoji <string>               # Tag emoji
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino tag rename <path> <new-name>  # Rename a tag and cascade descendant paths and note references
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino tag move <path>               # Move a tag under another parent and cascade descendant paths and note references
   --to <parent-path>             # Target parent tag path
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino tag merge <from> <to>         # Merge a tag subtree into another tag and soft-delete the source subtree
   --expected-count <n>           # Required for real writes; must equal source tags plus notes affected
   --confirm                      # Required for real writes after reviewing a dry run
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino tag suggest                   # Suggest likely duplicate tags to merge
@@ -321,6 +371,7 @@ dino box add [path]                # Create a zettel box path, restoring deleted
   --name <string>                # Box path (alternative to positional path)
   --description <string>         # Box purpose/usage description
   --color <string>               # Box color
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino box tree                      # Show zettel boxes as a hierarchy tree
@@ -328,15 +379,18 @@ dino box tree                      # Show zettel boxes as a hierarchy tree
 dino box stats                     # Show zettel box note counts and empty-box status
 
 dino box rename <path> <new-name>  # Rename a zettel box and cascade descendant paths
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino box move <path>               # Move a zettel box under another parent and cascade descendant paths
   --to <parent-path>             # Target parent box path
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino box merge <from> <to>         # Merge a zettel box subtree into another box and soft-delete the source subtree
   --expected-count <n>           # Required for real writes; must equal source boxes plus notes affected
   --confirm                      # Required for real writes after reviewing a dry run
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
 dino box cleanup                   # Inspect zettel box cleanup candidates
@@ -350,6 +404,7 @@ dino prompt list                   # List reusable prompts from c_cmd
 dino prompt add                    # Create a prompt template, restoring a deleted prompt when possible
   --name <string>                # Prompt name
   --prompt <string|@file>        # Prompt text or @file containing prompt text
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 ```
 
@@ -365,6 +420,7 @@ dino view fields                   # List system and property fields with their 
 dino view query <id>               # Query notes through a saved view filter and sort definition
   --limit <n>                    # Maximum returned notes (1-500)
   --offset <n>                   # Result offset for pagination
+  --cursor <token>               # Continue from nextCursor of the previous page (same view and time zone)
   --time-zone <iana>             # IANA time zone for dynamic date filters (isToday, isThisWeek, withinLastDays); defaults to the system zone
 
 dino view count <id>               # Count notes matching a saved view
@@ -533,6 +589,7 @@ dino storage upload <file>         # Upload one local file to a custom S3 storag
   --category <kind>              # Upload category: images|audios|files|videos
   --key <string>                 # Explicit object key override
   --overwrite                    # Replace existing objects addressed by an explicit --key
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the upload target and resource record without uploading
 
 dino storage stats                 # Summarize uploaded storage usage grouped by provider and bucket

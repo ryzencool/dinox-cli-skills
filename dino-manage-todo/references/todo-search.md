@@ -12,6 +12,7 @@ dino todo search [query]           # Search todo tasks extracted from note conte
   --days <n>                     # Recent N days; mutually exclusive with --from/--to
   --limit <n>                    # Maximum returned tasks
   --scan-limit <n>               # Maximum scanned note rows
+  --cursor <token>               # Continue from meta.next_cursor of the previous page (same query)
   --include-deleted              # Include soft-deleted notes
 ```
 

@@ -14,6 +14,7 @@ dino note search [query]           # Search notes by keyword, tags, date range, 
   --sql <expr>                   # SQL-like expression over id/content_md/summary/tags/zettel_boxes/created_at/type/is_starred
   --limit <n>                    # Maximum returned notes
   --offset <n>                   # Result offset for pagination
+  --cursor <token>               # Continue from meta.pagination.next_cursor of the previous page (same query)
   --fields <list>                # Comma-separated fields: id,title,summary,tags,created_at,starred_at,boxes,is_starred
   --include-deleted              # Include soft-deleted notes
 
@@ -25,6 +26,8 @@ dino note preview <id>             # Preview the first N lines of note markdown
 
 dino note detail [id]              # Get full note details for one or more ids
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)
+  --content <formats>            # Content fields to return: comma-separated md,text,json, or none (default: all three)
+  --max-chars <n>                # Shorten content_md and content_text to n characters; sets content_truncated
 
 dino note export [id]              # Export one or more notes as Markdown or JSON for backup and migration
   --ids <string|@file>           # Batch note ids (JSON array or comma/newline-separated)

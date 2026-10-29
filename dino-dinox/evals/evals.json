@@ -13,6 +13,15 @@
       ]
     },
     {
+      "id": "dinox-agent-workspace",
+      "prompt": "Where should I choose a working folder for my Dinox agent, and does starting a new topic move the conversation to the new folder?",
+      "expected_output": "Choose the working folder per Dinox agent in the app. A conversation keeps its initial folder across new topics; the app can browse that conversation folder.",
+      "assertions": [
+        "The gateway cwd is the fallback rather than the per-agent choice.",
+        "Relative send_file paths resolve against the session folder."
+      ]
+    },
+    {
       "id": "dinox-portable-install",
       "prompt": "Set up Dinox CLI and the matching portable skills for Codex, Claude Code, Hermes Agent, and OpenClaw. Keep CLI and skill versions aligned.",
       "expected_output": "The agent installs or inspects the CLI, reads `dino info` as structured JSON, verifies the skills version matches the CLI, and uses the pinned standalone skills release for all requested agents.",

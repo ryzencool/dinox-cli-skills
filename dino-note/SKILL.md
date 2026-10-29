@@ -6,7 +6,7 @@ description: >
   membership.
 license: ISC
 metadata:
-  version: "2.13.1"
+  version: "2.14.0"
   dinox-cli-help: "dino note --help"
   category: "notes"
   risk: "mixed"

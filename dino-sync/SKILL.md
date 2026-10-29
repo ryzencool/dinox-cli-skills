@@ -6,7 +6,7 @@ description: >
   settings.
 license: ISC
 metadata:
-  version: "2.13.1"
+  version: "2.14.0"
   dinox-cli-help: "dino sync --help"
   category: "sync"
   risk: "write"
@@ -58,7 +58,7 @@ Set the host tool timeout at least several seconds above the CLI timeout (for ex
 3. Set the host execution timeout above the CLI timeout so the process has time to return its final envelope after cleanup.
 4. Require top-level `ok: true`, then summarize `data.dbPath`, `data.stale`, `data.downloadIdle`, `data.uploadIdle`, `data.elapsedMs`, `data.gate`, `data.status`, and `data.tokenIndex`.
 5. Treat `data.gate.ok: true` and `data.stale: false` as fresh even when compatibility field `data.idle` is false because uploads are still active. Download freshness does not wait for the upload queue.
-6. Structured success is emitted only after the foreground database closes, its owner lease is released, and daemon restoration finishes.
+6. Data commands run inside the daemon and keep its database and gateways online. Strict freshness there requires a connected, synchronized, download-idle stream without download errors, plus a complete local index; no new checkpoint is required for an idle stream. Sync also waits for the upload queue to drain. Only the in-process fallback closes its foreground database, releases its owner lease and restores the daemon before returning success.
 
 ## Error Handling
 

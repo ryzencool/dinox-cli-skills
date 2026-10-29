@@ -41,6 +41,16 @@
         "Does not invent flags or output fields absent from the schema.",
         "Treats the generated command reference as a fallback rather than a stronger authority than the installed CLI."
       ]
+    },
+    {
+      "id": "dinox-idempotent-write-retry",
+      "prompt": "A data write with --request-id timed out. How do I retry safely, and what if I receive REQUEST_INTERRUPTED?",
+      "expected_output": "Repeat the exact command with the same id to replay the stored result within 24 hours. Verify the result before using a new id after REQUEST_INTERRUPTED.",
+      "assertions": [
+        "Use a fresh request id for each intended data write.",
+        "Explain conflict for changed argv and in-progress waiting.",
+        "Explain the single automatic retry and no local fallback after possible delivery."
+      ]
     }
   ],
   "trigger_evals": [

@@ -7,7 +7,7 @@ Portable [Agent Skills](https://agentskills.io) for [Dinox CLI](https://github.c
 > For abnormal behavior, suspected stale data, missing search results, daemon failures, upload backlog, or local DB/index concerns, run `dino doctor --sync-timeout 20000 --format json` first.
 > Structured success is `{ "ok": true, "data": ... }`; read command fields from `data` and inspect optional top-level `_notice` separately.
 > Structured failures include top-level `code`, `recoverable`, `exit_code`, and `suggested_action`; agents should branch on those fields and inspect `error` for details.
-> Default online reads use the daemon-owned DB runtime over a private local socket; retry with `--offline` only when the user accepts local-cache semantics.
+> Data commands use the daemon-owned DB runtime over a private socket, including writes, sync, `--offline` and `--require-sync`. Safe failures fall back with a stderr note; `DINOX_DAEMON=0` selects the in-process path silently. Uncertain delivery is never automatically replayed.
 > For online Agent calls whose schema exposes `--sync-timeout`, use a bounded value such as `20000` and set the host timeout 5-10 seconds higher. If the host times out before a structured envelope arrives, verify the result before retrying.
 
 ## Install Skills
@@ -92,7 +92,7 @@ dino sync --strict --sync-timeout 20000 --format json
 
 Security note: never paste tokens into chat logs. `DINOX_TOKEN` takes precedence over saved config, supports raw token or `Bearer ...`, and is not persisted by the CLI. A running agent only sees a process token when it inherited that environment at launch; exporting it in another terminal does not update the agent process.
 
-For completeness-sensitive analysis such as latest notes, date ranges, monthly summaries, duplicates, stats, or exports, use `dino sync --strict --sync-timeout 20000 --format json` first or add `--require-sync` to the read command. Set the host tool timeout several seconds higher. Strict freshness waits for the current whole-second checkpoint, downloads, and local token indexing; active uploads do not block it, and structured success appears only after runtime cleanup.
+For completeness-sensitive analysis such as latest notes, date ranges, monthly summaries, duplicates, stats, or exports, use `dino sync --strict --sync-timeout 20000 --format json` first or add `--require-sync` to the read command. Set the host tool timeout several seconds higher. Inside the daemon, strict freshness checks a connected, synced, download-idle stream without download errors and complete local token indexing; it does not require a new checkpoint. Sync also drains the upload queue. The in-process fallback retains the checkpoint and cleanup requirements.
 
 ## Repository Source
 

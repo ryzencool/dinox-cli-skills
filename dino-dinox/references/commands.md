@@ -38,6 +38,7 @@ user asks for a broad inventory of Dinox commands.
 | `--offline` | Skip sync, use local cache only |
 | `--require-sync` | Fail if the local PowerSync cache cannot be confirmed fresh before reading |
 | `--sync-timeout <ms>` | Override default 300000 ms (5 min) sync/connect timeout |
+| `--request-id <id>` | Idempotency key for data commands: rerunning with the same id within 24h replays the stored result |
 | `--verbose` | Enable verbose logging |
 
 ## Commands Quick Reference

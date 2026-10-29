@@ -31,6 +31,7 @@ unavailable. Branch on the structured `code` and `recoverable` fields and follow
 | `COMMAND_FAILED` | 1 | Generic command failure without a more specific code. |
 | `CONFIG_INVALID_JSON` | 1 | The CLI config file is not valid JSON. |
 | `CONFIG_WRITE_BUSY` | 1 | Another process is writing the CLI config. |
+| `DAEMON_COMMAND_NOT_FORWARDABLE` | 2 | The command must run in the CLI process. |
 | `DAEMON_ERROR` | 5 | The background daemon reported an error. |
 | `DAEMON_INSTANCE_CHANGED` | 1 | The daemon instance changed between requests. |
 | `DAEMON_INSTANCE_MISMATCH` | 1 | The running daemon belongs to a different CLI version or account. |
@@ -39,6 +40,7 @@ unavailable. Branch on the structured `code` and `recoverable` fields and follow
 | `DAEMON_RELEASE_FAILED` | 1 | The daemon could not release database ownership. |
 | `DAEMON_RELEASE_TIMEOUT` | 1 | The daemon did not release database ownership in time. |
 | `DAEMON_SERVICE_FAILED` | 1 | The service manager (launchd / systemd) rejected a daemon service operation. |
+| `DAEMON_SERVICE_FOREIGN` | 1 | The daemon service runs another dino install; it was left unchanged. |
 | `DAEMON_SERVICE_UNSUPPORTED` | 5 | The daemon cannot run as a login service on this platform or with this auth setup. |
 | `DAEMON_STALE` | 5 | The daemon state is stale and needs a restart. |
 | `DAEMON_START_FAILED` | 5 | The daemon process failed to start. |
@@ -105,6 +107,9 @@ unavailable. Branch on the structured `code` and `recoverable` fields and follow
 | `PROPERTY_UNIQUE_ID_TYPE_MISMATCH` | 1 | A unique-id setting was supplied for a different property type. |
 | `PROPERTY_URL_INVALID` | 1 | A url property value is invalid. |
 | `PROPERTY_VALUE_INVALID` | 1 | A property value does not match its definition. |
+| `REQUEST_ID_CONFLICT` | 2 | The request id was already used for different arguments. |
+| `REQUEST_INTERRUPTED` | 1 | The earlier request owner exited; its outcome is unknown. |
+| `REQUEST_IN_PROGRESS` | 1 | The earlier request is still running; retry with the same id. |
 | `SAVED_VIEW_FILTER_CORRUPT` | 1 | A stored saved view filter is corrupt. |
 | `SAVED_VIEW_FILTER_TOO_COMPLEX` | 1 | The saved view filter exceeds supported complexity. |
 | `SAVED_VIEW_FILTER_VALUE_REQUIRED` | 5 | A saved view filter condition is missing its value. |

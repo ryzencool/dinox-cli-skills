@@ -5,7 +5,7 @@ description: >
   daemon, gateway, graph, metadata, bootstrap; never domain work.
 license: ISC
 metadata:
-  version: "2.13.1"
+  version: "2.14.0"
   dinox-cli-help: "dino --help"
   category: "bootstrap"
   risk: "mixed"
@@ -90,10 +90,10 @@ are unsupported.
 ## Operational Rules
 
 - Use `dino schema <path> --format json` when arguments, output fields, or risk are uncertain.
-- Default online reads use the daemon-owned database over a private local socket. If daemon execution fails, follow a safe structured `suggested_action`; do not silently switch to stale `--offline` semantics.
+- Data commands (including writes, sync, --offline and --require-sync) run inside the daemon over a private socket, keeping gateways online. --offline skips the request sync wait and returns local durability; --require-sync accepts a connected, synced, download-idle stream without download errors. Safe startup/connection failures fall back to exclusive in-process execution with a stderr note; DINOX_DAEMON=0 or an overriding environment token selects it silently. A fresh warm daemon skips loading the command tree and startup manager. Forwarding retries an uncertain response once with the same request id; it never falls back after possible delivery. For data writes, pass a fresh `--request-id <uuid>` and retain it. On DAEMON_UNAVAILABLE or host timeout, rerun the exact same command with the same id to retrieve the stored output and exit code (24h). REQUEST_ID_CONFLICT means the argv changed; REQUEST_IN_PROGRESS means retry the same id later; REQUEST_INTERRUPTED means verify the result before retrying with a new id. Without an explicit id, verify the result after the automatic retry fails.
 - For latest-note, date-range, counts, duplicate detection, stats, or export completeness, add `--require-sync` to the read or run `dino sync --strict --sync-timeout 20000 --format json`. Keep the host timeout above the CLI timeout.
 - Judge strict sync from `data.stale`, `data.downloadIdle`, `data.tokenIndex.complete`, and `data.gate`; active uploads may leave `data.idle` false without invalidating download freshness.
-- A host timeout is an unknown outcome, not proof of failure. Verify the postcondition before retrying a write or sync.
+- A host timeout is an unknown outcome, not proof of failure. For a data command with an explicit request id, repeat the exact command with the same id; if no id was supplied or REQUEST_INTERRUPTED is returned, verify the postcondition before retrying with a new id.
 - For abnormal behavior, stale/missing results, daemon failures, upload backlog, or local index/database concerns, run `dino doctor --sync-timeout 20000 --format json`. Ask before `doctor --fix`.
 
 ## Command Selection

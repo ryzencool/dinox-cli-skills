@@ -16,6 +16,7 @@ user asks for a broad inventory of Dinox commands.
 - [Schema](#schema)
 - [Batch](#batch)
 - [MCP Server](#mcp-server)
+- [Note Co-editing](#note-co-editing)
 - [Update CLI](#update-cli)
 - [Agent Skills](#agent-skills)
 - [Notes](#notes)
@@ -133,6 +134,25 @@ dino batch                         # Run several data commands from one JSON arr
 dino mcp                           # Serve Dinox commands as MCP tools over stdio for MCP clients (Claude Desktop, Cursor, ...)
   --read-only                    # Expose only read actions
   --groups <names>               # Comma-separated tool groups to expose (note, tag, box, todo, view, prop, template, prompt, graph, storage, stats); default all
+```
+
+### Note Co-editing
+```text
+dino editor mcp                    # Serve the Dinox note editor as an MCP App over stdio (add it to an MCP Apps client such as Codex)
+  --session <name>               # Editor session this client shares; clients with the same name see the same open note
+
+dino editor install <host>         # Add the Dinox editor to an AI app (dsh: link the editor plugin into a DeepSeek Harness Desktop profile)
+  --profile <name>               # dsh profile to use
+  --dsh <path>                   # Path to the dsh CLI (default: the one inside DeepSeek Harness.app, then PATH)
+  --dry-run                      # Show the planned changes without making them
+
+dino editor uninstall <host>       # Remove the Dinox editor from an AI app (dsh: take the plugin out of the profile)
+  --profile <name>               # dsh profile to use
+  --dsh <path>                   # Path to the dsh CLI (default: the one inside DeepSeek Harness.app, then PATH)
+  --dry-run                      # Show the planned changes without making them
+
+dino editor status                 # Show where the Dinox editor is installed (dsh, Codex) and whether it matches this CLI
+  --profile <name>               # dsh profile to use
 ```
 
 ### Update CLI

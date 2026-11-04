@@ -48,6 +48,13 @@ unavailable. Branch on the structured `code` and `recoverable` fields and follow
 | `DAEMON_STOP_FAILED` | 1 | The daemon could not be stopped. |
 | `DAEMON_UNAVAILABLE` | 1 | The daemon is not available for this request. |
 | `DAEMON_UNREACHABLE` | 1 | The daemon socket could not be reached. |
+| `EDITOR_ANCHOR_AMBIGUOUS` | 2 | The suggestion anchor occurs more than once in the open note. |
+| `EDITOR_ANCHOR_MISSING` | 2 | The suggestion anchor does not occur in the open note. |
+| `EDITOR_INVALID_DOCUMENT` | 2 | The editor document cannot be saved without losing content. |
+| `EDITOR_NOTE_NOT_OPEN` | 5 | The editor session has no open note. |
+| `EDITOR_STALE_SEQUENCE` | 5 | The editor request targets a note the session has since replaced. |
+| `EDITOR_UNKNOWN_BLOCK` | 2 | The suggestion targets a block that is no longer in the open note. |
+| `EDITOR_UNSAVED_CHANGES` | 5 | The editor session has unsaved changes. |
 | `INTERNAL_ERROR` | 1 | Unexpected internal error; not a DinoxError. |
 | `INVALID_ARGUMENT` | 2 | An argument or option value is invalid. |
 | `INVALID_PROPERTY_DEF_CONFIG` | 1 | A property definition config could not be serialized. |

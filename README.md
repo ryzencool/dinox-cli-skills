@@ -58,8 +58,10 @@ The portable behavior lives in standard `SKILL.md` files. Agent-specific metadat
 Install Dinox CLI globally:
 
 ```bash
-npm install -g @dinoxx/dinox-cli
+npm install -g @dinoxx/dinox-cli@latest --allow-scripts=better-sqlite3,sharp
 ```
+
+Use Node.js 22, 23, 24, or 25. Drop `--allow-scripts` when npm is older than 11.16.
 
 Check the installation:
 

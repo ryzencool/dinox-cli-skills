@@ -6,7 +6,7 @@ description: >
   troubleshooting.
 license: ISC
 metadata:
-  version: "2.18.0"
+  version: "2.18.1"
   dinox-cli-help: "dino update --help"
   category: "maintenance"
   risk: "write"
@@ -110,5 +110,6 @@ the installer's inventory output alone.
 - If update fails due to permissions, ask the user to rerun in an environment
   with global package install permissions.
 - If the updater succeeds but the host loses output, run `dino info --format json` before retrying; do not assume the global update failed.
-- If `dino` is not found, install first:
-  `npm install -g @dinoxx/dinox-cli`
+- If `dino` is not found, install first with Node.js 22–25:
+  `npm install -g @dinoxx/dinox-cli@latest --allow-scripts=better-sqlite3,sharp`
+  Drop `--allow-scripts` when `npm -v` is older than 11.16. On pnpm 10.15 or newer, use `--allow-build=better-sqlite3 --allow-build=sharp`.

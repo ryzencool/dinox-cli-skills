@@ -5,7 +5,7 @@ description: >
   daemon, gateway, graph, metadata, bootstrap; never domain work.
 license: ISC
 metadata:
-  version: "2.18.0"
+  version: "2.18.1"
   dinox-cli-help: "dino --help"
   category: "bootstrap"
   risk: "mixed"
@@ -39,9 +39,11 @@ matching Dinox skill when it is available.
 Install or update the CLI first, then read its matching pinned skills release:
 
 ```bash
-npm install -g @dinoxx/dinox-cli
+npm install -g @dinoxx/dinox-cli@latest --allow-scripts=better-sqlite3,sharp
 dino info --format json
 ```
+
+The CLI needs Node.js 22, 23, 24, or 25. On npm older than 11.16, drop `--allow-scripts`. With pnpm 10.15 or newer, use `pnpm add -g @dinoxx/dinox-cli@latest --allow-build=better-sqlite3 --allow-build=sharp`. `dino update` installs `@latest` and adds those native-build flags itself.
 
 Require top-level `ok: true`. Verify `data.skills_version` equals
 `data.version`, then use `data.skills_install_command` exactly after validating

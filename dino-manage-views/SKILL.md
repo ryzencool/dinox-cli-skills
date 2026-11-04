@@ -5,7 +5,7 @@ description: >
   table/list/card views; not for one-off note searches.
 license: ISC
 metadata:
-  version: "2.18.0"
+  version: "2.18.1"
   dinox-cli-help: "dino view --help"
   category: "views"
   risk: "mixed"

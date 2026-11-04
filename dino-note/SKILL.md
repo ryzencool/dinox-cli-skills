@@ -6,7 +6,7 @@ description: >
   membership.
 license: ISC
 metadata:
-  version: "2.18.0"
+  version: "2.18.1"
   dinox-cli-help: "dino note --help"
   category: "notes"
   risk: "mixed"
@@ -80,7 +80,7 @@ metadata:
 
 ## Error Handling
 
-- If `dino` is not found, tell the user to install Dinox CLI: `npm install -g @dinoxx/dinox-cli`
+- If `dino` is not found, tell the user to install Dinox CLI on Node.js 22–25: `npm install -g @dinoxx/dinox-cli@latest --allow-scripts=better-sqlite3,sharp`
 - If the user does not provide a reliable note identifier for a read or write, search first and ask them to confirm the target note.
 - If an auth error occurs, have the user run `dino auth login` in their own terminal and scan the QR code (it can block for up to 10 minutes; do not paste tokens into chat), then retry. CI can set `DINOX_TOKEN` or pipe a token into `dino auth login --token-stdin`.
 - If sync times out or a result is marked stale, tell the user the local cache may be outdated.

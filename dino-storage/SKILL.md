@@ -5,7 +5,7 @@ description: >
   or inspect standalone storage; use dino-note for note-embedded media.
 license: ISC
 metadata:
-  version: "2.18.4"
+  version: "2.18.5"
   dinox-cli-help: "dino storage --help"
   category: "storage"
   risk: "mixed"

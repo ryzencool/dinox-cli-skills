@@ -6,8 +6,9 @@ Use this generated command surface as the canonical interface for todo search.
 ```text
 dino todo search [query]           # Search todo tasks extracted from note content
   --status <status>              # Task status: all | completed | uncompleted
-  --tags <string|@file>          # Task tags (JSON array or comma/newline-separated)
-  --from <date>                  # Task date range start (YYYY-MM-DD or ISO datetime)
+  --tags <string|@file>          # Tags every task must carry, via its own #tag or its note's tags (JSON array or comma/newline-separated)
+  --priority <list>              # Priorities to keep, comma-separated: high,medium,low,none
+  --from <date>                  # Task date range start (YYYY-MM-DD or ISO datetime); matches tasks whose schedule overlaps the range
   --to <date>                    # Task date range end (YYYY-MM-DD or ISO datetime)
   --days <n>                     # Recent N days; mutually exclusive with --from/--to
   --limit <n>                    # Maximum returned tasks
@@ -23,7 +24,7 @@ dino todo search [query]           # Search todo tasks extracted from note conte
 
 - `data.stale`: whether cache freshness could be proven
 - `data.meta`: query, filters, returned/total counts, scan bounds, and truncation info
-- `data.tasks`: each item includes `task_key`, `task_id`, `note_id`, `note_title`, `status`, `depth`, `parent_id`, time fields, and tags
+- `data.tasks`: each item includes `task_key`, `task_id`, `note_id`, `note_title`, `status`, `priority` (`high`/`medium`/`low`/`null`), `depth`, `parent_id`, `start_time`/`due_time`, `tags`, `note_tags`, and `note_box_ids`
 
 ## Completeness Rules
 
@@ -35,5 +36,7 @@ dino todo search [query]           # Search todo tasks extracted from note conte
 
 ## Notes
 
-- `--tags` matches task inline hashtags, not note-level tags
-- Date filtering checks `due_time` / `start_time`; when task time is missing, note `created_at` is used
+- `--tags` matches a task's own `#tag` or its note's tags (a leading `#` and letter case are ignored); every listed tag must match
+- A query matches the task text or its note title
+- `--priority high,medium` keeps those priorities; `none` keeps tasks without one
+- Date filtering keeps tasks whose schedule overlaps the range: start→due when both exist, a date-only due covers its whole local day, and an undated task sits on the local day its note was created

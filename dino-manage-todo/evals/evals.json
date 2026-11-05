@@ -17,7 +17,7 @@
       "prompt": "Append two checklist items to note note_atlas: review metrics and send the launch brief.",
       "expected_output": "The agent preserves the two task strings as data, targets the explicit note ID, previews the mutation, and performs the exact write while reporting revision and durability receipts.",
       "assertions": [
-        "Uses the explicit `--note-id note_atlas` rather than the default latest eligible note.",
+        "Uses the explicit `--note-id note_atlas` rather than the default daily todo note.",
         "Passes free-form task text through safe file or stdin arguments and runs a bounded JSON dry-run first.",
         "Reports `durability`, upload queue state, version, content hash, and whether content changed."
       ]

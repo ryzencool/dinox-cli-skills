@@ -5,7 +5,7 @@ description: >
   even when Dinox is not mentioned; not for notes, tasks, or one-off advice.
 license: ISC
 metadata:
-  version: "2.18.5"
+  version: "2.19.0"
   dinox-cli-help: "dino prompt --help"
   category: "prompts"
   risk: "mixed"

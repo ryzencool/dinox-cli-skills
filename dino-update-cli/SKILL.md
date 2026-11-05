@@ -6,7 +6,7 @@ description: >
   troubleshooting.
 license: ISC
 metadata:
-  version: "2.18.2"
+  version: "2.18.3"
   dinox-cli-help: "dino update --help"
   category: "maintenance"
   risk: "write"

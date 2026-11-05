@@ -143,12 +143,12 @@ dino editor mcp                    # Serve the Dinox note editor as an MCP App o
 
 dino editor install <host>         # Add the Dinox editor to an AI app (dsh: link the editor plugin into a DeepSeek Harness Desktop profile)
   --profile <name>               # dsh profile to use
-  --dsh <path>                   # Path to the dsh CLI (default: the one inside DeepSeek Harness.app, then PATH)
+  --dsh <path>                   # Path to the dsh CLI (default: the launcher that ships with DeepSeek Harness Desktop, then PATH)
   --dry-run                      # Show the planned changes without making them
 
 dino editor uninstall <host>       # Remove the Dinox editor from an AI app (dsh: take the plugin out of the profile)
   --profile <name>               # dsh profile to use
-  --dsh <path>                   # Path to the dsh CLI (default: the one inside DeepSeek Harness.app, then PATH)
+  --dsh <path>                   # Path to the dsh CLI (default: the launcher that ships with DeepSeek Harness Desktop, then PATH)
   --dry-run                      # Show the planned changes without making them
 
 dino editor status                 # Show where the Dinox editor is installed (dsh, Codex) and whether it matches this CLI

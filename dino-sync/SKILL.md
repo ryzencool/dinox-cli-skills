@@ -6,7 +6,7 @@ description: >
   settings.
 license: ISC
 metadata:
-  version: "2.18.2"
+  version: "2.18.3"
   dinox-cli-help: "dino sync --help"
   category: "sync"
   risk: "write"

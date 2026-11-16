@@ -49,7 +49,7 @@ project target is the canonical `skills/` directory itself.
 
 For a CLI-matched, immutable installation, run `dino info --format json` and execute `data.skills_install_command`. It pins the standalone repository to the matching `v<CLI version>` tag instead of tracking the repository default branch.
 
-Check installed skills at any time with `dino skills doctor --format json`. `data.current` reports each current skill as `current`, `outdated`, `missing`, `foreign`, or `unknown-version` against the CLI version and includes the matching pinned `installCommand`; `data.skills` lists retired Dinox skills. Remove retired skills that exactly match the official inventory with `dino skills migrate --dry-run --format json`, then `--confirm` after review.
+Check installed skills at any time with `dino skills doctor --format json`. `data.current` reports each current skill as `current`, `outdated`, `missing`, `foreign`, or `unknown-version` against the CLI version and includes the matching pinned `installCommand`; `data.skills` lists retired Dinox skills. Remove retired skills that exactly match the official inventory (including `leftover` folders the installer left in `~/.agents/skills`) with `dino skills migrate --dry-run --format json`, then `--confirm` after review.
 
 The portable behavior lives in standard `SKILL.md` files. Agent-specific metadata under paths such as `agents/`, `.claude-plugin/`, `.codex-plugin/`, or `adapters/` is optional presentation or packaging support; a skill must remain usable when a client ignores those adapters.
 

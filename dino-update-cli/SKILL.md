@@ -6,7 +6,7 @@ description: >
   troubleshooting.
 license: ISC
 metadata:
-  version: "2.20.1"
+  version: "2.20.2"
   dinox-cli-help: "dino update --help"
   category: "maintenance"
   risk: "write"
@@ -84,9 +84,10 @@ dino skills doctor --format json
   `missing`, `foreign`, or `unknown-version` relative to
   `data.current.expectedVersion`. Offer `data.current.installCommand` after
   checking it against the allowlisted shape below.
-- `data.summary.safeToRemove > 0` means retired Dinox skills (for example
-  `dinox`, `manage-tags`, `dino-shared`) are still installed and can compete
-  with current skills. Preview with `dino skills migrate --dry-run --format json`,
+- `data.summary.safeToRemove > 0` or `data.summary.leftover > 0` means retired
+  Dinox skills (for example `dinox`, `manage-tags`, `dino-shared`) are still
+  installed and can compete with current skills (`leftover`: the lock entry is
+  gone but the official folder is still in `~/.agents/skills`, which Codex reads). Preview with `dino skills migrate --dry-run --format json`,
   show `data.plannedRemoval`, and run `dino skills migrate --confirm --format json`
   only after explicit confirmation. Never remove `conflict` entries by name.
 

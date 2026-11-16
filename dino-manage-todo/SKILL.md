@@ -5,7 +5,7 @@ description: >
   complete, or reopen tasks; set priority, due dates, subtasks. Not note editing.
 license: ISC
 metadata:
-  version: "2.20.1"
+  version: "2.20.2"
   dinox-cli-help: "dino todo --help"
   category: "todo"
   risk: "mixed"

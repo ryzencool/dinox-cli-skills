@@ -1,17 +1,17 @@
 ---
 name: dino-manage-boxes
 description: >
-  Use this skill for Dinox card-box/卡片盒 hierarchies. Create, inspect, rename,
+  Use this skill for Dinox card-box/文件夹 hierarchies. Create, inspect, rename,
   move, merge, or clean up card/zettel boxes; use dino-note for note membership.
 license: ISC
 metadata:
-  version: "2.19.0"
+  version: "2.20.0"
   dinox-cli-help: "dino box --help"
   category: "boxes"
   risk: "mixed"
 ---
 
-# Manage Dinox Card Boxes
+# Manage Dinox Folders (formerly Card Boxes)
 
 <!-- BEGIN PORTABLE_RUNTIME -->
 ## Runtime Contract

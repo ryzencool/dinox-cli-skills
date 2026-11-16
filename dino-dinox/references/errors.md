@@ -28,6 +28,13 @@ unavailable. Branch on the structured `code` and `recoverable` fields and follow
 | `AUTH_REQUIRED` | 3 | The command needs an authenticated Dinox account. |
 | `AUTH_STATE_CHANGED` | 3 | Authentication changed while the command was running. |
 | `CACHE_CLEANUP_FAILED` | 1 | Local cache cleanup after logout did not complete. |
+| `CLIP_BLOCKED` | 1 | The site blocked the local page capture (anti-bot / captcha); retry later, with --proxy, or with cookies. |
+| `CLIP_BROWSER_MISSING` | 5 | The Camoufox browser for local clips is not installed (run `dino clip setup`). |
+| `CLIP_CONTENT_NOT_FOUND` | 5 | The link has no clippable content (deleted, private, or not an article). |
+| `CLIP_EXTRACT_FAILED` | 1 | Fetching or converting the link on this computer failed. |
+| `CLIP_LOGIN_REQUIRED` | 5 | The site needs a logged-in session: import the user's cookies (`dino clip cookies-import`). |
+| `CLIP_PLATFORM_UNSUPPORTED` | 2 | Local clipping does not support this link's platform yet. |
+| `CLIP_TOOL_MISSING` | 5 | A video or podcast clip needs yt-dlp / ffmpeg on PATH; the user must install them. |
 | `COMMAND_FAILED` | 1 | Generic command failure without a more specific code. |
 | `CONFIG_INVALID_JSON` | 1 | The CLI config file is not valid JSON. |
 | `CONFIG_WRITE_BUSY` | 1 | Another process is writing the CLI config. |

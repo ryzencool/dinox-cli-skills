@@ -6,7 +6,7 @@ description: >
   membership.
 license: ISC
 metadata:
-  version: "2.19.0"
+  version: "2.20.0"
   dinox-cli-help: "dino note --help"
   category: "notes"
   risk: "mixed"
@@ -53,6 +53,7 @@ metadata:
 - Update tags, boxes, or starred state on an existing note -> [update-and-delete](references/update-and-delete.md)
 - Create or update notes that reference local images/audio/video/files -> [media-resources](references/media-resources.md)
 - Delete a note -> [update-and-delete](references/update-and-delete.md)
+- Clip / save a web page or X (Twitter) link as a note (剪藏) -> [clip](references/clip.md)
 
 ## Workflow Router
 
@@ -62,7 +63,8 @@ metadata:
 4. If create/update content contains local media or file paths, read [media-resources](references/media-resources.md) before constructing the final markdown.
 5. For Markdown content edits, read [content-edit](references/content-edit.md). Never invent `note update --content`; content changes use `note content-read` plus `note patch`.
 6. For metadata updates, stars, unstars, or deletes, read [update-and-delete](references/update-and-delete.md).
-7. If the user asks to find a note and then modify or delete it, stay inside this skill and chain the read and write branches instead of switching skills.
+7. For a link the user wants saved as a note, read [clip](references/clip.md): `dino clip inspect` first, then `dino clip add`. Do not fetch the page yourself and paste it into `note create`.
+8. If the user asks to find a note and then modify or delete it, stay inside this skill and chain the read and write branches instead of switching skills.
 
 ## Important Principles
 
@@ -87,4 +89,5 @@ metadata:
 - If note search returns `data.meta.pagination.has_more: true`, pass `data.meta.pagination.next_cursor` back as `--cursor <token>` (same query and filters) until `has_more` is false before claiming the result set is complete. Treat `data.meta.stale: true` as uncertain even though freshness is nested under `meta` for this command.
 - If a write returns `durability: local` with a nonzero `upload_queue_remaining`, report that the local write succeeded and cloud upload is pending.
 - If a semantic command returns `SEMANTIC_SEARCH_UNAVAILABLE`, say so and fall back to `dino note search` with key terms. If its `_notice.index_may_lag` is present or the expected note is missing, confirm with `dino note search` before saying a note does not exist.
+- For `CLIP_*` errors, follow the error table in [clip](references/clip.md) and the error's `suggested_action.command`; `dino clip add` is idempotent per source URL, so retrying it is safe.
 - If the CLI returns `SYNC_REQUIRED`, do not infer that notes are missing or absent; explain that the local cache freshness could not be proven.

@@ -85,7 +85,7 @@
     {
       "id": "boxes-train-move-zh-no-brand",
       "split": "train",
-      "query": "把卡片盒 Projects/Active 移到 Work 下面",
+      "query": "把文件夹 Projects/Active 移到 Work 下面",
       "should_trigger": true,
       "expected_skills": ["dino-manage-boxes"],
       "reason": "Moving a card box within the hierarchy belongs to box management."
@@ -133,7 +133,7 @@
     {
       "id": "boxes-validation-merge-zh",
       "split": "validation",
-      "query": "把卡片盒 Projects/Legacy 合并到 Projects/Archive",
+      "query": "把文件夹 Projects/Legacy 合并到 Projects/Archive",
       "should_trigger": true,
       "expected_skills": ["dino-manage-boxes"],
       "reason": "This requests a destructive box-subtree merge."
@@ -173,7 +173,7 @@
     {
       "id": "boxes-validation-empty-cleanup-zh",
       "split": "validation",
-      "query": "找出没有任何笔记的卡片盒，并给出清理前的层级路径和数量",
+      "query": "找出没有任何笔记的文件夹，并给出清理前的层级路径和数量",
       "should_trigger": true,
       "expected_skills": ["dino-manage-boxes"],
       "reason": "Discovering empty boxes and reporting their hierarchy paths is box cleanup analysis."

@@ -160,7 +160,7 @@ skills/BEST_PRACTICES.md
 | **dino-manage-todo** | Search, create, append, or update todo tasks from notes |
 | **dino-storage** | List custom storage configs, test S3, upload files, and inspect usage |
 | **dino-manage-tags** | List, create, rename, move, merge, or clean up tags |
-| **dino-manage-boxes** | List, create, rename, move, merge, or clean up card boxes |
+| **dino-manage-boxes** | List, create, rename, move, merge, or clean up folders (card boxes) |
 | **dino-manage-prompts** | List or create reusable prompt templates |
 | **dino-manage-views** | List, create, update, query, count, or delete saved table views |
 | **dino-update-cli** | Upgrade installed `@dinoxx/dinox-cli` |

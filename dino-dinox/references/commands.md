@@ -28,6 +28,7 @@ user asks for a broad inventory of Dinox commands.
 - [Properties](#properties)
 - [Note Templates](#note-templates)
 - [Storage](#storage)
+- [Clip](#clip)
 - [Config](#config)
 - [Info](#info)
 - [Metadata](#metadata)
@@ -629,6 +630,40 @@ dino storage upload <file>         # Upload one local file to a custom S3 storag
   --dry-run                      # Preview the upload target and resource record without uploading
 
 dino storage stats                 # Summarize uploaded storage usage grouped by provider and bucket
+```
+
+### Clip
+```text
+dino clip inspect <url>            # Preflight a link without fetching it: platform, whether it can be clipped locally, browser / yt-dlp / ffmpeg / cookie readiness, and the next command to run
+  --cookies <file>               # Count cookies from this cookies.txt instead of the saved clip cookies
+
+dino clip add <url>                # Fetch a link on this computer, upload its images and media to your Dinox storage, and save it as a clip note; the server then transcribes its audio/video, or fills title, tags and summary and OCRs its images (postProcessing). Idempotent per source URL: an already-clipped link returns the existing note (duplicate: true) without fetching
+  --title <string>               # Override the clipped title
+  --tags <list>                  # Comma-separated tags, JSON array, @file or - for stdin
+  --boxes <list>                 # Comma-separated card box names, JSON array, @file or - for stdin
+  --proxy <url>                  # HTTP proxy for fetching (defaults to HTTPS_PROXY / ALL_PROXY)
+  --cookies <file>               # Netscape cookies.txt for this run instead of the saved clip cookies
+  --timeout <ms>                 # Page-capture timeout in ms (10000-600000, default 180000)
+  --allow-duplicate              # Clip again even if a note with this source URL exists
+  --max-chars <n>                # With --dry-run: truncate the returned Markdown (see truncated / markdownChars)
+  --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
+  --dry-run                      # Fetch and convert only: return the Markdown without uploading or saving (no login needed)
+
+dino clip process <noteId>         # Ask the server again for a clip note's follow-up processing (clip add requests it once the note is uploaded): transcription of its audio/video, otherwise title, tags, summary and image OCR. Idempotent
+
+dino clip setup                    # Download the Camoufox browser that local clips use (~1.3 GB, resumable), and check optional tools (yt-dlp, ffmpeg)
+  --force                        # Download the browser again even if it is installed
+  --check                        # Only report what is installed; download nothing
+
+dino clip cookies-list             # List the sites with saved clip cookies (domains and cookie names only; values are never shown)
+
+dino clip cookies-import <file>    # Import a Netscape cookies.txt (exported from your browser) so clips of those sites are fetched logged in
+  --domain <domain>              # Import only cookies for this domain and its subdomains
+
+dino clip cookies-set <domain> <header> # Save a site's Cookie request header (copied from browser devtools), replacing that site's saved cookies
+
+dino clip cookies-remove [domain]  # Remove the saved clip cookies of a domain (and its subdomains), or all of them
+  --all                          # Remove every saved clip cookie
 ```
 
 ### Config

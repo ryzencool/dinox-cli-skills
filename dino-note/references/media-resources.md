@@ -64,15 +64,15 @@ After reviewing a preview, repeat only the approved upload without `--dry-run`.
 
 ## Parser-Friendly Markdown Forms
 
-Prefer the following forms because they are compatible with the current
-markdown-to-json pipeline.
+Write media the way every Dinox app stores it in `content_md`: a media block is
+one line of HTML on its own (blank line before and after), carrying the
+resource attributes as `data-*`. Older forms (a link plus a `<!-- {...} -->`
+comment) still read, but do not write them.
 
 ### Image
 
-Use standard markdown image syntax plus Dinox metadata comment:
-
 ```md
-![Cover](https://bucket.example.com/assets/user/images/cover.jpg)<!-- {"kind":"image","resourceId":"<resourceId>","widthPercent":66} -->
+<img src="https://bucket.example.com/assets/user/images/cover.jpg" alt="Cover" data-type="image" data-resource-id="RESOURCE_ID" data-storage-key="STORAGE_KEY" data-width-percent="66">
 ```
 
 Notes:
@@ -80,34 +80,18 @@ Notes:
 - Use the uploaded `storageUrl` as the image `src`.
 - `thumbnailUrl` is for preview/metadata; do not replace the main image with the
   thumbnail unless the user explicitly wants a thumbnail-sized image.
-- The current image metadata comment preserves `resourceId`. Keep `storageKey`
-  in the working context/output even though it is not embedded in this image form.
+- An image with no resource attributes is plain Markdown: `![Cover](https://…)`.
 
 ### Audio
 
-Prefer HTML audio blocks so both `resourceId` and `storageKey` survive parsing:
-
 ```md
-<audio
-  src="https://bucket.example.com/assets/user/audios/demo.m4a"
-  preload="metadata"
-  data-resource-id="<resourceId>"
-  data-storage-key="<storageKey>"
-></audio>
+<audio controls src="https://bucket.example.com/assets/user/audios/demo.m4a" title="Demo" data-type="audio" data-resource-id="RESOURCE_ID" data-storage-key="STORAGE_KEY"></audio>
 ```
 
 ### Video
 
-Prefer HTML video blocks so both `resourceId` and `storageKey` survive parsing:
-
 ```md
-<video
-  src="https://bucket.example.com/assets/user/videos/demo.mp4"
-  poster="https://bucket.example.com/assets/user/videos/thumb/demo_thumbnail.webp"
-  data-resource-id="<resourceId>"
-  data-storage-key="<storageKey>"
-  controls
-></video>
+<video src="https://bucket.example.com/assets/user/videos/demo.mp4" title="Demo" poster="https://bucket.example.com/assets/user/videos/thumb/demo_thumbnail.webp" data-resource-id="RESOURCE_ID" data-storage-key="STORAGE_KEY"></video>
 ```
 
 If an uploaded image thumbnail exists, it is reasonable to use `thumbnailUrl` as
@@ -115,17 +99,13 @@ the `poster`.
 
 ### File
 
-Use a normal markdown link plus Dinox metadata comment:
-
 ```md
-[Quarterly Report.pdf](https://bucket.example.com/assets/user/files/report.pdf)<!-- {"kind":"file","resourceId":"<resourceId>"} -->
+<a href="https://bucket.example.com/assets/user/files/report.pdf" type="application/pdf" data-type="file" data-resource-id="RESOURCE_ID" data-storage-key="STORAGE_KEY">Quarterly Report.pdf</a>
 ```
 
 Notes:
 
-- Use the uploaded `storageUrl` as the link target.
-- Keep `storageKey` in the working context/output even though the current file
-  metadata comment only embeds `resourceId`.
+- Use the uploaded `storageUrl` as the link target; the link text is the file name.
 
 ## Create Or Patch Integration
 

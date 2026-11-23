@@ -318,7 +318,7 @@ dino note delete <id>              # Soft-delete a note by setting is_del=1
 ### Todo
 ```text
 dino todo search [query]           # Search todo tasks extracted from note content
-  --status <status>              # Task status: all | completed | uncompleted
+  --status <list>                # Statuses to keep, comma-separated: backlog,todo,in_progress,done,cancelled (omit for every status)
   --tags <string|@file>          # Tags every task must carry, via its own #tag or its note's tags (JSON array or comma/newline-separated)
   --priority <list>              # Priorities to keep, comma-separated: high,medium,low,none
   --from <date>                  # Task date range start (YYYY-MM-DD or ISO datetime); matches tasks whose schedule overlaps the range
@@ -332,7 +332,7 @@ dino todo search [query]           # Search todo tasks extracted from note conte
 dino todo append [task]            # Add tasks to today's daily todo note, a given note, or under a task as subtasks
   --task <text>                  # Repeatable task text (inline Markdown: #tag, links, [#A] priority cookie)
   --tasks <string|@file>         # Task list (JSON array or comma/newline-separated)
-  --items <json|@file>           # Structured tasks: JSON array of {text, checked?, priority?, schedule?: {date, time?}, subtasks?: [...]}
+  --items <json|@file>           # Structured tasks: JSON array of {text, status?, priority?, schedule?: {date, time?}, subtasks?: [...]} (status: backlog|todo|in_progress|done|cancelled, default todo)
   --priority <priority>          # Priority for --task/--tasks: high|medium|low
   --due <date>                   # Due date for --task/--tasks (local YYYY-MM-DD)
   --time <HH:mm>                 # Due clock time with --due (local HH:mm); omit for an all-day due date
@@ -345,7 +345,7 @@ dino todo append [task]            # Add tasks to today's daily todo note, a giv
 dino todo create [task]            # Create a new note containing one or more todo items
   --task <text>                  # Repeatable task text (inline Markdown: #tag, links, [#A] priority cookie)
   --tasks <string|@file>         # Task list (JSON array or comma/newline-separated)
-  --items <json|@file>           # Structured tasks: JSON array of {text, checked?, priority?, schedule?: {date, time?}, subtasks?: [...]}
+  --items <json|@file>           # Structured tasks: JSON array of {text, status?, priority?, schedule?: {date, time?}, subtasks?: [...]} (status: backlog|todo|in_progress|done|cancelled, default todo)
   --priority <priority>          # Priority for --task/--tasks: high|medium|low
   --due <date>                   # Due date for --task/--tasks (local YYYY-MM-DD)
   --time <HH:mm>                 # Due clock time with --due (local HH:mm); omit for an all-day due date
@@ -353,8 +353,8 @@ dino todo create [task]            # Create a new note containing one or more to
   --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
-dino todo update [taskId]          # Update a task's status, priority, or due time by task id (checking cascades to subtasks)
-  --status <status>              # Target status: completed|uncompleted|done|undone|true|false|1|0
+dino todo update [taskId]          # Update a task's status, priority, or due time by task id (closing cascades to subtasks, reopening to parents)
+  --status <status>              # Set the status: backlog|todo|in_progress|done|cancelled
   --priority <priority>          # Set priority: high|medium|low, or none to clear
   --due <date>                   # Set the due date (local YYYY-MM-DD)
   --time <HH:mm>                 # Due clock time with --due (local HH:mm); omit for an all-day due date

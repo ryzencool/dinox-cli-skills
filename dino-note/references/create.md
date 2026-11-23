@@ -27,7 +27,15 @@ dino note create                   # Create a new note from markdown content or 
 - Title
 - Markdown content, unless the note is created from a template (`--template <id>`)
 
-Markdown fenced code blocks with `mermaid` or `mindgraph` languages are preserved as structured atomic note nodes.
+Markdown fenced code blocks with `mermaid` or `mindgraph` languages are stored as diagram code blocks that the apps draw.
+
+Dinox blocks beyond plain Markdown (the same forms `dino note export` writes):
+
+- Callout: `> [!NOTE]` then `> ` body lines; kinds `NOTE`, `TIP`, `IMPORTANT`, `WARNING`, `CAUTION`.
+- Columns (side by side in the apps): a `<div data-type="columns">` holding two or more `<div data-type="column">` blocks, each container's tags on their own lines with blank lines around the Markdown inside. `data-width="1.5"` on a column sets its relative width (the columns average 1). A list with fewer than two columns is stored as its blocks.
+- Toggle: `<details><summary>Title</summary>` … `</details>`.
+
+YAML front matter at the top of the content (`---` … `---`) is note metadata, not body text: `tags` join `--tags` (validated the same way), every other key becomes a note property (a missing property definition is created, dates as datetime), and the body is stored without it. `title` is not read from front matter; pass `--title`. Invalid YAML fails with `USAGE_ERROR`. Values in `--properties` win over front matter keys with the same name.
 
 ## Optional Inputs
 

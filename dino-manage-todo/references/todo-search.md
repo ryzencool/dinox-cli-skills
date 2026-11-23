@@ -5,7 +5,7 @@ Use this generated command surface as the canonical interface for todo search.
 
 ```text
 dino todo search [query]           # Search todo tasks extracted from note content
-  --status <status>              # Task status: all | completed | uncompleted
+  --status <list>                # Statuses to keep, comma-separated: backlog,todo,in_progress,done,cancelled (omit for every status)
   --tags <string|@file>          # Tags every task must carry, via its own #tag or its note's tags (JSON array or comma/newline-separated)
   --priority <list>              # Priorities to keep, comma-separated: high,medium,low,none
   --from <date>                  # Task date range start (YYYY-MM-DD or ISO datetime); matches tasks whose schedule overlaps the range
@@ -36,6 +36,7 @@ dino todo search [query]           # Search todo tasks extracted from note conte
 
 ## Notes
 
+- `--status todo,in_progress` keeps those statuses (any of `backlog`, `todo`, `in_progress`, `done`, `cancelled`); omit it to keep every status. Open tasks are `--status backlog,todo,in_progress`; closed ones `--status done,cancelled`
 - `--tags` matches a task's own `#tag` or its note's tags (a leading `#` and letter case are ignored); every listed tag must match
 - A query matches the task text or its note title
 - `--priority high,medium` keeps those priorities; `none` keeps tasks without one

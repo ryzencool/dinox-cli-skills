@@ -5,7 +5,7 @@ description: >
   daemon, gateway, graph, metadata, bootstrap; never domain work.
 license: ISC
 metadata:
-  version: "2.20.2"
+  version: "3.0.0"
   dinox-cli-help: "dino --help"
   category: "bootstrap"
   risk: "mixed"

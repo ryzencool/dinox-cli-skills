@@ -7,7 +7,7 @@ Use these generated commands as the canonical mutation interfaces for todo workf
 dino todo append [task]            # Add tasks to today's daily todo note, a given note, or under a task as subtasks
   --task <text>                  # Repeatable task text (inline Markdown: #tag, links, [#A] priority cookie)
   --tasks <string|@file>         # Task list (JSON array or comma/newline-separated)
-  --items <json|@file>           # Structured tasks: JSON array of {text, checked?, priority?, schedule?: {date, time?}, subtasks?: [...]}
+  --items <json|@file>           # Structured tasks: JSON array of {text, status?, priority?, schedule?: {date, time?}, subtasks?: [...]} (status: backlog|todo|in_progress|done|cancelled, default todo)
   --priority <priority>          # Priority for --task/--tasks: high|medium|low
   --due <date>                   # Due date for --task/--tasks (local YYYY-MM-DD)
   --time <HH:mm>                 # Due clock time with --due (local HH:mm); omit for an all-day due date
@@ -20,7 +20,7 @@ dino todo append [task]            # Add tasks to today's daily todo note, a giv
 dino todo create [task]            # Create a new note containing one or more todo items
   --task <text>                  # Repeatable task text (inline Markdown: #tag, links, [#A] priority cookie)
   --tasks <string|@file>         # Task list (JSON array or comma/newline-separated)
-  --items <json|@file>           # Structured tasks: JSON array of {text, checked?, priority?, schedule?: {date, time?}, subtasks?: [...]}
+  --items <json|@file>           # Structured tasks: JSON array of {text, status?, priority?, schedule?: {date, time?}, subtasks?: [...]} (status: backlog|todo|in_progress|done|cancelled, default todo)
   --priority <priority>          # Priority for --task/--tasks: high|medium|low
   --due <date>                   # Due date for --task/--tasks (local YYYY-MM-DD)
   --time <HH:mm>                 # Due clock time with --due (local HH:mm); omit for an all-day due date
@@ -28,8 +28,8 @@ dino todo create [task]            # Create a new note containing one or more to
   --durability <local|uploaded>  # Required write durability before success: local saves to the local DB; uploaded waits for the PowerSync upload queue to drain
   --dry-run                      # Preview the write without executing it
 
-dino todo update [taskId]          # Update a task's status, priority, or due time by task id (checking cascades to subtasks)
-  --status <status>              # Target status: completed|uncompleted|done|undone|true|false|1|0
+dino todo update [taskId]          # Update a task's status, priority, or due time by task id (closing cascades to subtasks, reopening to parents)
+  --status <status>              # Set the status: backlog|todo|in_progress|done|cancelled
   --priority <priority>          # Set priority: high|medium|low, or none to clear
   --due <date>                   # Set the due date (local YYYY-MM-DD)
   --time <HH:mm>                 # Due clock time with --due (local HH:mm); omit for an all-day due date
@@ -43,7 +43,7 @@ dino todo update [taskId]          # Update a task's status, priority, or due ti
 - Run the same command with `--sync-timeout 20000 --dry-run --format json` first and keep the host timeout 5-10 seconds higher.
 - For append without `--note-id`/`--parent`, tasks go to the daily todo note for today (or `--date`), which is created when that day has none; prefer an explicit target when the user names a note.
 - Use `--items` for structured tasks (priority, schedule, subtasks); `--priority`/`--due`/`--time` apply to plain `--task`/`--tasks` text.
-- Checking a task also checks its subtasks; unchecking one also unchecks its checked parents. Report `cascaded_task_ids` to the user.
+- A task status is one of backlog, todo, in_progress, done, cancelled. Setting done or cancelled closes its open subtasks the same way (already-closed ones keep their status); setting an open status reopens its closed parents as todo; backlog and in_progress never cascade down. Report `cascaded_task_ids` to the user.
 - For update, pass the `note_id` returned by todo search as `--note-id` when available; broad task lookup is bounded and refuses truncated results. Legacy ids bind to the searched task snapshot, so search again after the note changes.
 <!-- END GENERATED_COMMANDS -->
 
@@ -73,4 +73,4 @@ dino todo update [taskId]          # Update a task's status, priority, or due ti
 
 ## Cascade
 
-Checking a task checks all of its subtasks; unchecking a task also unchecks its checked parents. Parents never complete automatically. The tasks flipped this way are in `cascaded_task_ids`.
+Setting `done` or `cancelled` closes every open subtask with that same status; subtasks already closed keep theirs (a cancelled subtask stays cancelled when its parent is done). Setting an open status (`backlog`, `todo`, `in_progress`) reopens closed parents as `todo` and leaves subtasks alone, so `backlog` and `in_progress` never cascade down. Parents never complete automatically. The tasks changed this way are in `cascaded_task_ids`.

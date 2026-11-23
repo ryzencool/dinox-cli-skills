@@ -5,7 +5,7 @@ description: >
   complete, or reopen tasks; set priority, due dates, subtasks. Not note editing.
 license: ISC
 metadata:
-  version: "2.20.2"
+  version: "3.0.0"
   dinox-cli-help: "dino todo --help"
   category: "todo"
   risk: "mixed"
@@ -44,7 +44,7 @@ metadata:
 - Search / browse todos -> `dino todo search`
 - Add tasks to today's daily todo note, a named note, or under a task -> `dino todo append`
 - Create a new todo note -> `dino todo create`
-- Mark task done / undone, set or clear priority, set or clear the due date -> `dino todo update`
+- Change a task's status (complete, reopen, cancel, defer to backlog, start), set or clear priority, set or clear the due date -> `dino todo update --status <status>`
 - Several task changes at once -> `dino todo update --updates <json|@file>`
 
 ## Important Principles
@@ -56,6 +56,7 @@ metadata:
 5. Todo mutations return write receipts with `durability`, `upload_queue_remaining`, `version`, `content_hash`, `changed`, and `stale`.
 6. Use `--durability uploaded` only when the user needs cloud upload completion before success; otherwise report the returned local/upload state.
 7. Todo search is bounded by both task `limit` and note `scan-limit`. A truncated search cannot prove that a task is absent or that a count is exact.
+8. A task's `status` is exactly one of `backlog`, `todo`, `in_progress`, `done`, `cancelled`. `done` and `cancelled` are closed; the rest are open. Map "complete" to `done`, "reopen" to `todo`, "drop/won't do" to `cancelled`, "later/someday" to `backlog`, "start/doing" to `in_progress`.
 
 ## Workflow Router
 

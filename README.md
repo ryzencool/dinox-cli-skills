@@ -183,7 +183,7 @@ skills/BEST_PRACTICES.md
 > /dino-manage-todo 搜索最近 7 天未完成且带 work 标签的任务
 > /dino-manage-todo 创建一个待办笔记，任务：补交报销单、整理发票
 > /dino-manage-todo 在笔记 01924f8a-... 末尾追加任务：联系供应商
-> /dino-manage-todo 把 task-uuid 更新为 completed
+> /dino-manage-todo 把 task-uuid 更新为 done
 > /dino-storage list
 > /dino-storage test --storage-id 0199...
 > /dino-storage upload ./report.pdf --storage-id 0199... --category files

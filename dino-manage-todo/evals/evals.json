@@ -48,7 +48,7 @@
       "query": "Mark Dinox task task_abc as complete.",
       "should_trigger": true,
       "expected_skills": ["dino-manage-todo"],
-      "reason": "Changing a todo item's checked state is a todo mutation."
+      "reason": "Changing a todo item's status is a todo mutation."
     },
     {
       "id": "todo-train-note-edit",

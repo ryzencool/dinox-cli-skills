@@ -58,10 +58,15 @@ unavailable. Branch on the structured `code` and `recoverable` fields and follow
 | `EDITOR_ANCHOR_AMBIGUOUS` | 2 | The suggestion anchor occurs more than once in the open note. |
 | `EDITOR_ANCHOR_MISSING` | 2 | The suggestion anchor does not occur in the open note. |
 | `EDITOR_INVALID_DOCUMENT` | 2 | The editor document cannot be saved without losing content. |
+| `EDITOR_LINK_PREVIEW_BLOCKED` | 2 | The link preview URL is not a public http(s) address (loopback, private and link-local hosts are refused). |
+| `EDITOR_LINK_PREVIEW_FAILED` | 1 | Fetching the page for a link preview failed or timed out. |
 | `EDITOR_NOTE_NOT_OPEN` | 5 | The editor session has no open note. |
 | `EDITOR_STALE_SEQUENCE` | 5 | The editor request targets a note the session has since replaced. |
 | `EDITOR_UNKNOWN_BLOCK` | 2 | The suggestion targets a block that is no longer in the open note. |
 | `EDITOR_UNSAVED_CHANGES` | 5 | The editor session has unsaved changes. |
+| `EDITOR_UPLOAD_FAILED` | 1 | Uploading the editor panel's file to Dinox storage failed. |
+| `EDITOR_UPLOAD_INVALID` | 2 | The editor upload has no data, invalid base64, or a missing name / media type. |
+| `EDITOR_UPLOAD_TOO_LARGE` | 2 | The editor upload exceeds its size limit (25 MB for images, 500 MB otherwise). |
 | `INTERNAL_ERROR` | 1 | Unexpected internal error; not a DinoxError. |
 | `INVALID_ARGUMENT` | 2 | An argument or option value is invalid. |
 | `INVALID_PROPERTY_DEF_CONFIG` | 1 | A property definition config could not be serialized. |

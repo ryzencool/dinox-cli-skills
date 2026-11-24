@@ -6,7 +6,7 @@ description: >
   settings.
 license: ISC
 metadata:
-  version: "3.5.0"
+  version: "3.5.1"
   dinox-cli-help: "dino sync --help"
   category: "sync"
   risk: "write"
